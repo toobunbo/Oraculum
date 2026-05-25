@@ -1,0 +1,12 @@
+model: "ollama/deepseek-r1:7b"
+
+temperature: 0.0    # hoàn toàn deterministic
+max_tokens: 8192    
+timeout: 180
+
+prompts_dir: "config/prompts"
+
+signatures_csv: "output/{lang}/{repo}/context/signatures_function.csv"
+functions_csv:  "output/{lang}/{repo}/context/functions.csv"
+
+oracle_spec_out: "output/{lang}/{repo}/oraculum/finding_{id}_{rule_id}/oracle_spec.json"

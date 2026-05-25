@@ -1,0 +1,15 @@
+## Security Finding
+
+{finding_json}
+
+## Answers (pre-traced data flow)
+
+{answers}
+
+## Target Function Signature
+
+{function_signature}
+
+## Input Strategy: {input_strategy}
+
+Produce oracle_spec JSON only.
