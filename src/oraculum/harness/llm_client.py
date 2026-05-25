@@ -1,6 +1,8 @@
-import re
 import logging
+import re
+
 from litellm import completion
+
 
 def call_llm(system_prompt: str, user_prompt: str, model: str,
              temperature: float = 0.2, max_tokens: int = 2048,
@@ -38,4 +40,4 @@ def validate_harness(code: str) -> None:
     try:
         compile(code, "<harness>", "exec")
     except SyntaxError as e:
-        raise ValueError(f"LLM generated invalid Python:\n{e}\n\n{code}")
+        raise ValueError(f"LLM generated invalid Python:\n{e}\n\n{code}") from e

@@ -85,6 +85,8 @@ output/python/<repo>/oraculum/ingest/
     finding_<id>_<rule_slug>.json
 ```
 
+Detailed implementation plan: [`ingest_design.md`](ingest_design.md).
+
 ## Stage 1: Oracle
 
 Oracle generation converts verified finding evidence into a structured runtime oracle specification.

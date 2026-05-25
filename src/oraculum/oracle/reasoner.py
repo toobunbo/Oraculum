@@ -1,10 +1,15 @@
-import json, yaml, os
+import json
 import logging
+import os
 from pathlib import Path
-from .csv_loader        import load_signatures, load_functions
+
+import yaml
+
+from .csv_loader import load_functions, load_signatures
+from .llm_client import call_llm, parse_oracle_spec, validate_oracle_spec
+from .prompt_builder import build_user_prompt, load_system_prompt
 from .signature_builder import build_signature, get_input_strategy
-from .prompt_builder    import load_system_prompt, build_user_prompt
-from .llm_client        import call_llm, parse_oracle_spec, validate_oracle_spec
+
 
 def run(finding_path: str, config_path: str = "config/oracle.yaml") -> dict:
     config       = yaml.safe_load(Path(config_path).read_text())

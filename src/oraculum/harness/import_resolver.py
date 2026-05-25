@@ -1,5 +1,6 @@
 import os
 
+
 def resolve_import(file_path: str, function_name: str, repo_root: str) -> str:
     """
     Convert file path + function name -> Python import statement.

@@ -1,7 +1,8 @@
 import json
-import os
 from pathlib import Path
+
 from jinja2 import Environment, FileSystemLoader
+
 from .import_resolver import resolve_import
 
 # "os" added — template __main__ block requires it for corpus export

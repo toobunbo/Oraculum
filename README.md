@@ -28,6 +28,70 @@ VulnHunterX/output/python/<repo>/verification_results/
 Oraculum does not clone repositories, create CodeQL databases, run CodeQL,
 Semgrep, OpenGrep, or re-run LLM verification.
 
+## Quick Start
+
+### Prerequisites
+
+- Python 3.10+; Python 3.12 is recommended for consistency with VulnHunterX.
+- A VulnHunterX checkout that has already run `prepare`, `analyze`, and `verify`.
+- An LLM provider key is not needed for `ingest`, but will be needed for later oracle/harness stages.
+
+### Install
+
+```bash
+git clone https://github.com/toobunbo/Oraculum.git && cd Oraculum
+uv venv --python python3.12 .venv && source .venv/bin/activate
+uv pip install -e ".[dev]"
+
+oraculum --help
+```
+
+> Requires [uv](https://docs.astral.sh/uv/) (`curl -LsSf https://astral.sh/uv/install.sh | sh`).
+> Plain `python3.12 -m venv .venv` + `pip install -e ".[dev]"` also works if you do not want to install `uv`.
+
+### First Ingest
+
+Configure the VulnHunterX root for your machine:
+
+```bash
+export ORACULUM_VHX_ROOT=/path/to/VulnHunterX
+```
+
+Run from the Oraculum project root:
+
+```bash
+oraculum ingest \
+  --repo Benchmark \
+  --lang python \
+  --verdict TP
+```
+
+You can still override the environment value per command with `--vhx-root`.
+
+For a local smoke test without writing into the repo output directory:
+
+```bash
+oraculum ingest \
+  --repo Benchmark \
+  --lang python \
+  --verdict TP \
+  --output-dir /tmp/oraculum-ingest-smoke \
+  --force
+```
+
+Expected output:
+
+```text
+Ingest Oraculum inputs
+  VulnHunterX root: /home/caterpie/VulnHunterX
+  Repo: python/Benchmark
+  Summary: /home/caterpie/VulnHunterX/output/python/Benchmark/verification_results/summary_Benchmark_20260523_134754.json
+  Verdict filter: TP
+
+Done. selected=2 enriched=2 skipped=0 failed=0
+Output: /tmp/oraculum-ingest-smoke/python/Benchmark/oraculum/ingest/summary.json
+```
+
 ## Planned Stages
 
 ### Stage 0: Ingest
@@ -86,15 +150,15 @@ output/python/<repo>/oraculum/
     └── corpus/
 ```
 
-## Planned CLI
+## CLI
 
 ```bash
 oraculum ingest \
-  --vhx-root /path/to/VulnHunterX \
   --repo Benchmark \
   --lang python \
   --verdict TP
 
+# Planned next stages:
 oraculum oracle --repo Benchmark
 
 oraculum harness --repo Benchmark
@@ -114,5 +178,6 @@ ingest -> oracle -> harness
 
 ## Current Status
 
-Architecture planning is in progress. See
+`ingest` is implemented. Oracle and harness stages are being migrated from the
+prototype. See
 [`docs/plan/architecture.md`](docs/plan/architecture.md).

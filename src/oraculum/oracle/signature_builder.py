@@ -1,4 +1,5 @@
-from .csv_loader import SigRow, FuncRow
+from .csv_loader import FuncRow, SigRow
+
 
 def build_signature(function_name: str, file: str, signatures: list[SigRow]) -> str:
     params = [r for r in signatures

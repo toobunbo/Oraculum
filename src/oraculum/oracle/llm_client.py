@@ -1,6 +1,9 @@
-import json, re
+import json
 import logging
+import re
+
 from litellm import completion
+
 
 def call_llm(system_prompt: str, user_prompt: str, model: str,
              temperature: float = 0.2, max_tokens: int = 1024, timeout: int = 60) -> str:

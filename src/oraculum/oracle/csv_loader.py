@@ -1,6 +1,7 @@
 import csv
 from typing import NamedTuple
 
+
 class SigRow(NamedTuple):
     name: str
     file: str

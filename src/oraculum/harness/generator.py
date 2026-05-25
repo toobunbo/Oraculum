@@ -1,10 +1,12 @@
 import json
-import yaml
 import logging
 import os
 from pathlib import Path
+
+import yaml
+
+from .llm_client import call_llm, extract_code, validate_harness
 from .template_builder import build_skeleton
-from .llm_client       import call_llm, extract_code, validate_harness
 
 
 def run(finding_path: str, spec_path: str,
@@ -79,7 +81,7 @@ def run(finding_path: str, spec_path: str,
         logging.info(f"[Stage2] corpus    : {corpus_dir} ({len(seed_corpus)} seeds)")
 
     logging.info(f"[Stage2] output    : {out}")
-    logging.info(f"\n[Stage2] Run with:")
+    logging.info("\n[Stage2] Run with:")
     logging.info(f"  python {out} -atheris_runs=10000")
     if seed_corpus:
         logging.info(f"  python {out} {corpus_dir}")
