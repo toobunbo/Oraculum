@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 
 from oraculum import __version__
-from oraculum.cli.commands import cmd_ingest, cmd_oracle
+from oraculum.cli.commands import cmd_harness, cmd_ingest, cmd_oracle
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -101,6 +101,58 @@ def create_parser() -> argparse.ArgumentParser:
         help="Overwrite existing oracle JSON files",
     )
     oracle_parser.set_defaults(func=cmd_oracle)
+
+    harness_parser = subparsers.add_parser(
+        "harness",
+        help="Generate Atheris fuzz harnesses for generated oracle specs",
+    )
+    harness_parser.add_argument("--repo", required=True, help="Repository name")
+    harness_parser.add_argument(
+        "--lang",
+        default="python",
+        choices=["python"],
+        help="Repository language (currently only python)",
+    )
+    harness_parser.add_argument(
+        "--output-dir",
+        default="output",
+        help="Oraculum output directory",
+    )
+    harness_parser.add_argument(
+        "--oracle-status",
+        help="Explicit oracle status JSON path",
+    )
+    harness_parser.add_argument(
+        "--target-id",
+        help="Generate harness for one oracle target id",
+    )
+    harness_parser.add_argument(
+        "--finding-id",
+        help="Generate harnesses for one ingested finding id",
+    )
+    harness_parser.add_argument(
+        "--oracle",
+        help="Generate harness for one explicit oracle JSON path",
+    )
+    harness_parser.add_argument(
+        "--config",
+        default="config/harness.yaml",
+        help="Harness config path",
+    )
+    harness_parser.add_argument(
+        "--model",
+        help="Override LLM model for this run",
+    )
+    harness_parser.add_argument(
+        "--log-file",
+        help="Write harness LLM audit details to a Markdown log file",
+    )
+    harness_parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Overwrite existing harness files",
+    )
+    harness_parser.set_defaults(func=cmd_harness)
     return parser
 
 

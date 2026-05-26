@@ -14,6 +14,10 @@ from unittest.mock import patch, MagicMock
 {{ imp }}
 {% endfor %}
 
+REPO_ROOT = {{ repo_root | tojson }}
+if REPO_ROOT and REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+
 with atheris.instrument_imports():
 {% for stmt in import_stmts %}
     {{ stmt }}
@@ -125,7 +129,7 @@ _SEED_CORPUS = [
 if __name__ == "__main__":
     # Export seed corpus to disk so libFuzzer can mutate raw bytes directly.
     # This preserves coverage-guided mutation — fuzzer mutates content, not index.
-    _CORPUS_DIR = os.path.join(os.path.dirname(__file__), "fuzz_corpus")
+    _CORPUS_DIR = {{ corpus_dir | tojson }}
     os.makedirs(_CORPUS_DIR, exist_ok=True)
     for _i, _seed in enumerate(_SEED_CORPUS):
         _seed_path = os.path.join(_CORPUS_DIR, f"seed_{_i:03d}")

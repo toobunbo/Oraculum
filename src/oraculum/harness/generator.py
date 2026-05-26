@@ -5,8 +5,11 @@ from pathlib import Path
 
 import yaml
 
-from .llm_client import call_llm, extract_code, validate_harness
-from .template_builder import build_skeleton
+from oraculum.harness.paths import resolve_harness_paths
+from oraculum.harness.runner import generate_one_harness
+from oraculum.oracle.paths import target_id_for_artifact
+
+from .llm_client import validate_harness
 
 
 def run(finding_path: str, spec_path: str,
@@ -28,49 +31,33 @@ def run(finding_path: str, spec_path: str,
     f        = finding["finding"]
     repo     = f["repo_name"]
     lang     = f["lang"]
-    rule_id  = f["rule_id"].replace("/", "_")
-    function = f.get("function_name", "unknown")          # ← fix: KeyError → ""unknown""
-    finding_id = f.get("id", "0")
-
-    repo_root = config.get("repo_root", "").format(lang=lang, repo=repo)
+    function = finding.get("function", {}).get("name", "unknown")
+    target_id = spec.get("_meta", {}).get("target_id") or target_id_for_artifact(finding)
+    output_dir = Path(os.environ.get("ORACULUM_OUTPUT_DIR", "output"))
+    paths = resolve_harness_paths(output_dir=output_dir, lang=lang, repo=repo)
+    out = paths.fuzz_targets_dir / f"{target_id}.py"
+    corpus_dir = paths.fuzz_corpus_dir / target_id
 
     logging.info(f"[Stage2] function  : {function}")
     logging.info(f"[Stage2] rule_id   : {f['rule_id']}")
     logging.info(f"[Stage2] strategy  : {spec.get('_meta', {}).get('input_strategy')}"
                  f" / {spec.get('monitor', {}).get('strategy')}")
 
-    # 1. Pre-fill skeleton
-    skeleton = build_skeleton(finding, spec, repo_root)
     logging.info(f"[Stage2] skeleton built, calling {config['model']} ...")
 
-    # 2. Load prompts
-    prompts_dir = config["prompts_dir"]
-
-    strategy = spec.get("monitor", {}).get("strategy", "inspect_return")
-    if strategy == "patch_call":
-        system_file = "harness_system_patch_call.txt"
-    else:
-        system_file = "harness_system_inspect_return.txt"
-
-    system_p  = Path(prompts_dir, system_file).read_text(encoding="utf-8")
-    user_tmpl = Path(prompts_dir, "harness_user.txt").read_text(encoding="utf-8")
-    user_p    = user_tmpl.format(skeleton=skeleton)
-
-    # 3. Call LLM
-    raw  = call_llm(system_p, user_p, config["model"],
-                    config["temperature"], config["max_tokens"], config["timeout"])
-    code = extract_code(raw)
-
-    # 4. Validate syntax
+    code = generate_one_harness(
+        artifact=finding,
+        oracle_spec=spec,
+        corpus_dir=corpus_dir,
+        config=config,
+        prompts_dir=Path(config["prompts_dir"]),
+        model=config["model"],
+    )
     validate_harness(code)
 
-    # 5. Write harness output
-    out = Path(config["harness_out"].format(lang=lang, repo=repo, id=finding_id, rule_id=rule_id))
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(code, encoding="utf-8")
 
-    # 6. Write seed corpus
-    corpus_dir = out.parent / "corpus"
     seed_corpus = spec.get("fuzz_guidance", {}).get("seed_corpus", [])
     if seed_corpus:
         corpus_dir.mkdir(parents=True, exist_ok=True)

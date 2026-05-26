@@ -154,6 +154,8 @@ output/python/<repo>/fuzz_corpus/<rule_slug>_<file_slug>_<line>/
 output/python/<repo>/fuzz_results/summary.json
 ```
 
+Detailed implementation plan: [`harness_design.md`](harness_design.md).
+
 ## Data Contracts
 
 ### Verified Finding

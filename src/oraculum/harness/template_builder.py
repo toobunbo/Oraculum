@@ -5,20 +5,24 @@ from jinja2 import Environment, FileSystemLoader
 
 from .import_resolver import resolve_import
 
-# "os" added — template __main__ block requires it for corpus export
 TEMPLATE_BUILTINS = {"re", "sys", "atheris", "os"}
 
 
-def build_skeleton(finding: dict, spec: dict, repo_root: str) -> str:
-    f      = finding["finding"]
+def build_skeleton(
+    artifact: dict,
+    spec: dict,
+    repo_root: str,
+    corpus_dir: str,
+) -> str:
+    f      = artifact["finding"]
     meta    = spec.get("_meta", {})
     monitor = spec.get("monitor", {})
     oracle  = spec.get("oracle_check", {})
     fuzz    = spec.get("fuzz_guidance", {})
 
     rule_id          = f.get("rule_id", "Unknown")
-    function_name    = meta.get("function", "")
-    file_path        = meta.get("file", "")
+    function_name    = meta.get("function") or artifact.get("function", {}).get("name", "")
+    file_path        = meta.get("file") or f.get("file", "")
     input_strategy   = meta.get("input_strategy", "direct_params")
     monitor_strategy = monitor.get("strategy", "inspect_return")
 
@@ -65,6 +69,8 @@ def build_skeleton(finding: dict, spec: dict, repo_root: str) -> str:
         file_path          = file_path,
         extra_imports      = extra_imports,
         import_stmts       = import_stmts,
+        repo_root          = repo_root,
+        corpus_dir         = corpus_dir,
         input_strategy     = input_strategy,
         monitor_strategy   = monitor_strategy,
         patch_target       = monitor.get("patch_target"),
