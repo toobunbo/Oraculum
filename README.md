@@ -57,6 +57,12 @@ Configure the VulnHunterX root for your machine:
 export ORACULUM_VHX_ROOT=/path/to/VulnHunterX
 ```
 
+Or put it in a local `.env` file at the Oraculum project root:
+
+```bash
+ORACULUM_VHX_ROOT=/path/to/VulnHunterX
+```
+
 Run from the Oraculum project root:
 
 ```bash

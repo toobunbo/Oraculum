@@ -263,12 +263,46 @@ def test_ingest_cli_reads_vhx_root_from_env(
     assert (output_dir / "python/demo/oraculum/ingest/summary.json").is_file()
 
 
+def test_ingest_cli_reads_vhx_root_from_dotenv(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    vhx_root = _make_vhx_fixture(tmp_path)
+    output_dir = tmp_path / "output"
+    workdir = tmp_path / "workspace"
+    workdir.mkdir()
+    (workdir / ".env").write_text(f"ORACULUM_VHX_ROOT={vhx_root}\n", encoding="utf-8")
+    monkeypatch.delenv("ORACULUM_VHX_ROOT", raising=False)
+    monkeypatch.delenv("VHX_ROOT", raising=False)
+    monkeypatch.chdir(workdir)
+
+    rc = main(
+        [
+            "ingest",
+            "--repo",
+            "demo",
+            "--lang",
+            "python",
+            "--output-dir",
+            str(output_dir),
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert rc == 0
+    assert f"VulnHunterX root: {vhx_root}" in captured.out
+    assert (output_dir / "python/demo/oraculum/ingest/summary.json").is_file()
+
+
 def test_ingest_cli_missing_vhx_root_fails(
+    tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     monkeypatch.delenv("ORACULUM_VHX_ROOT", raising=False)
     monkeypatch.delenv("VHX_ROOT", raising=False)
+    monkeypatch.chdir(tmp_path)
 
     rc = main(["ingest", "--repo", "demo", "--lang", "python"])
 

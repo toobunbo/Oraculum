@@ -7,11 +7,14 @@ import os
 import sys
 from pathlib import Path
 
+from dotenv import find_dotenv, load_dotenv
+
 from oraculum.ingest.runner import IngestError, run_ingest
 
 
 def cmd_ingest(args: argparse.Namespace) -> int:
     """Run the ingest command."""
+    _load_dotenv()
     vhx_root = _resolve_vhx_root(args.vhx_root)
     if vhx_root is None:
         print(
@@ -50,6 +53,13 @@ def cmd_ingest(args: argparse.Namespace) -> int:
     )
     print(f"Output: {result.summary_path}")
     return 0 if result.ok else 1
+
+
+def _load_dotenv() -> None:
+    """Load a local .env file without overriding exported environment variables."""
+    dotenv_path = find_dotenv(usecwd=True)
+    if dotenv_path:
+        load_dotenv(dotenv_path, override=False)
 
 
 def _resolve_vhx_root(cli_value: str | None) -> Path | None:
