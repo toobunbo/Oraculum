@@ -25,7 +25,7 @@ class IngestPaths:
     vhx_context_dir: Path
     vhx_functions_csv: Path
     summary_path: Path
-    oraculum_repo_output: Path
+    repo_output: Path
     ingest_dir: Path
     ingest_findings_dir: Path
     ingest_summary_path: Path
@@ -63,8 +63,8 @@ def resolve_ingest_paths(
         repo=repo,
     )
 
-    oraculum_repo_output = output_dir / lang / repo / "oraculum"
-    ingest_dir = oraculum_repo_output / "ingest"
+    repo_output = output_dir / lang / repo
+    ingest_dir = repo_output / "verification_results"
     ingest_findings_dir = ingest_dir / "findings"
     ingest_summary_path = ingest_dir / "summary.json"
 
@@ -79,7 +79,7 @@ def resolve_ingest_paths(
         vhx_context_dir=vhx_context_dir,
         vhx_functions_csv=vhx_functions_csv,
         summary_path=summary_path,
-        oraculum_repo_output=oraculum_repo_output,
+        repo_output=repo_output,
         ingest_dir=ingest_dir,
         ingest_findings_dir=ingest_findings_dir,
         ingest_summary_path=ingest_summary_path,

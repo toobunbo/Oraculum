@@ -1,6 +1,6 @@
 ## Plan: Oraculum Ingest Stage
 
-**TL;DR** - Add an `oraculum ingest` command that reads VulnHunterX `verify` output, filters selected Python verdicts, enriches each finding with `function_name` from `context/functions.csv`, and writes an Oraculum-owned snapshot under `output/python/<repo>/oraculum/ingest/`. The stage is file-only: it does not run SAST, does not call an LLM, does not generate oracles, and does not mutate VulnHunterX.
+**TL;DR** - Add an `oraculum ingest` command that reads VulnHunterX `verify` output, filters selected Python verdicts, enriches each finding with `function_name` from `context/functions.csv`, and writes an Oraculum-owned snapshot under `output/python/<repo>/verification_results/`. The stage is file-only: it does not run SAST, does not call an LLM, does not generate oracles, and does not mutate VulnHunterX.
 
 **Steps**
 
@@ -59,7 +59,7 @@
      Verdict filter: TP
 
    Done. selected=2 enriched=2 skipped=0 failed=0
-   Output: output/python/Benchmark/oraculum/ingest/summary.json
+   Output: output/python/Benchmark/verification_results/summary.json
    ```
 
 ### Phase 3: VulnHunterX Artifact Resolution
@@ -73,7 +73,7 @@
    <vhx-root>/output/python/<repo>/context/functions.csv
    ```
 
-9. Do not require `signatures_function.csv` in ingest. Current VulnHunterX Python output guarantees `functions.csv`, `callers.csv`, and `classes.csv`; signatures can be handled later during harness generation.
+9. Do not require a function signatures CSV in ingest. Current VulnHunterX Python output guarantees `functions.csv`, `callers.csv`, and `classes.csv`; signatures can be handled later during oracle or harness generation.
 
 10. Summary selection:
     - If `--summary` is provided, accept absolute paths, paths relative to Oraculum cwd, and paths relative to `--vhx-root`.
@@ -151,7 +151,7 @@
 
 24. Write ingest outputs to:
     ```text
-    output/python/<repo>/oraculum/ingest/
+    output/python/<repo>/verification_results/
     ├── summary.json
     └── findings/
         ├── finding_0_py_xxe.json
@@ -193,12 +193,12 @@
 ### Phase 8: Overwrite and Copy Policy
 
 28. Default overwrite behavior:
-    - If `output/python/<repo>/oraculum/ingest/summary.json` already exists, fail and ask for `--force`.
+    - If `output/python/<repo>/verification_results/summary.json` already exists, fail and ask for `--force`.
 
 29. With `--force`:
     - overwrite ingest `summary.json`;
     - overwrite selected per-finding ingest JSON files;
-    - do not delete later-stage artifacts like `oracle_spec.json` or `harness.py`.
+    - do not delete later-stage artifacts like `fuzz_oracles/*.json` or `fuzz_targets/*.py`.
 
 30. Initial copy policy:
     - copy only Oraculum ingest JSON outputs;

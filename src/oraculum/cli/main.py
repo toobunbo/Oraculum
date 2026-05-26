@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 
 from oraculum import __version__
-from oraculum.cli.commands import cmd_ingest
+from oraculum.cli.commands import cmd_ingest, cmd_oracle
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -53,6 +53,54 @@ def create_parser() -> argparse.ArgumentParser:
         help="Overwrite existing ingest summary and selected finding artifacts",
     )
     ingest_parser.set_defaults(func=cmd_ingest)
+
+    oracle_parser = subparsers.add_parser(
+        "oracle",
+        help="Generate runtime oracle specs for ingested findings",
+    )
+    oracle_parser.add_argument("--repo", required=True, help="Repository name")
+    oracle_parser.add_argument(
+        "--lang",
+        default="python",
+        choices=["python"],
+        help="Repository language (currently only python)",
+    )
+    oracle_parser.add_argument(
+        "--output-dir",
+        default="output",
+        help="Oraculum output directory",
+    )
+    oracle_parser.add_argument(
+        "--ingest-summary",
+        help="Explicit ingest summary JSON path",
+    )
+    oracle_parser.add_argument(
+        "--finding-id",
+        help="Generate oracle for one ingested finding id",
+    )
+    oracle_parser.add_argument(
+        "--finding",
+        help="Generate oracle for one enriched finding JSON path",
+    )
+    oracle_parser.add_argument(
+        "--config",
+        default="config/oracle.yaml",
+        help="Oracle config path",
+    )
+    oracle_parser.add_argument(
+        "--model",
+        help="Override LLM model for this run",
+    )
+    oracle_parser.add_argument(
+        "--log-file",
+        help="Write oracle progress details to a Markdown log file",
+    )
+    oracle_parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Overwrite existing oracle JSON files",
+    )
+    oracle_parser.set_defaults(func=cmd_oracle)
     return parser
 
 

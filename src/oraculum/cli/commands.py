@@ -5,11 +5,14 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+from datetime import datetime
 from pathlib import Path
+from typing import TextIO
 
 from dotenv import find_dotenv, load_dotenv
 
 from oraculum.ingest.runner import IngestError, run_ingest
+from oraculum.oracle.runner import OracleError, run_oracle
 
 
 def cmd_ingest(args: argparse.Namespace) -> int:
@@ -55,6 +58,131 @@ def cmd_ingest(args: argparse.Namespace) -> int:
     return 0 if result.ok else 1
 
 
+def cmd_oracle(args: argparse.Namespace) -> int:
+    """Run the oracle command."""
+    _load_dotenv()
+    log_fh = _open_log_file(Path(args.log_file)) if args.log_file else None
+    if log_fh:
+        _write_oracle_log_header(log_fh, args)
+
+    print("Generate Oraculum oracle specs")
+    print(f"  Repo: {args.lang}/{args.repo}")
+    print(f"  Output dir: {Path(args.output_dir)}")
+    if args.ingest_summary:
+        print(f"  Ingest summary: {Path(args.ingest_summary)}")
+    if args.finding_id:
+        print(f"  Finding id: {args.finding_id}")
+    if args.finding:
+        print(f"  Finding: {Path(args.finding)}")
+    sys.stdout.flush()
+
+    def write_log(line: str = "") -> None:
+        if log_fh:
+            log_fh.write(line + "\n")
+            log_fh.flush()
+
+    def on_start(
+        i: int,
+        total: int,
+        artifact: dict,
+        _artifact_path: Path,
+        target_id: str,
+    ) -> None:
+        finding = artifact.get("finding", {})
+        print(f"\n[{i}/{total}] {finding.get('rule_id', 'unknown')}")
+        print(f"  File: {finding.get('file', 'unknown')}:{finding.get('start_line', '?')}")
+        print(f"  Target: {target_id}")
+        write_log(f"## [{i}/{total}] {finding.get('rule_id', 'unknown')}")
+        write_log()
+        write_log(f"- File: `{finding.get('file', 'unknown')}:{finding.get('start_line', '?')}`")
+        write_log(f"- Target: `{target_id}`")
+        write_log(f"- Artifact: `{_artifact_path}`")
+
+    def on_complete(
+        _i: int,
+        _total: int,
+        _artifact: dict | None,
+        status: str,
+        detail: str,
+    ) -> None:
+        if status == "generated":
+            print(f"  Oracle: generated ({detail})")
+            write_log("- Result: `generated`")
+            write_log(f"- Strategy: `{detail}`")
+        elif status == "skipped_existing":
+            print(f"  Oracle: skipped existing -> {detail}")
+            write_log("- Result: `skipped_existing`")
+            write_log(f"- Existing oracle: `{detail}`")
+        else:
+            print("  Oracle: failed")
+            print(f"  Error: {detail}")
+            write_log("- Result: `failed`")
+            write_log(f"- Error: `{detail}`")
+        write_log()
+
+    def on_llm_exchange(
+        _i: int,
+        _total: int,
+        _artifact: dict,
+        system_prompt: str,
+        user_prompt: str,
+        raw_response: str | None,
+    ) -> None:
+        if not log_fh:
+            return
+        if raw_response is None:
+            _write_fenced_section(log_fh, "### System Prompt", system_prompt)
+            _write_fenced_section(log_fh, "### User Prompt", user_prompt)
+        else:
+            _write_fenced_section(log_fh, "### LLM Response (Iteration 1)", raw_response)
+
+    try:
+        result = run_oracle(
+            repo=args.repo,
+            lang=args.lang,
+            output_dir=Path(args.output_dir),
+            ingest_summary=Path(args.ingest_summary) if args.ingest_summary else None,
+            finding_id=args.finding_id,
+            finding=Path(args.finding) if args.finding else None,
+            config_path=Path(args.config),
+            model=args.model,
+            force=args.force,
+            on_finding_start=on_start,
+            on_finding_complete=on_complete,
+            on_llm_exchange=on_llm_exchange if log_fh else None,
+        )
+    except Exception as exc:
+        write_log("## Failed")
+        write_log()
+        write_log(f"`{exc}`")
+        if log_fh:
+            print(f"Log: {Path(args.log_file)}")
+            log_fh.close()
+        print(f"oracle failed: {exc}", file=sys.stderr)
+        return 1
+
+    print()
+    print(
+        "Done. "
+        f"selected={result.selected} "
+        f"generated={result.generated} "
+        f"skipped={result.skipped} "
+        f"failed={result.failed}"
+    )
+    print(f"Output: {result.status_path}")
+    write_log("## Summary")
+    write_log()
+    write_log(f"- Selected: `{result.selected}`")
+    write_log(f"- Generated: `{result.generated}`")
+    write_log(f"- Skipped: `{result.skipped}`")
+    write_log(f"- Failed: `{result.failed}`")
+    write_log(f"- Status: `{result.status_path}`")
+    if log_fh:
+        print(f"Log: {Path(args.log_file)}")
+        log_fh.close()
+    return 0 if result.ok else 1
+
+
 def _load_dotenv() -> None:
     """Load a local .env file without overriding exported environment variables."""
     dotenv_path = find_dotenv(usecwd=True)
@@ -70,4 +198,40 @@ def _resolve_vhx_root(cli_value: str | None) -> Path | None:
     return Path(raw)
 
 
-__all__ = ["IngestError", "cmd_ingest"]
+def _open_log_file(path: Path) -> TextIO:
+    """Open a Markdown log file for a new command run."""
+    path = path.expanduser()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return path.open("w", encoding="utf-8")
+
+
+def _write_oracle_log_header(log_fh: TextIO, args: argparse.Namespace) -> None:
+    """Write Markdown metadata for an oracle run."""
+    log_fh.write("# Oraculum Oracle Run\n\n")
+    log_fh.write(f"- Started: `{datetime.now().isoformat(timespec='seconds')}`\n")
+    log_fh.write(f"- Repo: `{args.lang}/{args.repo}`\n")
+    log_fh.write(f"- Output dir: `{Path(args.output_dir)}`\n")
+    if args.ingest_summary:
+        log_fh.write(f"- Ingest summary: `{Path(args.ingest_summary)}`\n")
+    if args.finding_id:
+        log_fh.write(f"- Finding id: `{args.finding_id}`\n")
+    if args.finding:
+        log_fh.write(f"- Finding: `{Path(args.finding)}`\n")
+    if args.model:
+        log_fh.write(f"- Model override: `{args.model}`\n")
+    log_fh.write("\n")
+    log_fh.flush()
+
+
+def _write_fenced_section(log_fh: TextIO, title: str, content: str) -> None:
+    """Write a Markdown fenced block, escaping nested fence markers."""
+    log_fh.write(f"\n{title}\n\n")
+    log_fh.write("````text\n")
+    log_fh.write(content.replace("````", "` ` ` `"))
+    if not content.endswith("\n"):
+        log_fh.write("\n")
+    log_fh.write("````\n\n")
+    log_fh.flush()
+
+
+__all__ = ["IngestError", "OracleError", "cmd_ingest", "cmd_oracle"]

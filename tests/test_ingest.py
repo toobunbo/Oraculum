@@ -233,7 +233,7 @@ def test_ingest_cli_smoke(tmp_path: Path, capsys: pytest.CaptureFixture[str]) ->
     captured = capsys.readouterr()
     assert rc == 0
     assert "Done. selected=1 enriched=1 skipped=3 failed=0" in captured.out
-    assert (output_dir / "python/demo/oraculum/ingest/summary.json").is_file()
+    assert (output_dir / "python/demo/verification_results/summary.json").is_file()
 
 
 def test_ingest_cli_reads_vhx_root_from_env(
@@ -260,7 +260,7 @@ def test_ingest_cli_reads_vhx_root_from_env(
     captured = capsys.readouterr()
     assert rc == 0
     assert f"VulnHunterX root: {vhx_root}" in captured.out
-    assert (output_dir / "python/demo/oraculum/ingest/summary.json").is_file()
+    assert (output_dir / "python/demo/verification_results/summary.json").is_file()
 
 
 def test_ingest_cli_reads_vhx_root_from_dotenv(
@@ -292,7 +292,7 @@ def test_ingest_cli_reads_vhx_root_from_dotenv(
     captured = capsys.readouterr()
     assert rc == 0
     assert f"VulnHunterX root: {vhx_root}" in captured.out
-    assert (output_dir / "python/demo/oraculum/ingest/summary.json").is_file()
+    assert (output_dir / "python/demo/verification_results/summary.json").is_file()
 
 
 def test_ingest_cli_missing_vhx_root_fails(

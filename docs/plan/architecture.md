@@ -25,8 +25,8 @@ VulnHunterX root
 
 Oraculum
   ├── ingest     copy verified findings and enrich target function metadata
-  ├── oracle     generate oracle_spec.json from verified finding evidence
-  └── harness    generate Atheris harness.py from oracle_spec + source context
+  ├── oracle     generate fuzz oracle JSON from verified finding evidence
+  └── harness    generate Atheris fuzz targets from oracle JSON + source context
 ```
 
 Initial implementation scope:
@@ -79,7 +79,7 @@ If multiple rows match, choose the narrowest line range.
 Output:
 
 ```text
-output/python/<repo>/oraculum/ingest/
+output/python/<repo>/verification_results/
   summary.json
   findings/
     finding_<id>_<rule_slug>.json
@@ -89,7 +89,7 @@ Detailed implementation plan: [`ingest_design.md`](ingest_design.md).
 
 ## Stage 1: Oracle
 
-Oracle generation converts verified finding evidence into a structured runtime oracle specification.
+Oracle generation converts verified finding evidence into structured runtime oracle JSON.
 
 Inputs:
 
@@ -104,7 +104,9 @@ Non-goal:
 Output:
 
 ```text
-output/python/<repo>/oraculum/finding_<id>_<rule_slug>/oracle_spec.json
+output/python/<repo>/fuzz_oracles/
+  status.json
+  <rule_slug>_<file_slug>_<line>.json
 ```
 
 Oracle spec contains:
@@ -116,13 +118,15 @@ Oracle spec contains:
 - seed corpus guidance
 - metadata for traceability
 
+Detailed implementation plan: [`oracle_design.md`](oracle_design.md).
+
 ## Stage 2: Harness
 
-Harness generation turns `oracle_spec.json` into an executable Python Atheris harness.
+Harness generation turns oracle JSON into executable Python Atheris fuzz targets.
 
 Inputs:
 
-- `oracle_spec.json`
+- oracle JSON from `fuzz_oracles/`
 - enriched function metadata
 - source repo under VulnHunterX `repos/python/<repo>/`
 - context CSVs where useful
@@ -138,9 +142,16 @@ Responsibilities:
 Output:
 
 ```text
-output/python/<repo>/oraculum/finding_<id>_<rule_slug>/
-  harness.py
-  corpus/
+output/python/<repo>/fuzz_targets/
+  status.json
+  <rule_slug>_<file_slug>_<line>.py
+```
+
+Persistent corpus and run output follow VulnHunterX fuzz naming:
+
+```text
+output/python/<repo>/fuzz_corpus/<rule_slug>_<file_slug>_<line>/
+output/python/<repo>/fuzz_results/summary.json
 ```
 
 ## Data Contracts
@@ -248,5 +259,5 @@ oraculum generate --vhx-root /path/to/VulnHunterX --repo Benchmark --lang python
 
 - Whether Oraculum should copy source/context into its own output or reference VulnHunterX paths.
 - Whether default verdict filter should be `TP` only or `TP + NMD`.
-- Whether `oracle_spec.json` should preserve the current FuzzGenG schema exactly or introduce versioned schema metadata.
+- Whether the oracle JSON should preserve the current FuzzGenG schema exactly or introduce versioned schema metadata.
 - How much harness validation belongs in Stage 2 before adding a dedicated run/triage stage.

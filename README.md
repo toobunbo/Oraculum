@@ -95,7 +95,7 @@ Ingest Oraculum inputs
   Verdict filter: TP
 
 Done. selected=2 enriched=2 skipped=0 failed=0
-Output: /tmp/oraculum-ingest-smoke/python/Benchmark/oraculum/ingest/summary.json
+Output: /tmp/oraculum-ingest-smoke/python/Benchmark/verification_results/summary.json
 ```
 
 ## Planned Stages
@@ -120,7 +120,7 @@ It enriches each verified finding with target function metadata by matching
 
 ### Stage 1: Oracle
 
-Generate `oracle_spec.json` from the verified finding evidence:
+Generate oracle JSON specs from the verified finding evidence:
 
 - SAST rule and message
 - LLM verdict, confidence, reasoning, and guided-question answers
@@ -131,9 +131,9 @@ This stage does not require the full function body.
 
 ### Stage 2: Harness
 
-Generate an Atheris `harness.py` from:
+Generate Atheris fuzz targets from:
 
-- `oracle_spec.json`
+- oracle JSON specs
 - target function metadata
 - VulnHunterX source checkout
 - context CSVs where useful
@@ -145,15 +145,21 @@ small portion of harness logic that benefits from reasoning.
 ## Expected Output Layout
 
 ```text
-output/python/<repo>/oraculum/
-├── ingest/
+output/python/<repo>/
+├── verification_results/
 │   ├── summary.json
 │   └── findings/
 │       └── finding_<id>_<rule_slug>.json
-└── finding_<id>_<rule_slug>/
-    ├── oracle_spec.json
-    ├── harness.py
-    └── corpus/
+├── fuzz_oracles/
+│   ├── status.json
+│   └── <rule_slug>_<file_slug>_<line>.json
+├── fuzz_targets/
+│   ├── status.json
+│   └── <rule_slug>_<file_slug>_<line>.py
+├── fuzz_corpus/
+│   └── <rule_slug>_<file_slug>_<line>/
+└── fuzz_results/
+    └── summary.json
 ```
 
 ## CLI
@@ -164,9 +170,14 @@ oraculum ingest \
   --lang python \
   --verdict TP
 
-# Planned next stages:
 oraculum oracle --repo Benchmark
 
+oraculum oracle \
+  --repo Benchmark \
+  --lang python \
+  --log-file logs/oracle_Benchmark.md
+
+# Planned next stage:
 oraculum harness --repo Benchmark
 
 oraculum generate \
@@ -184,6 +195,6 @@ ingest -> oracle -> harness
 
 ## Current Status
 
-`ingest` is implemented. Oracle and harness stages are being migrated from the
-prototype. See
+`ingest` and `oracle` are implemented. Harness generation is being migrated
+from the prototype. See
 [`docs/plan/architecture.md`](docs/plan/architecture.md).

@@ -1,12 +1,14 @@
 import json
 import logging
+import os
 import re
-
-from litellm import completion
 
 
 def call_llm(system_prompt: str, user_prompt: str, model: str,
              temperature: float = 0.2, max_tokens: int = 1024, timeout: int = 60) -> str:
+    _silence_litellm_optional_provider_warnings()
+    from litellm import completion
+
     logging.debug("\n========== LLM REQUEST ==========")
     logging.debug(f"[SYSTEM PROMPT]\n{system_prompt}\n")
     logging.debug(f"[USER PROMPT]\n{user_prompt}\n")
@@ -21,6 +23,14 @@ def call_llm(system_prompt: str, user_prompt: str, model: str,
     content = response.choices[0].message.content
     logging.debug(f"========== LLM RESPONSE ==========\n{content}\n==================================")
     return content
+
+
+def _silence_litellm_optional_provider_warnings() -> None:
+    """Suppress noisy LiteLLM warnings for optional providers we do not use."""
+    os.environ.setdefault("LITELLM_LOG", "ERROR")
+    for logger_name in ("LiteLLM", "litellm"):
+        logging.getLogger(logger_name).setLevel(logging.ERROR)
+
 
 def parse_oracle_spec(raw_text: str) -> dict:
     text = raw_text.strip()
@@ -55,7 +65,7 @@ def parse_oracle_spec(raw_text: str) -> dict:
 
 def validate_oracle_spec(spec: dict) -> None:
     # Top-level blocks
-    for block in ["monitor", "oracle_check", "_meta"]:
+    for block in ["monitor", "oracle_check", "fuzz_guidance", "_meta"]:
         if block not in spec:
             raise ValueError(f"oracle_spec missing block: '{block}'")
 
@@ -80,6 +90,19 @@ def validate_oracle_spec(spec: dict) -> None:
     for field in ["condition_description", "trigger_patterns", "raise_type", "raise_message_template"]:
         if field not in oracle_check:
             raise ValueError(f"oracle_check missing field: '{field}'")
+
+    if monitor["strategy"] in {"patch_call", "inspect_return"} and not oracle_check["trigger_patterns"]:
+        raise ValueError("oracle_check.trigger_patterns must not be empty for patch_call/inspect_return")
+
+    # fuzz_guidance fields
+    fuzz_guidance = spec["fuzz_guidance"]
+    for field in ["seed_corpus", "skip_condition"]:
+        if field not in fuzz_guidance:
+            raise ValueError(f"fuzz_guidance missing field: '{field}'")
+    if not isinstance(fuzz_guidance["seed_corpus"], list):
+        raise ValueError("fuzz_guidance.seed_corpus must be a list")
+    if not isinstance(fuzz_guidance["skip_condition"], str):
+        raise ValueError("fuzz_guidance.skip_condition must be a string")
 
     # _meta fields
     meta = spec["_meta"]

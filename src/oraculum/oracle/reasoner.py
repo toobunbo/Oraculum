@@ -1,68 +1,42 @@
+"""Backward-compatible single-finding oracle entrypoint."""
+
+from __future__ import annotations
+
 import json
-import logging
-import os
 from pathlib import Path
 
-import yaml
-
-from .csv_loader import load_functions, load_signatures
-from .llm_client import call_llm, parse_oracle_spec, validate_oracle_spec
-from .prompt_builder import build_user_prompt, load_system_prompt
-from .signature_builder import build_signature, get_input_strategy
+from oraculum.oracle.paths import target_id_for_artifact
+from oraculum.oracle.runner import run_oracle
 
 
 def run(finding_path: str, config_path: str = "config/oracle.yaml") -> dict:
-    config       = yaml.safe_load(Path(config_path).read_text())
-    
-    # Override model using .env variables if they exist
-    llm_provider = os.getenv("LLM_PROVIDER")
-    llm_model    = os.getenv("LLM_MODEL")
-    if llm_provider and llm_model:
-        config["model"] = f"{llm_provider}/{llm_model}"
-    elif llm_model:
-        config["model"] = llm_model
+    """Generate one oracle spec from an enriched finding artifact."""
+    path = Path(finding_path)
+    artifact = json.loads(path.read_text(encoding="utf-8"))
+    finding = artifact["finding"]
+    repo = finding["repo_name"]
+    lang = finding["lang"]
+    output_dir = _infer_output_dir(path, lang, repo)
 
-    finding_full = json.loads(Path(finding_path).read_text(encoding="utf-8"))
-    f     = finding_full["finding"]
-    repo  = f["repo_name"]
-    lang  = f["lang"]
-    func  = f.get("function_name", "unknown")
-    file_ = f["file"]
-    finding_id = f.get("id", "0")
-    rule_id = f.get("rule_id", "unknown").replace("/", "_")
+    run_oracle(
+        repo=repo,
+        lang=lang,
+        output_dir=output_dir,
+        finding=path,
+        config_path=Path(config_path),
+        force=True,
+    )
 
-    sigs  = load_signatures(config["signatures_csv"].format(lang=lang, repo=repo))
-    funcs = load_functions(config["functions_csv"].format(lang=lang, repo=repo))
+    oracle_path = output_dir / lang / repo / "fuzz_oracles" / f"{target_id_for_artifact(artifact)}.json"
+    return json.loads(oracle_path.read_text(encoding="utf-8"))
 
-    sig      = build_signature(func, file_, sigs)
-    strategy = get_input_strategy(func, file_, sigs, funcs)
-    logging.info(f"[Stage1] function  : {func}")
-    logging.info(f"[Stage1] signature : {sig}")
-    logging.info(f"[Stage1] strategy  : {strategy}")
 
-    answers = finding_full.get("answers")
-
-    sys_p  = load_system_prompt(config["prompts_dir"])
-    user_p = build_user_prompt(finding_full, sig, strategy, config["prompts_dir"], answers)
-
-    logging.info(f"[Stage1] calling   : {config['model']} ...")
-    raw  = call_llm(sys_p, user_p, config["model"],
-                    config["temperature"], config["max_tokens"], config["timeout"])
-    spec = parse_oracle_spec(raw)
-    validate_oracle_spec(spec)
-
-    if "_meta" not in spec:
-        spec["_meta"] = {}
-    
-    spec["_meta"].update({
-        "function": func, 
-        "file": file_,
-        "input_strategy": strategy, 
-        "function_signature": sig,
-        "model": config["model"],
-    })
-    out = Path(config["oracle_spec_out"].format(lang=lang, repo=repo, id=finding_id, rule_id=rule_id))
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(spec, indent=2, ensure_ascii=False), encoding="utf-8")
-    logging.info(f"[Stage1] output    : {out}")
-    return spec
+def _infer_output_dir(path: Path, lang: str, repo: str) -> Path:
+    """Infer output root from output/<lang>/<repo>/verification_results/findings/*.json."""
+    resolved = path.expanduser().resolve()
+    parts = resolved.parts
+    suffix = (lang, repo, "verification_results", "findings")
+    for idx in range(len(parts) - len(suffix) + 1):
+        if tuple(parts[idx : idx + len(suffix)]) == suffix:
+            return Path(*parts[:idx])
+    return Path("output")
