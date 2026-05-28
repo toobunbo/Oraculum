@@ -84,6 +84,8 @@ def validate_oracle_spec(spec: dict) -> None:
             f"Must be one of {_VALID_APPROACHES}"
         )
 
+    approach = decision["oracle_approach"]
+
     # Q3 fields: required only when Q2 is true
     if decision.get("q2_observable_after_return"):
         for field in ["q3_accessible_in_memory", "q3_reason"]:
@@ -94,6 +96,23 @@ def validate_oracle_spec(spec: dict) -> None:
     if not isinstance(decision["build_mock"], bool):
         raise ValueError(f"decision.build_mock must be bool, got: {type(decision['build_mock']).__name__}")
 
+    # Decision Tree consistency: Q2/Q3 must match oracle_approach
+    q2 = decision.get("q2_observable_after_return")
+    if q2 is False and approach != "recorded_call":
+        raise ValueError(
+            f"decision.oracle_approach must be 'recorded_call' when Q2=false, got '{approach}'"
+        )
+    if q2 is True:
+        q3 = decision.get("q3_accessible_in_memory")
+        if q3 is True and approach != "return_value":
+            raise ValueError(
+                f"decision.oracle_approach must be 'return_value' when Q2=true and Q3=true, got '{approach}'"
+            )
+        if q3 is False and approach != "filesystem_state":
+            raise ValueError(
+                f"decision.oracle_approach must be 'filesystem_state' when Q2=true and Q3=false, got '{approach}'"
+            )
+
     # research fields
     research = spec["research"]
     for field in ["target_to_record", "record_selector", "fake_return",
@@ -102,7 +121,6 @@ def validate_oracle_spec(spec: dict) -> None:
             raise ValueError(f"research missing field: '{field}'")
 
     # Approach-specific required research fields
-    approach = decision["oracle_approach"]
     if approach == "recorded_call":
         if not research.get("target_to_record"):
             raise ValueError("research.target_to_record must be set for recorded_call")

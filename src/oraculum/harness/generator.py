@@ -40,8 +40,9 @@ def run(finding_path: str, spec_path: str,
 
     logging.info(f"[Stage2] function  : {function}")
     logging.info(f"[Stage2] rule_id   : {f['rule_id']}")
-    logging.info(f"[Stage2] strategy  : {spec.get('_meta', {}).get('input_strategy')}"
-                 f" / {spec.get('monitor', {}).get('strategy')}")
+    logging.info(f"[Stage2] input     : {spec.get('_meta', {}).get('input_strategy')}")
+    logging.info(f"[Stage2] approach  : {spec.get('decision', {}).get('oracle_approach')}"
+                 f" / mock={spec.get('decision', {}).get('build_mock')}")
 
     logging.info(f"[Stage2] skeleton built, calling {config['model']} ...")
 

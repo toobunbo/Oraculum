@@ -155,12 +155,13 @@ def run_harness(
             seed_count = _write_seed_corpus(oracle_spec, corpus_dir)
 
             generated += 1
-            strategy = str(oracle_spec.get("monitor", {}).get("strategy", ""))
+            decision = oracle_spec.get("decision") if isinstance(oracle_spec.get("decision"), dict) else {}
             entries.append(
                 {
                     **base_entry,
                     "status": "generated",
-                    "strategy": strategy,
+                    "oracle_approach": str(decision.get("oracle_approach", "")),
+                    "build_mock": bool(decision.get("build_mock", False)),
                     "seed_count": seed_count,
                     "errors": "",
                 }
@@ -493,11 +494,11 @@ def _load_system_prompt(
         tainted_params=meta.get("tainted_params", []),
         oracle_approach=approach,
         build_mock=bool(decision.get("build_mock", False)),
-        patch_target=str(research.get("target_to_record", "")),
+        patch_target=research.get("target_to_record") or "",
         target_arg_index=research.get("target_arg_index"),
-        target_arg_name=str(research.get("record_selector", "")),
-        capture_what=str(research.get("return_selector", "")),
-        allowed_root=str((research.get("filesystem_watch") or {}).get("allowed_root", "")),
+        target_arg_name=research.get("record_selector") or "",
+        capture_what=research.get("return_selector") or "",
+        allowed_root=(research.get("filesystem_watch") or {}).get("allowed_root") or "",
     )
 
 
@@ -531,7 +532,7 @@ def _entry_base(
 ) -> dict[str, Any]:
     finding = artifact.get("finding") if isinstance(artifact.get("finding"), dict) else {}
     function = artifact.get("function") if isinstance(artifact.get("function"), dict) else {}
-    monitor = oracle_spec.get("monitor") if isinstance(oracle_spec.get("monitor"), dict) else {}
+    decision = oracle_spec.get("decision") if isinstance(oracle_spec.get("decision"), dict) else {}
     return {
         "id": str(artifact.get("id", target.status_entry.get("id", ""))),
         "target_id": target_id,
@@ -543,7 +544,8 @@ def _entry_base(
         "oracle": str(target.oracle_path),
         "finding_artifact": str(target.finding_artifact_path),
         "corpus": str(corpus_dir),
-        "strategy": str(monitor.get("strategy", target.status_entry.get("strategy", ""))),
+        "oracle_approach": str(decision.get("oracle_approach", "")),
+        "build_mock": bool(decision.get("build_mock", False)),
     }
 
 

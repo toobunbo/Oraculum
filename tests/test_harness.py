@@ -60,13 +60,32 @@ def _make_harness_fixture(tmp_path: Path) -> Path:
         },
     }
     oracle = {
-        "monitor": {
-            "strategy": "patch_call",
-            "patch_target": "pkg.app.open",
+        "decision": {
+            "q1_sink_dangerous": True,
+            "q1_reason": "open may touch filesystem",
+            "q2_observable_after_return": False,
+            "q2_reason": "violation is observed at sink call",
+            "q3_accessible_in_memory": None,
+            "q3_reason": None,
+            "build_mock": True,
+            "oracle_approach": "recorded_call",
+            "confidence": "high",
+        },
+        "research": {
+            "target_to_record": "pkg.app.open",
             "target_arg_index": 0,
-            "target_arg_name": None,
-            "capture_what": "path passed to open",
+            "record_selector": None,
+            "fake_return": "readable file mock",
+            "return_selector": None,
+            "filesystem_watch": {"allowed_root": None, "snapshot_dirs": []},
+            "assertion": {
+                "kind": "regex_match",
+                "input": "captured",
+                "patterns": [r"\.\./"],
+                "description": "path traversal reaches open",
+            },
             "additional_imports": [],
+            "risks": [],
         },
         "oracle_check": {
             "condition_description": "path traversal reaches open",
@@ -76,7 +95,12 @@ def _make_harness_fixture(tmp_path: Path) -> Path:
         },
         "fuzz_guidance": {
             "seed_corpus": ["../etc/passwd", "../../secret.txt"],
-            "skip_condition": "'../' not in value",
+            "skip_condition": "False",
+        },
+        "driver": {
+            "arrange": {"tainted_params": [], "setup": [], "skip_condition": "False"},
+            "act": {"target_callable": "target", "call_style": "direct"},
+            "assert": {"place": "after_target_call", "input": "recorded_call", "never_assert_on": "raw fuzz input"},
         },
         "_meta": {
             "target_id": target_id,
@@ -107,7 +131,7 @@ def _make_harness_fixture(tmp_path: Path) -> Path:
                 "finding_artifact": str(artifact_path),
                 "oracle": str(oracle_path),
                 "status": "generated",
-                "strategy": "patch_call",
+                "oracle_approach": "recorded_call",
             }
         ],
         "errors": [],
@@ -199,8 +223,8 @@ def test_harness_cli_writes_markdown_log(tmp_path: Path, monkeypatch, capsys) ->
     assert "### System Prompt" in log_text
     assert "### User Prompt" in log_text
     assert "### LLM Response (Iteration 1)" in log_text
-    assert "expert security fuzzing engineer" in log_text
-    assert "Complete the following partial Atheris harness" in log_text
+    assert "security fuzzing engineer" in log_text
+    assert "Fill ONLY the" in log_text
     assert "atheris.Setup" in log_text
 
 

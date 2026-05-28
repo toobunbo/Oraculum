@@ -43,7 +43,9 @@ Do NOT stub the sink — it must execute for real.
 ### _extract_recorded_value(call)
 Extract the tainted payload from the recorded call.
 - Check call.args[{{ target_arg_index }}] first.
-- Fall back to call.kwargs.get("{{ target_arg_name }}").
+{% if target_arg_name %}- Fall back to call.kwargs.get("{{ target_arg_name }}").
+{% else %}- This sink uses only positional arguments; no keyword fallback.
+{% endif %}
 - Return the value, or None if not found.
 
 ### _SEED_CORPUS

@@ -117,10 +117,11 @@ def run_oracle(
                 encoding="utf-8",
             )
             generated += 1
-            strategy = spec.get("monitor", {}).get("strategy", "")
-            entries.append({**base_entry, "status": "generated", "strategy": str(strategy)})
+            decision = spec.get("decision") if isinstance(spec.get("decision"), dict) else {}
+            approach = str(decision.get("oracle_approach", ""))
+            entries.append({**base_entry, "status": "generated", "oracle_approach": approach})
             if on_finding_complete is not None:
-                on_finding_complete(index, total, artifact, "generated", str(strategy))
+                on_finding_complete(index, total, artifact, "generated", approach)
         except Exception as exc:
             errors.append(_error_entry(artifact_path, str(exc)))
             if artifact is not None:
