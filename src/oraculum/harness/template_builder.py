@@ -14,9 +14,10 @@ def build_skeleton(
     repo_root: str,
     corpus_dir: str,
 ) -> str:
-    f      = artifact["finding"]
+    f       = artifact["finding"]
     meta    = spec.get("_meta", {})
-    monitor = spec.get("monitor", {})
+    decision = spec.get("decision", {})
+    research = spec.get("research", {})
     oracle  = spec.get("oracle_check", {})
     fuzz    = spec.get("fuzz_guidance", {})
 
@@ -24,7 +25,8 @@ def build_skeleton(
     function_name    = meta.get("function") or artifact.get("function", {}).get("name", "")
     file_path        = meta.get("file") or f.get("file", "")
     input_strategy   = meta.get("input_strategy", "direct_params")
-    monitor_strategy = monitor.get("strategy", "inspect_return")
+    oracle_approach  = decision.get("oracle_approach", "return_value")
+    build_mock       = decision.get("build_mock", False)
 
     # Resolve import
     raw_import   = resolve_import(file_path, function_name, repo_root)
@@ -32,7 +34,7 @@ def build_skeleton(
 
     # Extra imports — skip builtins and unittest.mock (template handles it)
     extra_imports = []
-    for m in monitor.get("additional_imports", []):
+    for m in research.get("additional_imports", []):
         if m.strip() not in TEMPLATE_BUILTINS:
             extra_imports.append(f"import {m}")
 
@@ -54,8 +56,12 @@ def build_skeleton(
         )
     )
 
-    # capture_what — lives in oracle semantically; monitor is a fallback
-    capture_what = oracle.get("capture_what") or monitor.get("capture_what", "")
+    # Extract research fields
+    patch_target    = research.get("target_to_record", "")
+    target_arg_index = research.get("target_arg_index")
+    target_arg_name  = research.get("record_selector", "")
+    capture_what    = research.get("return_selector", "")
+    allowed_root    = (research.get("filesystem_watch") or {}).get("allowed_root", "")
 
     # Render
     templates_dir = Path(__file__).parent / "templates"
@@ -72,12 +78,13 @@ def build_skeleton(
         repo_root          = repo_root,
         corpus_dir         = corpus_dir,
         input_strategy     = input_strategy,
-        monitor_strategy   = monitor_strategy,
-        patch_target       = monitor.get("patch_target"),
-        target_arg_index   = monitor.get("target_arg_index"),
-        target_arg_name    = monitor.get("target_arg_name"),
+        oracle_approach    = oracle_approach,
+        build_mock         = build_mock,
+        patch_target       = patch_target,
+        target_arg_index   = target_arg_index,
+        target_arg_name    = target_arg_name,
         capture_what       = capture_what,
-        condition_desc     = oracle.get("condition_description", ""),
+        allowed_root       = allowed_root,
         tainted_params     = tainted_params,
         trigger_patterns   = trigger_patterns,
         raise_message      = oracle.get("raise_message_template", ""),

@@ -1,0 +1,55 @@
+You are a security fuzzing engineer completing a Driver-based Atheris harness.
+The oracle approach is `recorded_call` — the vulnerability is confirmed by
+inspecting what payload reached the sink call site.
+
+## Your Task
+Fill ONLY the `# LLM_FILL` slots in the provided harness skeleton.
+Do NOT modify any section outside those slots.
+Output a single complete Python file. No markdown. No explanation. No code fences.
+
+## Context (from oracle spec)
+- rule_id: {{ rule_id }}
+- function: {{ function_name }}
+- patch_target: {{ patch_target }}
+- target_arg_index: {{ target_arg_index }}
+- target_arg_name: {{ target_arg_name }}
+- build_mock: {{ build_mock }}
+- input_strategy: {{ input_strategy }}
+- function_signature: {{ function_signature }}
+- tainted_params: {{ tainted_params }}
+
+## Slot-Specific Instructions
+
+### _build_inputs()
+Use FuzzedDataProvider (self.fdp) to generate inputs for tainted params.
+- Single str param: consume all remaining bytes.
+- Multiple params: fixed-size types first, then split remaining among str/bytes.
+- NEVER use ConsumeBool/ConsumeIntInRange to index a strategy or seed list.
+
+### _call_target()
+Call {{ function_name }} with self.inputs. Match the call style to input_strategy.
+
+### mock_context()
+{% if build_mock %}
+build_mock=true: Patch {{ patch_target }} with unittest.mock.patch.
+Return MagicMock so the target continues normally.
+{% else %}
+build_mock=false: Use spy/delegate for observability. If no safe spy exists,
+use mock but understand it is for recording, not safety.
+{% endif %}
+
+### _extract_recorded_value(call)
+Extract the tainted payload from the recorded call.
+- Check call.args[{{ target_arg_index }}] first.
+- Fall back to call.kwargs.get("{{ target_arg_name }}").
+- Return the value, or None if not found.
+
+### _SEED_CORPUS
+At least 6 bypass-oriented entries. Must survive the filter, not just trigger it.
+Cover: mixed case, whitespace injection, unicode homoglyphs, double encoding.
+
+## Critical Rules
+- Assert ONLY on the captured sink argument — NEVER on the raw fuzz input.
+- Oracle assert is already placed outside the try/except in TestOneInput. Do NOT move it.
+- Do NOT mock validation or parsing functions. Only mock/record the sink.
+- Do NOT modify TestOneInput, __main__, or FIXED CONTRACTS sections.

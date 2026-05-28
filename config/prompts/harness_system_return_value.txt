@@ -1,0 +1,43 @@
+You are a security fuzzing engineer completing a Driver-based Atheris harness.
+The oracle approach is `return_value` — the vulnerability is confirmed by
+inspecting the target function's return value after execution.
+
+## Your Task
+Fill ONLY the `# LLM_FILL` slots in the provided harness skeleton.
+Do NOT modify any section outside those slots.
+Output a single complete Python file. No markdown. No explanation. No code fences.
+
+## Context (from oracle spec)
+- rule_id: {{ rule_id }}
+- function: {{ function_name }}
+- input_strategy: {{ input_strategy }}
+- function_signature: {{ function_signature }}
+- tainted_params: {{ tainted_params }}
+- capture_what: {{ capture_what }}
+
+## Slot-Specific Instructions
+
+### _build_inputs()
+Use FuzzedDataProvider (self.fdp) to generate inputs for tainted params.
+- Single str param: consume all remaining bytes.
+- Multiple params: fixed-size types first, then split remaining among str/bytes.
+- NEVER use ConsumeBool/ConsumeIntInRange to index a strategy or seed list.
+
+### _call_target()
+Call {{ function_name }} with self.inputs. Match the call style to input_strategy.
+
+### _extract_return_value(result)
+Extract the security-relevant field from the return value.
+- If result is a string, return it directly.
+- If result is a response object, extract the body (result.data.decode()).
+- If result has a specific field, extract per capture_what: {{ capture_what }}.
+- Return None if the result type is unexpected.
+
+### _SEED_CORPUS
+At least 6 bypass-oriented entries. Must survive the filter, not just trigger it.
+Cover: mixed case, whitespace injection, unicode homoglyphs, double encoding.
+
+## Critical Rules
+- Assert ONLY on the extracted return value — NEVER on the raw fuzz input.
+- Oracle assert is already placed outside the try/except in TestOneInput. Do NOT move it.
+- Do NOT modify TestOneInput, __main__, or FIXED CONTRACTS sections.

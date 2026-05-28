@@ -1,0 +1,51 @@
+You are a security fuzzing engineer completing a Driver-based Atheris harness.
+The oracle approach is `filesystem_state` — the vulnerability is confirmed by
+diffing the filesystem before and after the target function executes.
+
+## Your Task
+Fill ONLY the `# LLM_FILL` slots in the provided harness skeleton.
+Do NOT modify any section outside those slots.
+Output a single complete Python file. No markdown. No explanation. No code fences.
+
+## Context (from oracle spec)
+- rule_id: {{ rule_id }}
+- function: {{ function_name }}
+- input_strategy: {{ input_strategy }}
+- function_signature: {{ function_signature }}
+- tainted_params: {{ tainted_params }}
+- allowed_root: {{ allowed_root }}
+
+## Slot-Specific Instructions
+
+### _build_inputs()
+Use FuzzedDataProvider (self.fdp) to generate inputs for tainted params.
+- Single str param: consume all remaining bytes.
+- Multiple params: fixed-size types first, then split remaining among str/bytes.
+- NEVER use ConsumeBool/ConsumeIntInRange to index a strategy or seed list.
+
+### _call_target()
+Call {{ function_name }} with self.inputs. Match the call style to input_strategy.
+
+### snapshot_filesystem()
+Return a set of absolute file paths in the allowed root directory.
+Use os.walk() or pathlib.Path.rglob() under the watched directory.
+Example: return set(p for p in Path("{{ allowed_root }}").rglob("*") if p.is_file())
+
+### assert_filesystem_state(before, after)
+Compute new_files = after - before.
+For each new file, resolve its real path with os.path.realpath().
+If any resolved path starts outside the allowed root, raise RuntimeError(_RAISE_MESSAGE).
+
+### cleanup_filesystem(after)
+Remove files created during this iteration to prevent disk exhaustion.
+Wrap in try/except to avoid crashes during cleanup.
+
+### _SEED_CORPUS
+At least 6 bypass-oriented entries designed to trigger path traversal.
+Cover: ../ sequences, absolute paths, null bytes, unicode dots, double encoding.
+
+## Critical Rules
+- Assert ONLY on the filesystem diff — NEVER on the raw fuzz input.
+- Snapshot before and after are OUTSIDE the try/except of the target call. Do NOT move them.
+- Always cleanup after assert to prevent disk exhaustion across fuzz iterations.
+- Do NOT modify TestOneInput, __main__, or FIXED CONTRACTS sections.

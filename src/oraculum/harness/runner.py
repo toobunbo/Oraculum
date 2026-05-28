@@ -462,11 +462,16 @@ def _generate_harness_code(
 
 
 def _load_system_prompt(prompts_dir: Path, oracle_spec: dict[str, Any]) -> str:
-    strategy = str(oracle_spec.get("monitor", {}).get("strategy") or "inspect_return")
-    if strategy == "patch_call":
-        filename = "harness_system_patch_call.txt"
-    else:
-        filename = "harness_system_inspect_return.txt"
+    decision = oracle_spec.get("decision") if isinstance(oracle_spec.get("decision"), dict) else {}
+    approach = str(decision.get("oracle_approach") or "")
+    prompt_map = {
+        "recorded_call": "harness_system_recorded_call.txt",
+        "return_value": "harness_system_return_value.txt",
+        "filesystem_state": "harness_system_filesystem_state.txt",
+    }
+    filename = prompt_map.get(approach)
+    if not filename:
+        raise HarnessError(f"Unknown oracle_approach: {approach}")
     return (prompts_dir / filename).read_text(encoding="utf-8")
 
 
