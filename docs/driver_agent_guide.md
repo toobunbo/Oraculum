@@ -101,9 +101,9 @@ Key rules:
           yield mock_obj
   ```
 - When `build_mock = false`:
-  - Prefer a spy/delegate that calls the real function but records arguments.
-  - If no safe spy mechanism exists, use a mock but understand this is for
-    observability, not safety.
+  - Wrap the sink with a spy that delegates to the real function but records arguments.
+  - Use `unittest.mock.patch` with `side_effect=real_function`, or a custom wrapper.
+  - Do NOT stub the sink — it must execute for real.
 
 **`_extract_recorded_value(call)`:**
 - Inspect `call.args` and `call.kwargs` to find the tainted payload.
@@ -141,7 +141,7 @@ Key rules:
 - For each new file, resolve its real path with `os.path.realpath()`.
 - If any file is outside the allowed root, raise `RuntimeError(_RAISE_MESSAGE)`.
 
-**`cleanup_filesystem(after)`:**
+**`cleanup_filesystem(before, after)`:**
 - Delete files in `after - before` to prevent disk exhaustion across fuzz iterations.
 - Wrap in try/except to avoid crashes during cleanup.
 

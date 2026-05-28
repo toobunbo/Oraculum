@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from jinja2 import Environment, FileSystemLoader
 
 from oraculum.harness.llm_client import call_llm, extract_code, validate_harness
 from oraculum.harness.paths import HarnessPaths, resolve_harness_paths
@@ -442,7 +443,7 @@ def _generate_harness_code(
         repo_root=repo_root,
         corpus_dir=str(corpus_dir),
     )
-    system_prompt = _load_system_prompt(prompts_dir, oracle_spec)
+    system_prompt = _load_system_prompt(prompts_dir, oracle_spec, artifact)
     user_prompt = _load_user_prompt(prompts_dir).format(skeleton=skeleton)
     if on_llm_exchange is not None:
         on_llm_exchange(index, total, artifact, oracle_spec, system_prompt, user_prompt, None)
@@ -461,8 +462,15 @@ def _generate_harness_code(
     return code
 
 
-def _load_system_prompt(prompts_dir: Path, oracle_spec: dict[str, Any]) -> str:
+def _load_system_prompt(
+    prompts_dir: Path, oracle_spec: dict[str, Any], artifact: dict[str, Any],
+) -> str:
     decision = oracle_spec.get("decision") if isinstance(oracle_spec.get("decision"), dict) else {}
+    research = oracle_spec.get("research") if isinstance(oracle_spec.get("research"), dict) else {}
+    meta = oracle_spec.get("_meta") if isinstance(oracle_spec.get("_meta"), dict) else {}
+    oracle_check = oracle_spec.get("oracle_check") if isinstance(oracle_spec.get("oracle_check"), dict) else {}
+    finding = artifact.get("finding") if isinstance(artifact.get("finding"), dict) else {}
+
     approach = str(decision.get("oracle_approach") or "")
     prompt_map = {
         "recorded_call": "harness_system_recorded_call.txt",
@@ -472,7 +480,25 @@ def _load_system_prompt(prompts_dir: Path, oracle_spec: dict[str, Any]) -> str:
     filename = prompt_map.get(approach)
     if not filename:
         raise HarnessError(f"Unknown oracle_approach: {approach}")
-    return (prompts_dir / filename).read_text(encoding="utf-8")
+
+    raw = (prompts_dir / filename).read_text(encoding="utf-8")
+
+    env = Environment(loader=FileSystemLoader(str(prompts_dir)))
+    return env.from_string(raw).render(
+        rule_id=str(finding.get("rule_id", "")),
+        function_name=str(meta.get("function") or ""),
+        file_path=str(meta.get("file") or ""),
+        input_strategy=str(meta.get("input_strategy", "")),
+        function_signature=str(meta.get("function_signature") or ""),
+        tainted_params=meta.get("tainted_params", []),
+        oracle_approach=approach,
+        build_mock=bool(decision.get("build_mock", False)),
+        patch_target=str(research.get("target_to_record", "")),
+        target_arg_index=research.get("target_arg_index"),
+        target_arg_name=str(research.get("record_selector", "")),
+        capture_what=str(research.get("return_selector", "")),
+        allowed_root=str((research.get("filesystem_watch") or {}).get("allowed_root", "")),
+    )
 
 
 def _load_user_prompt(prompts_dir: Path) -> str:

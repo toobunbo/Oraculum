@@ -13,7 +13,7 @@ import atheris
 import sys
 import re
 import os
-{% if build_mock %}from unittest.mock import patch, MagicMock
+{% if oracle_approach == "recorded_call" %}from unittest.mock import patch, MagicMock
 {% endif %}
 {% for imp in extra_imports %}{{ imp }}
 {% endfor %}
@@ -113,8 +113,8 @@ class Driver:
         # Compare before/after snapshots. Check resolved paths (os.path.realpath).
         raise NotImplementedError
 
-    def cleanup_filesystem(self, after):
-        # LLM_FILL: remove files created during this iteration to prevent disk exhaustion.
+    def cleanup_filesystem(self, before, after):
+        # LLM_FILL: remove files in (after - before) to prevent disk exhaustion.
         pass
 {% endif %}
 
@@ -150,7 +150,7 @@ def TestOneInput(data):
         return
     after = driver.snapshot_filesystem()
     driver.assert_filesystem_state(before, after)
-    driver.cleanup_filesystem(after)
+    driver.cleanup_filesystem(before, after)
 {% endif %}
 
 

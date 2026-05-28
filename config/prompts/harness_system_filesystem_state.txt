@@ -36,8 +36,8 @@ Compute new_files = after - before.
 For each new file, resolve its real path with os.path.realpath().
 If any resolved path starts outside the allowed root, raise RuntimeError(_RAISE_MESSAGE).
 
-### cleanup_filesystem(after)
-Remove files created during this iteration to prevent disk exhaustion.
+### cleanup_filesystem(before, after)
+Remove files in (after - before) to prevent disk exhaustion.
 Wrap in try/except to avoid crashes during cleanup.
 
 ### _SEED_CORPUS

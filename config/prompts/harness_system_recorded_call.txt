@@ -34,8 +34,10 @@ Call {{ function_name }} with self.inputs. Match the call style to input_strateg
 build_mock=true: Patch {{ patch_target }} with unittest.mock.patch.
 Return MagicMock so the target continues normally.
 {% else %}
-build_mock=false: Use spy/delegate for observability. If no safe spy exists,
-use mock but understand it is for recording, not safety.
+build_mock=false: Wrap {{ patch_target }} with a spy that delegates to the
+real function but records arguments. Use unittest.mock.patch with
+side_effect=real_function, or a custom wrapper that records then calls through.
+Do NOT stub the sink — it must execute for real.
 {% endif %}
 
 ### _extract_recorded_value(call)
