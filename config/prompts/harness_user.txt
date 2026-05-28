@@ -1,5 +1,4 @@
-Complete the following Driver-based Atheris harness by filling in the # LLM_FILL slots.
-Do NOT modify TestOneInput, __main__, FIXED CONTRACTS, or any section outside # LLM_FILL.
+Complete the following partial Atheris harness by filling in the TestOneInput body.
 Output the complete Python script only. No markdown, no explanation.
 
 {skeleton}
