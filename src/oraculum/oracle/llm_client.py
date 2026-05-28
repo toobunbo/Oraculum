@@ -45,6 +45,7 @@ def parse_oracle_spec(raw_text: str) -> dict:
             pass  # fall through to next strategy
 
     # 2. Fallback: find the first balanced { ... } JSON object in the raw text.
+    #    Handles LLMs that emit THINKING: ... text before a bare JSON block.
     start = text.find("{")
     if start != -1:
         depth = 0
@@ -58,81 +59,31 @@ def parse_oracle_spec(raw_text: str) -> dict:
                     try:
                         return json.loads(candidate)
                     except json.JSONDecodeError:
-                        break
+                        break  # found a {} block but it's not valid JSON
 
     raise ValueError(f"LLM output not valid JSON:\n{raw_text}")
 
-_VALID_APPROACHES = {"recorded_call", "return_value", "filesystem_state"}
-
-
 def validate_oracle_spec(spec: dict) -> None:
     # Top-level blocks
-    for block in ["decision", "research", "oracle_check", "fuzz_guidance", "_meta"]:
+    for block in ["monitor", "oracle_check", "fuzz_guidance", "_meta"]:
         if block not in spec:
             raise ValueError(f"oracle_spec missing block: '{block}'")
 
-    # decision fields
-    decision = spec["decision"]
-    for field in ["q1_sink_dangerous", "q1_reason", "q2_observable_after_return",
-                  "q2_reason", "build_mock", "oracle_approach", "confidence"]:
-        if field not in decision:
-            raise ValueError(f"decision missing field: '{field}'")
+    # monitor fields
+    monitor = spec["monitor"]
+    for field in ["strategy", "patch_target", "capture_what", "additional_imports"]:
+        if field not in monitor:
+            raise ValueError(f"monitor missing field: '{field}'")
 
-    if decision["oracle_approach"] not in _VALID_APPROACHES:
-        raise ValueError(
-            f"decision.oracle_approach invalid: '{decision['oracle_approach']}'. "
-            f"Must be one of {_VALID_APPROACHES}"
-        )
+    valid_strategies = {"inspect_return", "patch_call", "catch_exception"}
+    if monitor["strategy"] not in valid_strategies:
+        raise ValueError(f"monitor.strategy invalid: '{monitor['strategy']}'. Must be one of {valid_strategies}")
 
-    approach = decision["oracle_approach"]
+    if monitor["strategy"] == "patch_call" and not monitor["patch_target"]:
+        raise ValueError("monitor.patch_target must be set when strategy is 'patch_call'")
 
-    # Q3 fields: required only when Q2 is true
-    if decision.get("q2_observable_after_return"):
-        for field in ["q3_accessible_in_memory", "q3_reason"]:
-            if field not in decision:
-                raise ValueError(f"decision missing field: '{field}' (required when Q2 is true)")
-
-    # build_mock must be bool
-    if not isinstance(decision["build_mock"], bool):
-        raise ValueError(f"decision.build_mock must be bool, got: {type(decision['build_mock']).__name__}")
-
-    # Decision Tree consistency: Q2/Q3 must match oracle_approach
-    q2 = decision.get("q2_observable_after_return")
-    if q2 is False and approach != "recorded_call":
-        raise ValueError(
-            f"decision.oracle_approach must be 'recorded_call' when Q2=false, got '{approach}'"
-        )
-    if q2 is True:
-        q3 = decision.get("q3_accessible_in_memory")
-        if q3 is True and approach != "return_value":
-            raise ValueError(
-                f"decision.oracle_approach must be 'return_value' when Q2=true and Q3=true, got '{approach}'"
-            )
-        if q3 is False and approach != "filesystem_state":
-            raise ValueError(
-                f"decision.oracle_approach must be 'filesystem_state' when Q2=true and Q3=false, got '{approach}'"
-            )
-
-    # research fields
-    research = spec["research"]
-    for field in ["target_to_record", "record_selector", "fake_return",
-                  "return_selector", "assertion"]:
-        if field not in research:
-            raise ValueError(f"research missing field: '{field}'")
-
-    # Approach-specific required research fields
-    if approach == "recorded_call":
-        if not research.get("target_to_record"):
-            raise ValueError("research.target_to_record must be set for recorded_call")
-        if research.get("target_arg_index") is None:
-            raise ValueError("research.target_arg_index must be set for recorded_call")
-    elif approach == "return_value":
-        if not research.get("return_selector"):
-            raise ValueError("research.return_selector must be set for return_value")
-    elif approach == "filesystem_state":
-        fsw = research.get("filesystem_watch")
-        if not isinstance(fsw, dict) or not fsw.get("allowed_root"):
-            raise ValueError("research.filesystem_watch.allowed_root must be set for filesystem_state")
+    # if monitor["strategy"] != "inspect_return" and spec["oracle_check"].get("trigger_patterns"):
+    #     raise ValueError("oracle_check.trigger_patterns must be [] when strategy is not 'inspect_return'")
 
     # oracle_check fields
     oracle_check = spec["oracle_check"]
@@ -140,8 +91,8 @@ def validate_oracle_spec(spec: dict) -> None:
         if field not in oracle_check:
             raise ValueError(f"oracle_check missing field: '{field}'")
 
-    if not oracle_check["trigger_patterns"]:
-        raise ValueError("oracle_check.trigger_patterns must not be empty")
+    if monitor["strategy"] in {"patch_call", "inspect_return"} and not oracle_check["trigger_patterns"]:
+        raise ValueError("oracle_check.trigger_patterns must not be empty for patch_call/inspect_return")
 
     # fuzz_guidance fields
     fuzz_guidance = spec["fuzz_guidance"]
@@ -168,4 +119,4 @@ def validate_oracle_spec(spec: dict) -> None:
             if field not in param:
                 raise ValueError(f"tainted_params[{i}] missing field: '{field}'")
         if meta["input_strategy"] == "direct_params" and param["index"] < 0:
-            raise ValueError(f"tainted_params[{i}].index must be >= 0 for direct_params")
+            raise ValueError(f"tainted_params[{i}].index must be >= 0 for direct_params strategy")
