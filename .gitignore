@@ -12,3 +12,4 @@ htmlcov/
 output/
 
 *:Zone.Identifier
+.claude
