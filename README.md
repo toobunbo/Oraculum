@@ -20,7 +20,7 @@ Oraculum nhận **verified finding** từ VulnHunterX và sinh **Atheris harness
 
 ```
  verified         enriched          {strategy,         oracle            Atheris          crash /
- finding    ──►   finding    ──►    mock_type}   ──►   spec       ──►    harness   ──►    violation
+ finding    ──►   finding    ──►    mock_guidance} ─►   spec       ──►    harness   ──►    violation
  (VHX verify)     (ingest)          (Stage 1:          (Stage 2:         (Stage 3:        (fuzz-run)
                                      Classify)          Research)         Harness)
 ```
@@ -29,7 +29,7 @@ Mỗi stage tiêu thụ output có cấu trúc của stage trước; không stag
 
 ## 2. Stage 1: Classification
 
-Stage 1 nhận một **enriched finding** (user prompt) cùng một bộ chỉ dẫn cố định (**system prompt**), suy luận theo decision procedure, và xuất ra `{strategy, mock_type}` — không sinh mã. Sơ đồ quyết định:
+Stage 1 nhận một **enriched finding** (user prompt) cùng một bộ chỉ dẫn cố định (**system prompt**), suy luận theo decision procedure, và xuất ra `{strategy, mock_guidance}` — không sinh mã. Sơ đồ quyết định:
 
 ```
                        enriched finding
@@ -83,12 +83,13 @@ Q3  Is the result accessible in memory on return?  (read `returns`)
       YES → strategy = return_value
       NO  → strategy = filesystem_state
 
-MOCK TYPE  (only when a mock is built)
-<partner-defined enum — TBD>
+MOCK GUIDANCE  (only when recorded_call is selected)
+Free-form guidance describing what sink/call to mock or record, what argument
+or state to capture, and what fake behavior lets execution continue safely.
 
 OUTPUT
 { "strategy": "return_value | recorded_call | filesystem_state",
-  "mock_type": "<mock type> | null" }
+  "mock_guidance": "<object when recorded_call, otherwise null>" }
 
 RULES
 Ground every decision in the finding's sink and data flow — never in
@@ -117,7 +118,7 @@ The verified finding (post-verification schema):
     "exploit_possible": "...",
     "dtd_unrestricted": "..."
   },
-  "returns": { "kind": "value | none", "exprs": ["..."], "persists_to_disk": false }
+  "returns": { "kind": "value | none | mixed | unknown", "exprs": ["..."] }
 }
 ```
 
@@ -126,18 +127,72 @@ The verified finding (post-verification schema):
 ```json
 {
   "strategy": "return_value | recorded_call | filesystem_state",
-  "mock_type": "<mock type do partner định nghĩa, hoặc null>"
+  "mock_guidance": {
+    "required": true,
+    "target": "<sink/call guidance>",
+    "capture": "<argument/state to record>",
+    "fake_behavior": "<safe fake behavior>",
+    "notes": []
+  }
 }
+```
+
+Với `return_value` và `filesystem_state`, `mock_guidance` là `null`.
+
+### 2.4 Chạy classification
+
+Sau khi đã chạy `oraculum ingest` và có `output/python/<repo>/verification_results/summary.json`, chạy Stage 1:
+
+```bash
+oraculum classify \
+  --repo Benchmark \
+  --lang python \
+  --log-file output/python/Benchmark/classifications/classification.md
+```
+
+Chạy lại và overwrite classification cũ:
+
+```bash
+oraculum classify \
+  --repo Benchmark \
+  --lang python \
+  --force \
+  --log-file output/python/Benchmark/classifications/classification.md
+```
+
+Chỉ classify một finding:
+
+```bash
+oraculum classify \
+  --repo Benchmark \
+  --lang python \
+  --finding-id 0
+```
+
+Output:
+
+```text
+output/python/<repo>/classifications/status.json
+output/python/<repo>/classifications/<target_id>.json
+```
+
+Model được resolve theo thứ tự:
+
+```text
+--model
+LLM_PROVIDER + LLM_MODEL
+LLM_MODEL
+config/classification.yaml
 ```
 
 ---
 
 ## 3. Stage 2: Oracle Research
 
-Stage 2 nhận `{strategy, mock_type}` + finding, **route theo strategy** để nạp đúng prompt, rồi sinh **oracle spec** cho Stage 3.
+Stage 2 nhận `{strategy, mock_guidance}` + finding, **route theo strategy** để nạp đúng prompt, rồi sinh **oracle spec** cho Stage 3.
 
 ```
-        {strategy, mock_type} + enriched finding + function source
+        {strategy, mock_guidance} + enriched finding + function source
                                │
                                ▼
                    ┌────────────────────────┐
@@ -154,7 +209,7 @@ Stage 2 nhận `{strategy, mock_type}` + finding, **route theo strategy** để 
                      │            │            │
                      │            ▼            │
                      │     ┌─────────────┐     │
-                     │     │ mock_type    │     │
+                     │     │ mock_guidance│     │
                      │     │ prompt       │     │
                      │     │ http_client /│     │
                      │     │ subprocess / │     │
