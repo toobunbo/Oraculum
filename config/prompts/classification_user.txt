@@ -1,0 +1,8 @@
+## Classification Input
+
+```json
+{classification_payload_json}
+```
+
+Classify this finding using the three-question decision procedure from the
+system prompt. Output strict JSON only.

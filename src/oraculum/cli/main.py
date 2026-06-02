@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 
 from oraculum import __version__
-from oraculum.cli.commands import cmd_harness, cmd_ingest, cmd_oracle
+from oraculum.cli.commands import cmd_classify, cmd_harness, cmd_ingest, cmd_oracle
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -53,6 +53,54 @@ def create_parser() -> argparse.ArgumentParser:
         help="Overwrite existing ingest summary and selected finding artifacts",
     )
     ingest_parser.set_defaults(func=cmd_ingest)
+
+    classify_parser = subparsers.add_parser(
+        "classify",
+        help="Classify ingested findings into runtime oracle strategies",
+    )
+    classify_parser.add_argument("--repo", required=True, help="Repository name")
+    classify_parser.add_argument(
+        "--lang",
+        default="python",
+        choices=["python"],
+        help="Repository language (currently only python)",
+    )
+    classify_parser.add_argument(
+        "--output-dir",
+        default="output",
+        help="Oraculum output directory",
+    )
+    classify_parser.add_argument(
+        "--ingest-summary",
+        help="Explicit ingest summary JSON path",
+    )
+    classify_parser.add_argument(
+        "--finding-id",
+        help="Classify one ingested finding id",
+    )
+    classify_parser.add_argument(
+        "--finding",
+        help="Classify one enriched finding JSON path",
+    )
+    classify_parser.add_argument(
+        "--config",
+        default="config/classification.yaml",
+        help="Classification config path",
+    )
+    classify_parser.add_argument(
+        "--model",
+        help="Override LLM model for this run",
+    )
+    classify_parser.add_argument(
+        "--log-file",
+        help="Write classification LLM audit details to a Markdown log file",
+    )
+    classify_parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Overwrite existing classification JSON files",
+    )
+    classify_parser.set_defaults(func=cmd_classify)
 
     oracle_parser = subparsers.add_parser(
         "oracle",
