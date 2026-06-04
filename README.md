@@ -19,13 +19,13 @@ Kết quả thực nghiệm trên *(benchmark)* cho thấy *(kết quả chính)
 Oraculum nhận **verified finding** từ VulnHunterX và sinh **Atheris harness** phát hiện những lỗi bảo mật mà oracle mặc định của Atheris (crash / unhandled exception) không bắt được. Artifact chảy qua pipeline như sau:
 
 ```
- verified         enriched          {strategy,         oracle            Atheris          crash /
- finding    ──►   finding    ──►    mock_guidance} ─►   spec       ──►    harness   ──►    violation
- (VHX verify)     (ingest)          (Stage 1:          (Stage 2:         (Stage 3:        (fuzz-run)
-                                     Classify)          Research)         Harness)
+ verified         enriched          {strategy,         mock              oracle            Atheris          crash /
+ finding    ──►   finding    ──►    mock_guidance} ─►  construction  ─►   spec       ──►    harness   ──►    violation
+ (VHX verify)     (ingest)          (Stage 1:           (Stage 1.5:      (Stage 2:         (Stage 3:        (fuzz-run)
+                                     Classify)           Mock Analysis)    Research)         Harness)
 ```
 
-Mỗi stage tiêu thụ output có cấu trúc của stage trước; không stage nào sinh mã harness cho đến Stage 3. Tài liệu này đặc tả **Stage 1 (Classification)**; ingest, Stage 2 và Stage 3 có tài liệu riêng.
+Mỗi stage tiêu thụ output có cấu trúc của stage trước; không stage nào sinh mã harness cho đến Stage 3. Tài liệu này đặc tả **Stage 1 (Classification)** và **Stage 1.5 (Mock Analysis)**; ingest, Stage 2 và Stage 3 có tài liệu riêng.
 
 ## 2. Stage 1: Classification
 
@@ -187,9 +187,91 @@ config/classification.yaml
 
 ---
 
+## 2.5 Stage 1.5: Mock Analysis
+
+Stage 1.5 chạy **sau classification**, chỉ xử lý các finding có `strategy = recorded_call`. Nó đọc classification output + finding + source code, gọi LLM trả lời 8 câu hỏi (Q1-Q8) để xác định **cách dựng mock chính xác**: patch target nào, call style gì, return spec ra sao, v.v.
+
+**Tại sao cần Stage 1.5?** Classification trả lời "có cần mock không?" (YES/NO). Mock Analysis trả lời "mock **như thế nào**?" — chi tiết đến mức downstream harness code có thể generate trực tiếp mà không cần LLM suy luận lại.
+
+Đầu ra là JSON có cấu trúc, validate qua `docs/plan/issue/mock_construction_questions.yaml` (23 required fields, enum validation, cross-field rules).
+
+### 2.5.1 Input
+
+- **Classification output**: `output/python/<repo>/classifications/<target_id>.json`
+- **Finding artifact**: từ ingest
+- **Source code**: file chứa function bị lỗi
+
+### 2.5.2 Output
+
+```text
+output/python/<repo>/mock_constructions/status.json
+output/python/<repo>/mock_constructions/<target_id>.json
+```
+
+### 2.5.3 Chạy mock analysis
+
+```bash
+oraculum analyze-mock \
+  --repo Benchmark \
+  --lang python \
+  --log-file output/python/Benchmark/mock_constructions/mock_analysis.md
+```
+
+Chạy lại và overwrite:
+
+```bash
+oraculum analyze-mock \
+  --repo Benchmark \
+  --lang python \
+  --force \
+  --log-file output/python/Benchmark/mock_constructions/mock_analysis.md
+```
+
+Chỉ analyze một finding:
+
+```bash
+oraculum analyze-mock \
+  --repo Benchmark \
+  --lang python \
+  --finding-id 0
+```
+
+### 2.5.4 Config
+
+```yaml
+# config/mock_analysis.yaml
+temperature: 0.0
+max_tokens: 4096
+timeout: 120
+prompts_dir: "config/prompts"
+```
+
+Model được resolve theo thứ tự:
+
+```text
+--model
+LLM_PROVIDER + LLM_MODEL
+LLM_MODEL
+config/mock_analysis.yaml
+```
+
+### 2.5.5 Module structure
+
+```text
+src/oraculum/mock_analysis/
+├── __init__.py         # Module docstring
+├── paths.py            # Path resolution (MockAnalysisPaths dataclass)
+├── llm_client.py       # LLM call + JSON parsing (call_llm, parse_mock_construction)
+├── prompt_builder.py   # Load system/user prompts, build user prompt with finding + source
+├── validator.py        # Validate output against YAML spec (23 fields, enum, cross-field rules)
+└── runner.py           # Main runner (run_mock_analysis) — orchestrate select → LLM → validate → write
+```
+
+---
+
 ## 3. Stage 2: Oracle Research
 
-Stage 2 nhận `{strategy, mock_guidance}` + finding, **route theo strategy** để nạp đúng prompt, rồi sinh **oracle spec** cho Stage 3.
+Stage 2 nhận `{strategy, mock_guidance}` + **mock construction** (nếu có) + finding, **route theo strategy** để nạp đúng prompt, rồi sinh **oracle spec** cho Stage 3.
 
 ```
         {strategy, mock_guidance} + enriched finding + function source

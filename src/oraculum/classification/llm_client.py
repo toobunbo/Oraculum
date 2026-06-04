@@ -161,21 +161,37 @@ def normalize_classification(spec: dict[str, Any]) -> dict[str, Any]:
         warnings.append("LLM response omitted decision; reconstructed from compact response.")
 
     if "mock_guidance" not in normalized:
-        normalized["mock_guidance"] = None
-        warnings.append("LLM response omitted mock_guidance; normalized to null.")
+        if strategy == "recorded_call":
+            normalized["mock_guidance"] = {
+                "required": True,
+                "target": "(mock guidance omitted by LLM; harness stage should infer from finding)",
+                "capture": "(not provided)",
+                "fake_behavior": (
+                    "Use a fake return value that lets execution continue "
+                    "without executing the real sink."
+                ),
+                "notes": ["LLM omitted mock_guidance; synthesized placeholder."],
+            }
+            warnings.append("LLM omitted mock_guidance for recorded_call; synthesized placeholder.")
+        else:
+            normalized["mock_guidance"] = None
+            warnings.append("LLM response omitted mock_guidance; normalized to null.")
     elif strategy == "recorded_call" and isinstance(normalized.get("mock_guidance"), str):
         text = normalized["mock_guidance"]
         normalized["mock_guidance"] = {
             "required": True,
             "target": text,
-            "capture": text,
+            "capture": "See target field; separate capture guidance not provided.",
             "fake_behavior": (
                 "Use a fake return value that lets execution continue without "
                 "executing the real sink."
             ),
-            "notes": ["LLM returned mock_guidance as free-form text; normalized to object."],
+            "notes": [
+                "LLM returned mock_guidance as free-form text; "
+                "target set from raw text, capture inferred from target.",
+            ],
         }
-        warnings.append("LLM response used string mock_guidance; normalized to object.")
+        warnings.append("LLM returned mock_guidance as free-form text; normalized to object.")
 
     if "confidence" not in normalized:
         normalized["confidence"] = "low"
@@ -221,7 +237,7 @@ def _decision_from_compact_response(spec: dict[str, Any]) -> dict[str, Any]:
     elif strategy == "filesystem_state":
         values = (False, True, False)
     elif strategy == "recorded_call":
-        values = (None, None, None)
+        values = (True, None, None)
     else:
         values = (None, None, None)
 

@@ -1,0 +1,22 @@
+## Verified Finding
+
+{finding_json}
+
+## Classification Result
+
+{classification_json}
+
+## Target Function Source Code
+
+```
+{source_code}
+```
+
+## Function Metadata
+
+- function_name: {function_name}
+- file: {file_path}
+- start_line: {start_line}
+- end_line: {end_line}
+
+Produce mock_construction JSON only.
