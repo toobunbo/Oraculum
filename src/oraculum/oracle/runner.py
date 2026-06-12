@@ -108,6 +108,7 @@ def run_oracle(
                 config=config,
                 prompts_dir=prompts_dir,
                 model=resolved_model,
+                ollama_key_state_path=paths.output_dir / ".ollama_key_state.json",
                 index=index,
                 total=total,
                 on_llm_exchange=on_llm_exchange,
@@ -289,6 +290,7 @@ def _generate_spec(
     config: dict[str, Any],
     prompts_dir: Path,
     model: str,
+    ollama_key_state_path: Path,
     index: int,
     total: int,
     on_llm_exchange: OracleLLMCallback | None,
@@ -309,6 +311,7 @@ def _generate_spec(
         float(config.get("temperature", 0.0)),
         int(config.get("max_tokens", 8192)),
         int(config.get("timeout", 180)),
+        ollama_key_state_path=ollama_key_state_path,
     )
     if on_llm_exchange is not None:
         on_llm_exchange(index, total, artifact, system_prompt, user_prompt, raw)

@@ -1,35 +1,22 @@
 import json
-import logging
-import os
 import re
+from pathlib import Path
+
+from oraculum.llm.client import call_llm as _shared_call_llm
 
 
 def call_llm(system_prompt: str, user_prompt: str, model: str,
-             temperature: float = 0.2, max_tokens: int = 1024, timeout: int = 60) -> str:
-    _silence_litellm_optional_provider_warnings()
-    from litellm import completion
-
-    logging.debug("\n========== LLM REQUEST ==========")
-    logging.debug(f"[SYSTEM PROMPT]\n{system_prompt}\n")
-    logging.debug(f"[USER PROMPT]\n{user_prompt}\n")
-
-    response = completion(
+             temperature: float = 0.2, max_tokens: int = 1024, timeout: int = 60,
+             *, ollama_key_state_path: str | Path | None = None) -> str:
+    return _shared_call_llm(
+        system_prompt=system_prompt,
+        user_prompt=user_prompt,
         model=model,
-        messages=[{"role": "system", "content": system_prompt},
-                  {"role": "user",   "content": user_prompt}],
-        temperature=temperature, max_tokens=max_tokens, timeout=timeout,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        timeout=timeout,
+        ollama_key_state_path=ollama_key_state_path,
     )
-
-    content = response.choices[0].message.content
-    logging.debug(f"========== LLM RESPONSE ==========\n{content}\n==================================")
-    return content
-
-
-def _silence_litellm_optional_provider_warnings() -> None:
-    """Suppress noisy LiteLLM warnings for optional providers we do not use."""
-    os.environ.setdefault("LITELLM_LOG", "ERROR")
-    for logger_name in ("LiteLLM", "litellm"):
-        logging.getLogger(logger_name).setLevel(logging.ERROR)
 
 
 def parse_oracle_spec(raw_text: str) -> dict:
