@@ -14,6 +14,7 @@ from dotenv import find_dotenv, load_dotenv
 from oraculum.classification.runner import ClassificationError, run_classification
 from oraculum.harness.runner import HarnessError, run_harness
 from oraculum.ingest.runner import IngestError, run_ingest
+from oraculum.llm.client import check_ollama_keys
 from oraculum.oracle.runner import OracleError, run_oracle
 
 
@@ -450,6 +451,144 @@ def cmd_harness(args: argparse.Namespace) -> int:
     return 0 if result.ok else 1
 
 
+def cmd_check_env(args: argparse.Namespace) -> int:  # noqa: ARG001
+    """Check that the runtime environment is properly configured."""
+    _load_dotenv()
+
+    results: list[tuple[str, str, str]] = []  # (check_name, status, detail)
+    has_error = False
+
+    # --- .env file ---
+    from dotenv import find_dotenv
+
+    dotenv_path = find_dotenv(usecwd=True)
+    if dotenv_path:
+        results.append((".env file", "OK", str(dotenv_path)))
+    else:
+        results.append((".env file", "WARN", "No .env file found in cwd or parents"))
+        has_error = True
+
+    # --- LLM Provider ---
+    valid_providers = {"openai", "ollama", "anthropic"}
+    provider = os.environ.get("LLM_PROVIDER", "").strip().lower()
+    if provider in valid_providers:
+        results.append(("LLM Provider", "OK", provider))
+    else:
+        results.append(("LLM Provider", "FAIL", f"Invalid or unset (got '{provider or '(empty)'}'); expected: {', '.join(sorted(valid_providers))}"))
+        has_error = True
+
+    # --- LLM Model ---
+    model = os.environ.get("LLM_MODEL", "").strip()
+    if model:
+        results.append(("LLM Model", "OK", model))
+    else:
+        results.append(("LLM Model", "FAIL", "LLM_MODEL is not set"))
+        has_error = True
+
+    # --- Provider-specific checks ---
+    if provider == "openai":
+        api_key = os.environ.get("OPENAI_API_KEY", "").strip()
+        if api_key:
+            results.append(("OPENAI_API_KEY", "OK", f"...{api_key[-4:]}"))
+        else:
+            results.append(("OPENAI_API_KEY", "FAIL", "Not set"))
+            has_error = True
+        base_url = os.environ.get("OPENAI_BASE_URL", "").strip()
+        if base_url:
+            results.append(("OPENAI_BASE_URL", "OK", base_url))
+        else:
+            results.append(("OPENAI_BASE_URL", "OK", "Using default (https://api.openai.com/v1)"))
+
+    elif provider == "anthropic":
+        api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
+        if api_key:
+            results.append(("ANTHROPIC_API_KEY", "OK", f"...{api_key[-4:]}"))
+        else:
+            results.append(("ANTHROPIC_API_KEY", "FAIL", "Not set"))
+            has_error = True
+
+    elif provider == "ollama":
+        api_base = os.environ.get("OLLAMA_API_BASE", "").strip()
+        if api_base:
+            results.append(("OLLAMA_API_BASE", "OK", api_base))
+        else:
+            results.append(("OLLAMA_API_BASE", "WARN", "Not set — will default to http://localhost:11434"))
+
+        is_cloud = "ollama.com" in api_base or "-cloud" in model or ":cloud" in model
+        if is_cloud:
+            keys_raw = os.environ.get("OLLAMA_API_KEYS", "").strip()
+            keys = [k.strip() for k in keys_raw.split(",") if k.strip()]
+            if keys:
+                results.append(("OLLAMA_API_KEYS", "OK", f"{len(keys)} key(s) configured"))
+                if not args.skip_connectivity:
+                    print("Testing Ollama Cloud key connectivity...")
+                    sys.stdout.flush()
+                    ok, summary = check_ollama_keys(model, api_base)
+                    if ok:
+                        results.append(("Ollama Connectivity", "OK", summary))
+                    else:
+                        results.append(("Ollama Connectivity", "FAIL", summary))
+                        has_error = True
+            else:
+                results.append(("OLLAMA_API_KEYS", "FAIL", "Cloud mode detected but OLLAMA_API_KEYS is not set"))
+                has_error = True
+        else:
+            results.append(("OLLAMA_API_KEYS", "OK", "Local mode — no keys required"))
+
+    # --- Tool paths ---
+    codeql_path = os.environ.get("CODEQL_PATH", "").strip()
+    if codeql_path:
+        codeql = Path(codeql_path).expanduser()
+        if codeql.is_file():
+            results.append(("CODEQL_PATH", "OK", str(codeql)))
+        else:
+            results.append(("CODEQL_PATH", "FAIL", f"File not found: {codeql}"))
+            has_error = True
+    else:
+        results.append(("CODEQL_PATH", "WARN", "Not set (optional)"))
+
+    # --- VulnHunterX root ---
+    vhx_root = os.environ.get("ORACULUM_VHX_ROOT", "") or os.environ.get("VHX_ROOT", "")
+    if vhx_root:
+        vhx = Path(vhx_root.strip()).expanduser()
+        if vhx.is_dir():
+            results.append(("ORACULUM_VHX_ROOT", "OK", str(vhx)))
+        else:
+            results.append(("ORACULUM_VHX_ROOT", "FAIL", f"Directory not found: {vhx}"))
+            has_error = True
+    else:
+        results.append(("ORACULUM_VHX_ROOT", "WARN", "Not set (required for ingest)"))
+
+    # --- Config files ---
+    config_dir = Path("config")
+    for cfg_name in ("classification.yaml", "oracle.yaml", "harness.yaml"):
+        cfg_path = config_dir / cfg_name
+        if cfg_path.is_file():
+            results.append((f"config/{cfg_name}", "OK", str(cfg_path.resolve())))
+        else:
+            results.append((f"config/{cfg_name}", "FAIL", "Not found"))
+            has_error = True
+
+    # --- Print results ---
+    print("Oraculum Environment Check\n")
+    max_name = max(len(name) for name, _, _ in results)
+    for name, status, detail in results:
+        icon = {"OK": "✅", "FAIL": "❌", "WARN": "⚠️"}.get(status, "?")
+        line = f"  {icon} {name:<{max_name}}  {detail}"
+        print(line)
+
+    print()
+    ok_count = sum(1 for _, s, _ in results if s == "OK")
+    fail_count = sum(1 for _, s, _ in results if s == "FAIL")
+    warn_count = sum(1 for _, s, _ in results if s == "WARN")
+    print(f"  Total: {len(results)} | ✅ {ok_count} OK | ❌ {fail_count} FAIL | ⚠️ {warn_count} WARN")
+    if has_error:
+        print("\n  Some checks failed. Fix the issues above before running Oraculum commands.")
+        return 1
+    print("\n  Environment looks good!")
+    return 0
+
+
 def _load_dotenv() -> None:
     """Load a local .env file without overriding exported environment variables."""
     dotenv_path = find_dotenv(usecwd=True)
@@ -544,6 +683,7 @@ __all__ = [
     "HarnessError",
     "IngestError",
     "OracleError",
+    "cmd_check_env",
     "cmd_classify",
     "cmd_harness",
     "cmd_ingest",

@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 
 from oraculum import __version__
-from oraculum.cli.commands import cmd_classify, cmd_harness, cmd_ingest, cmd_oracle
+from oraculum.cli.commands import cmd_check_env, cmd_classify, cmd_harness, cmd_ingest, cmd_oracle
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -201,6 +201,17 @@ def create_parser() -> argparse.ArgumentParser:
         help="Overwrite existing harness files",
     )
     harness_parser.set_defaults(func=cmd_harness)
+
+    check_env_parser = subparsers.add_parser(
+        "check-env",
+        help="Check that the runtime environment is properly configured",
+    )
+    check_env_parser.add_argument(
+        "--skip-connectivity",
+        action="store_true",
+        help="Skip LLM API connectivity tests (only check config & files)",
+    )
+    check_env_parser.set_defaults(func=cmd_check_env)
     return parser
 
 
