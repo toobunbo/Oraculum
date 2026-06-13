@@ -130,6 +130,7 @@ def run_classification(
                 config=config,
                 prompts_dir=prompts_dir,
                 model=resolved_model,
+                ollama_key_state_path=paths.output_dir / ".ollama_key_state.json",
                 index=index,
                 total=total,
                 on_llm_exchange=on_llm_exchange,
@@ -321,6 +322,7 @@ def _generate_classification(
     config: dict[str, Any],
     prompts_dir: Path,
     model: str,
+    ollama_key_state_path: Path,
     index: int,
     total: int,
     on_llm_exchange: ClassificationLLMCallback | None,
@@ -338,6 +340,7 @@ def _generate_classification(
         float(config.get("temperature", 0.0)),
         int(config.get("max_tokens", 4096)),
         int(config.get("timeout", 120)),
+        ollama_key_state_path=ollama_key_state_path,
     )
     if on_llm_exchange is not None:
         on_llm_exchange(index, total, artifact, system_prompt, user_prompt, raw)

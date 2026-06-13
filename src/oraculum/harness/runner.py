@@ -146,6 +146,7 @@ def run_harness(
                 config=config,
                 prompts_dir=prompts_dir,
                 model=resolved_model,
+                ollama_key_state_path=paths.output_dir / ".ollama_key_state.json",
                 index=index,
                 total=total,
                 on_llm_exchange=on_llm_exchange,
@@ -226,6 +227,7 @@ def generate_one_harness(
         config=config,
         prompts_dir=prompts_dir,
         model=model,
+        ollama_key_state_path=Path("output") / ".ollama_key_state.json",
         index=1,
         total=1,
         on_llm_exchange=None,
@@ -430,6 +432,7 @@ def _generate_harness_code(
     config: dict[str, Any],
     prompts_dir: Path,
     model: str,
+    ollama_key_state_path: Path,
     index: int,
     total: int,
     on_llm_exchange: HarnessLLMCallback | None,
@@ -453,6 +456,7 @@ def _generate_harness_code(
         float(config.get("temperature", 0.15)),
         int(config.get("max_tokens", 8192)),
         int(config.get("timeout", 120)),
+        ollama_key_state_path=ollama_key_state_path,
     )
     if on_llm_exchange is not None:
         on_llm_exchange(index, total, artifact, oracle_spec, system_prompt, user_prompt, raw)
