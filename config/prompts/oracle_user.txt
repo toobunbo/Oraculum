@@ -6,6 +6,10 @@
 
 {answers}
 
+## Classification
+
+{classification}
+
 ## Target Function Signature
 
 {function_signature}

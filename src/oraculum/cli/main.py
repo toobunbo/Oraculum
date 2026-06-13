@@ -131,6 +131,17 @@ def create_parser() -> argparse.ArgumentParser:
         help="Generate oracle for one enriched finding JSON path",
     )
     oracle_parser.add_argument(
+        "--classification-status",
+        help=(
+            "Explicit classification status JSON path "
+            "(default: output/<lang>/<repo>/classifications/status.json when present)"
+        ),
+    )
+    oracle_parser.add_argument(
+        "--classification",
+        help="Generate oracle using one explicit classification JSON path",
+    )
+    oracle_parser.add_argument(
         "--config",
         default="config/oracle.yaml",
         help="Oracle config path",

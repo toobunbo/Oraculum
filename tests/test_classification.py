@@ -269,17 +269,37 @@ def test_normalize_classification_accepts_compact_model_response() -> None:
 
 def test_validate_classification_rejects_invalid_strategy() -> None:
     spec = json.loads(_recorded_response())
-    spec["strategy"] = "patch_call"
+    spec["strategy"] = "unknown_strategy"
 
     with pytest.raises(ValueError, match="strategy invalid"):
         validate_classification(spec)
 
 
-def test_validate_classification_rejects_return_value_with_mock_guidance() -> None:
+def test_validate_classification_accepts_return_value_with_execution_mock_guidance() -> None:
     spec = json.loads(_recorded_response())
     spec["strategy"] = "return_value"
 
-    with pytest.raises(ValueError, match="mock_guidance must be null"):
+    validate_classification(spec)
+
+
+def test_normalize_classification_accepts_filesystem_state() -> None:
+    normalized = normalize_classification(
+        {
+            "strategy": "filesystem_state",
+            "confidence": "medium",
+            "mock_guidance": None,
+        }
+    )
+
+    validate_classification(normalized)
+    assert normalized["strategy"] == "filesystem_state"
+
+
+def test_validate_classification_rejects_invalid_confidence() -> None:
+    spec = json.loads(_recorded_response())
+    spec["confidence"] = "high_medium"
+
+    with pytest.raises(ValueError, match="confidence"):
         validate_classification(spec)
 
 

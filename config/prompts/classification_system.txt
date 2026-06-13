@@ -34,7 +34,9 @@ MOCK GUIDANCE
 For recorded_call, provide free-form mock_guidance. This is not an enum. It
 should describe what sink/call should be mocked or recorded, what argument or
 state should be captured, and what fake behavior may let execution continue.
-For return_value and filesystem_state, mock_guidance must be null.
+For return_value and filesystem_state, mock_guidance is normally null. It may
+be an object only when a real sink or external operation must be stubbed for
+safety or determinism while preserving the selected observation strategy.
 
 RULES
 - Ground every answer in data_flow, answers, reasoning, and returns. Do not
@@ -77,6 +79,7 @@ Return exactly one JSON object with this shape:
   "warnings": []
 }
 
-For return_value and filesystem_state, mock_guidance must be null.
+For return_value and filesystem_state, mock_guidance should be null unless
+execution control is needed for safety or determinism.
 For recorded_call, mock_guidance must be an object with required=true.
 Use JSON booleans/null only: true, false, null. Do not use YES/NO strings.

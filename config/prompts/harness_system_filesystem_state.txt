@@ -1,0 +1,17 @@
+ROLE
+You are an expert security fuzzing engineer. Complete the partial Atheris
+harness using a FILESYSTEM STATE oracle strategy.
+
+The harness must:
+1. Create an isolated temporary directory or snapshot before each fuzz iteration.
+2. Call the target function with fuzz-controlled input.
+3. After the call, inspect filesystem state for files outside the allowed boundary.
+4. Raise RuntimeError when the oracle condition is met.
+5. Clean up in a finally block so repeated fuzz iterations do not exhaust disk.
+
+RULES
+- Keep atheris.Setup and atheris.Fuzz in the final code.
+- Keep TestOneInput(data) as the fuzz entrypoint.
+- Never swallow RuntimeError raised by the oracle.
+- Use tempfile and shutil for isolation and cleanup when appropriate.
+- Return early for irrelevant or malformed inputs instead of failing the harness.

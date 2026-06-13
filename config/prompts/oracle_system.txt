@@ -39,12 +39,12 @@ sequentially based ONLY on the input:
 ## STEP 2: DETERMINE MONITOR STRATEGY & PATTERNS
 Based on your THINKING in Step 1, select exactly one strategy:
 
-  ### patch_call
+  ### recorded_call
   Use when the sink executes a side-effect and the exploit is confirmed by
   inspecting what the sink RECEIVES as an argument
   (e.g., cursor.execute, subprocess.run, requests.get, builtins.open, eval).
 
-  -> strategy        : "patch_call"
+  -> strategy        : "recorded_call"
   -> patch_target    : fully qualified name of the sink as imported inside the
                        target module — NOT the stdlib canonical path.
                        GOOD: "app.db.query.cursor.execute"
@@ -60,12 +60,12 @@ Based on your THINKING in Step 1, select exactly one strategy:
                        appear in the sink's argument to confirm exploitation.
                        Derived from THE SYNTHESIS. MUST NOT BE EMPTY.
 
-  ### inspect_return
+  ### return_value
   Use when the sink returns a value consumed by the caller and the exploit
   manifests as a dangerous fragment surviving in that return value
   (e.g., re.sub output, sanitized HTML/SVG string).
 
-  -> strategy        : "inspect_return"
+  -> strategy        : "return_value"
   -> patch_target    : null
   -> target_arg_index: null
   -> target_arg_name : null
@@ -73,28 +73,28 @@ Based on your THINKING in Step 1, select exactly one strategy:
                        SURVIVES the filter in the return value.
                        Derived from THE SYNTHESIS. MUST NOT BE EMPTY.
 
-  ### catch_exception
-  Use ONLY when the sink raises a catchable exception as the sole bug signal
-  and there is no meaningful argument or return value to inspect.
+  ### filesystem_state
+  Use when violation evidence is only observable through filesystem state after
+  the target function returns.
 
-  -> strategy        : "catch_exception"
+  -> strategy        : "filesystem_state"
   -> patch_target    : null
   -> target_arg_index: null
   -> target_arg_name : null
-  -> trigger_patterns: []
+  -> trigger_patterns: regex list for unsafe paths or [] when state diff alone is sufficient
 
 ## trigger_patterns Rules
-- ALWAYS populate for patch_call and inspect_return.
-  Leave [] ONLY for catch_exception.
+- ALWAYS populate for recorded_call and return_value.
+  For filesystem_state, use patterns when the path string itself is relevant.
 - Derive EXCLUSIVELY from the finding context in this order:
     1. The exact bypass or missing validation described in answers
     2. The attack scenario described in answers or message
     3. The sink description in answers
 - Each entry MUST be a valid Python regex — test mentally:
   re.search(pattern, some_string) must be able to return a match object.
-- For patch_call   : patterns match what the tainted payload looks like
+- For recorded_call : patterns match what the tainted payload looks like
                      when it reaches the sink argument.
-- For inspect_return: patterns match the dangerous fragment that SURVIVES
+- For return_value  : patterns match the dangerous fragment that SURVIVES
                      the filter in the return value.
 - Include encoding or case variants ONLY when the finding explicitly describes
   them — do not add variants speculatively.
@@ -128,16 +128,16 @@ Based on THE SYNTHESIS from Step 1, populate fuzz_guidance:
 ## Output Schema
 {
   "monitor": {
-    "strategy": "<inspect_return | patch_call | catch_exception>",
-    "patch_target": "<fully.qualified.name if patch_call, else null>",
-    "target_arg_index": <0-based int if patch_call, else null>,
-    "target_arg_name": "<keyword name if patch_call, else null>",
+    "strategy": "<return_value | recorded_call | filesystem_state>",
+    "patch_target": "<fully.qualified.name if recorded_call, else null>",
+    "target_arg_index": <0-based int if recorded_call, else null>,
+    "target_arg_name": "<keyword name if recorded_call, else null>",
     "capture_what": "<describe what is captured: sink argument or return value>",
     "additional_imports": ["<module if needed, else []>"]
   },
   "oracle_check": {
     "condition_description": "<precise boolean condition that confirms exploitation>",
-    "trigger_patterns": ["<regex — MUST NOT BE EMPTY for patch_call and inspect_return>"],
+    "trigger_patterns": ["<regex — MUST NOT BE EMPTY for recorded_call and return_value>"],
     "raise_type": "RuntimeError",
     "raise_message_template": "<RULE_ID_UPPER: short description — captured={captured} pattern={matched_pattern}>"
   },

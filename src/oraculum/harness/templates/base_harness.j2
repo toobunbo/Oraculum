@@ -7,7 +7,11 @@ import atheris
 import sys
 import re
 import os
-{% if monitor_strategy == "patch_call" %}
+{% if monitor_strategy == "filesystem_state" %}
+import tempfile
+import shutil
+{% endif %}
+{% if monitor_strategy == "recorded_call" %}
 from unittest.mock import patch, MagicMock
 {% endif %}
 {% for imp in extra_imports %}
@@ -45,8 +49,8 @@ _TAINTED_PARAMS = {{ tainted_params | tojson }}
 # skip_hint        : {{ skip_condition }}
 # ========================================
 
-{% if monitor_strategy == "patch_call" %}
-# === PATCH_CALL SKELETON ===
+{% if monitor_strategy == "recorded_call" %}
+# === RECORDED_CALL SKELETON ===
 # 1. INPUT GENERATION
 #    - Generate inputs for tainted params using FuzzedDataProvider.
 #    - For MULTIPLE params: split the buffer proportionally by param count.
@@ -76,8 +80,8 @@ _TAINTED_PARAMS = {{ tainted_params | tojson }}
 #    - except Exception:    return  → only around the target function call
 # ==========================================
 
-{% elif monitor_strategy == "inspect_return" %}
-# === INSPECT_RETURN SKELETON ===
+{% elif monitor_strategy == "return_value" %}
+# === RETURN_VALUE SKELETON ===
 # 1. INPUT GENERATION
 #    - Generate inputs for tainted params using FuzzedDataProvider.
 #    - For a SINGLE str param: consume ALL remaining bytes as one string:
@@ -110,6 +114,37 @@ _TAINTED_PARAMS = {{ tainted_params | tojson }}
 #    - except RuntimeError: raise   → never swallow oracle signals
 #    - except Exception:    return  → only around the function call
 # ==========================================
+{% elif monitor_strategy == "filesystem_state" %}
+# === FILESYSTEM_STATE SKELETON ===
+# 1. INPUT GENERATION
+#    - Generate inputs for tainted params using FuzzedDataProvider.
+#    - Prefer path-like payloads derived from the fuzz data.
+#
+# 2. ISOLATION
+#    - Create a temporary directory before the target function call.
+#    - Redirect or pass the allowed base directory when the target signature supports it.
+#
+# 3. FUNCTION CALL
+#    - Call the target function inside try/finally.
+#    - except RuntimeError: raise must come BEFORE except Exception.
+#
+# 4. STATE CHECK
+#    - After the call returns, inspect filesystem state for the condition:
+#      {{ condition_desc }}
+#    - Match relevant path strings against _COMPILED_PATTERNS when applicable.
+#    - On violation -> raise RuntimeError(_RAISE_MESSAGE)
+#
+# 5. CLEANUP
+#    - Always remove temporary directories in finally.
+# ==========================================
+
+def _setup_filesystem_snapshot():
+    return tempfile.mkdtemp(prefix="oraculum_fuzz_")
+
+
+def _cleanup_filesystem_snapshot(path):
+    if path:
+        shutil.rmtree(path, ignore_errors=True)
 {% endif %}
 
 def TestOneInput(data):

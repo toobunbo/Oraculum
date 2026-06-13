@@ -5,6 +5,8 @@ from pathlib import Path
 
 from oraculum.cli.main import main
 from oraculum.ingest.runner import run_ingest
+from oraculum.oracle.llm_client import normalize_oracle_spec, validate_oracle_spec
+from oraculum.oracle.prompt_builder import build_user_prompt, load_system_prompt
 from oraculum.oracle.runner import run_oracle
 from oraculum.oracle.signature_builder import (
     build_signature_from_artifact,
@@ -91,7 +93,7 @@ def _oracle_response() -> str:
     return json.dumps(
         {
             "monitor": {
-                "strategy": "patch_call",
+                "strategy": "recorded_call",
                 "patch_target": "pkg.app.open",
                 "target_arg_index": 0,
                 "target_arg_name": None,
@@ -226,7 +228,7 @@ def test_oracle_cli_writes_markdown_log(tmp_path: Path, monkeypatch, capsys) -> 
     assert "### LLM Response (Iteration 1)" in log_text
     assert "You are a fuzzing oracle designer" in log_text
     assert "user-controlled path reaches open" in log_text
-    assert '"strategy": "patch_call"' in log_text
+    assert '"strategy": "recorded_call"' in log_text
     assert "- Result: `generated`" in log_text
     assert "## Summary" in log_text
 
@@ -248,3 +250,123 @@ def test_oracle_signature_uses_flask_view_for_no_param_functions(tmp_path: Path)
 
     assert build_signature_from_artifact(artifact) == "def view()"
     assert get_input_strategy_from_artifact(artifact) == "flask_view"
+
+
+def test_oracle_consumes_classification_strategy_and_mock_guidance(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    vhx_root = _make_vhx_fixture(tmp_path)
+    output_dir = tmp_path / "output"
+    run_ingest(vhx_root=vhx_root, repo="demo", output_dir=output_dir)
+    target_id = "py_path_injection_pkg_app_py_2"
+    classification_path = output_dir / f"python/demo/classifications/{target_id}.json"
+    _write_json(
+        classification_path,
+        {
+            "schema_version": "1.0",
+            "strategy": "return_value",
+            "decision": {},
+            "mock_guidance": {
+                "required": True,
+                "target": "stub open",
+                "capture": "preserve returned string",
+                "fake_behavior": "return controlled content",
+                "notes": [],
+            },
+            "confidence": "medium",
+            "warnings": [],
+        },
+    )
+    _write_json(
+        output_dir / "python/demo/classifications/status.json",
+        {
+            "stage": "classification",
+            "repo": "demo",
+            "lang": "python",
+            "classifications": [
+                {
+                    "id": "0",
+                    "target_id": target_id,
+                    "classification": str(classification_path),
+                    "status": "generated",
+                }
+            ],
+            "errors": [],
+        },
+    )
+    captured: dict[str, str] = {}
+
+    def fake_call(system: str, user: str, *_args, **_kwargs) -> str:
+        captured["system"] = system
+        captured["user"] = user
+        response = json.loads(_oracle_response())
+        response["monitor"]["strategy"] = "recorded_call"
+        return json.dumps(response)
+
+    monkeypatch.setattr("oraculum.oracle.runner.call_llm", fake_call)
+
+    result = run_oracle(repo="demo", output_dir=output_dir, model="test/model")
+
+    assert result.ok
+    assert "return-value inspection" in captured["system"]
+    assert '"strategy": "return_value"' in captured["user"]
+    assert '"target": "stub open"' in captured["user"]
+    spec = json.loads(
+        (output_dir / f"python/demo/fuzz_oracles/{target_id}.json").read_text(encoding="utf-8")
+    )
+    assert spec["monitor"]["strategy"] == "return_value"
+    assert spec["_meta"]["classification_strategy"] == "return_value"
+    assert spec["_meta"]["mock_guidance"]["target"] == "stub open"
+
+
+def test_oracle_prompt_builder_routes_strategy_prompts() -> None:
+    prompts_dir = "config/prompts"
+
+    assert "sink-mocking strategies" in load_system_prompt(prompts_dir, "recorded_call")
+    assert "return-value inspection" in load_system_prompt(prompts_dir, "return_value")
+    assert "filesystem state inspection" in load_system_prompt(prompts_dir, "filesystem_state")
+    assert "fuzzing oracle designer" in load_system_prompt(prompts_dir)
+
+
+def test_oracle_user_prompt_includes_classification_context() -> None:
+    prompt = build_user_prompt(
+        {"finding": {"message": "demo"}},
+        "def target(value: str)",
+        "direct_params",
+        "config/prompts",
+        {"sink_identity": "open(value)"},
+        classification={"strategy": "recorded_call", "mock_guidance": {"target": "open"}},
+    )
+
+    assert "## Classification" in prompt
+    assert '"strategy": "recorded_call"' in prompt
+    assert '"sink_identity": "open(value)"' in prompt
+
+
+def test_normalize_oracle_spec_accepts_compact_recorded_call() -> None:
+    spec = normalize_oracle_spec(
+        {
+            "monitor": {
+                "strategy": "recorded_call",
+                "target": {"module": "builtins", "callable": "eval"},
+                "capture": {"argument_index": 0, "name": "expression"},
+            },
+            "oracle_check": {
+                "predicate": "lambda captured: isinstance(captured, str)",
+            },
+            "fuzz_guidance": {"input_types": ["str"]},
+            "_meta": {
+                "function": "target",
+                "file": "pkg/app.py",
+                "input_strategy": "direct_params",
+                "function_signature": "def target(value: str)",
+                "tainted_params": [{"name": "value", "index": 0, "type": "str"}],
+            },
+        }
+    )
+
+    validate_oracle_spec(spec)
+    assert spec["monitor"]["patch_target"] == "builtins.eval"
+    assert spec["monitor"]["target_arg_index"] == 0
+    assert spec["oracle_check"]["trigger_patterns"] == [r"[\s\S]+"]

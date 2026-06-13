@@ -7,7 +7,8 @@ import pytest
 
 from oraculum.cli.main import main
 from oraculum.harness.llm_client import extract_code, validate_harness
-from oraculum.harness.runner import run_harness
+from oraculum.harness.runner import _load_system_prompt, run_harness
+from oraculum.harness.template_builder import build_skeleton
 
 
 def _write_json(path: Path, data: dict) -> None:
@@ -61,7 +62,7 @@ def _make_harness_fixture(tmp_path: Path) -> Path:
     }
     oracle = {
         "monitor": {
-            "strategy": "patch_call",
+            "strategy": "recorded_call",
             "patch_target": "pkg.app.open",
             "target_arg_index": 0,
             "target_arg_name": None,
@@ -107,7 +108,7 @@ def _make_harness_fixture(tmp_path: Path) -> Path:
                 "finding_artifact": str(artifact_path),
                 "oracle": str(oracle_path),
                 "status": "generated",
-                "strategy": "patch_call",
+                "strategy": "recorded_call",
             }
         ],
         "errors": [],
@@ -230,3 +231,67 @@ def test_harness_validation_rejects_incomplete_fenced_skeleton() -> None:
     assert code.startswith("import atheris")
     with pytest.raises(ValueError, match="missing TestOneInput"):
         validate_harness(code)
+
+
+def test_harness_filesystem_state_uses_correct_prompt(tmp_path: Path) -> None:
+    oracle_spec = {
+        "monitor": {
+            "strategy": "filesystem_state",
+            "patch_target": None,
+            "capture_what": "created files outside base dir",
+            "additional_imports": [],
+        }
+    }
+
+    prompt = _load_system_prompt(Path("config/prompts"), oracle_spec)
+
+    assert "FILESYSTEM STATE oracle strategy" in prompt
+
+
+def test_harness_filesystem_state_skeleton_contains_helpers(tmp_path: Path) -> None:
+    output_dir = _make_harness_fixture(tmp_path)
+    artifact_path = (
+        output_dir
+        / "python/demo/verification_results/findings/finding_0_py_path-injection.json"
+    )
+    artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+    oracle_spec = {
+        "monitor": {
+            "strategy": "filesystem_state",
+            "patch_target": None,
+            "target_arg_index": None,
+            "target_arg_name": None,
+            "capture_what": "filesystem state",
+            "additional_imports": [],
+        },
+        "oracle_check": {
+            "condition_description": "file created outside allowed base",
+            "trigger_patterns": [r"\.\."],
+            "raise_type": "RuntimeError",
+            "raise_message_template": "FILESYSTEM_STATE",
+        },
+        "fuzz_guidance": {"seed_corpus": ["../escape"], "skip_condition": "False"},
+        "_meta": {
+            "target_id": "py_path_injection_pkg_app_py_2",
+            "finding_id": "0",
+            "rule_id": "py/path-injection",
+            "rule_slug": "py_path_injection",
+            "file": "pkg/app.py",
+            "function": "target",
+            "input_strategy": "direct_params",
+            "function_signature": "def target(value: str)",
+            "tainted_params": [{"name": "value", "index": 0, "type": "str"}],
+            "source_finding_artifact": str(artifact_path),
+        },
+    }
+
+    skeleton = build_skeleton(
+        artifact,
+        oracle_spec,
+        repo_root=str(tmp_path / "VulnHunterX/repos/python/demo"),
+        corpus_dir=str(tmp_path / "corpus"),
+    )
+
+    assert "import tempfile" in skeleton
+    assert "_setup_filesystem_snapshot" in skeleton
+    assert "FILESYSTEM_STATE SKELETON" in skeleton

@@ -103,7 +103,7 @@ def validate_classification(spec: dict[str, Any]) -> None:
     if strategy == "recorded_call":
         _validate_mock_guidance(mock_guidance)
     elif mock_guidance is not None:
-        raise ValueError("classification.mock_guidance must be null unless strategy is recorded_call")
+        _validate_optional_mock_guidance(mock_guidance)
 
     if spec["confidence"] not in VALID_CONFIDENCE:
         raise ValueError("classification.confidence must be high, medium, or low")
@@ -130,6 +130,23 @@ def _validate_mock_guidance(value: Any) -> None:
         raise ValueError("classification.mock_guidance.notes must be a list of strings")
 
 
+def _validate_optional_mock_guidance(value: Any) -> None:
+    if not isinstance(value, dict):
+        raise ValueError("classification.mock_guidance must be an object or null")
+    required = ("required", "target", "capture", "fake_behavior", "notes")
+    missing = [field for field in required if field not in value]
+    if missing:
+        raise ValueError(f"classification.mock_guidance missing fields: {', '.join(missing)}")
+    if not isinstance(value.get("required"), bool):
+        raise ValueError("classification.mock_guidance.required must be a boolean")
+    for field in ("target", "capture", "fake_behavior"):
+        if not isinstance(value.get(field), str):
+            raise ValueError(f"classification.mock_guidance.{field} must be a string")
+    notes = value.get("notes")
+    if not isinstance(notes, list) or not all(isinstance(item, str) for item in notes):
+        raise ValueError("classification.mock_guidance.notes must be a list of strings")
+
+
 def normalize_classification(spec: dict[str, Any]) -> dict[str, Any]:
     """Normalize common compact LLM outputs into the classification schema."""
     normalized = dict(spec)
@@ -143,6 +160,8 @@ def normalize_classification(spec: dict[str, Any]) -> dict[str, Any]:
     if "decision" not in normalized:
         normalized["decision"] = _decision_from_compact_response(normalized)
         warnings.append("LLM response omitted decision; reconstructed from compact response.")
+    elif isinstance(normalized["decision"], dict):
+        _normalize_decision_answers(normalized["decision"])
 
     if "mock_guidance" not in normalized:
         normalized["mock_guidance"] = None
@@ -175,6 +194,14 @@ def _normalized_warnings(value: Any) -> list[str]:
     if value in (None, ""):
         return []
     return [str(value)]
+
+
+def _normalize_decision_answers(decision: dict[str, Any]) -> None:
+    for field in DECISION_FIELDS:
+        item = decision.get(field)
+        if not isinstance(item, dict) or "answer" not in item:
+            continue
+        item["answer"] = _parse_answer(item["answer"])
 
 
 def _decision_from_compact_response(spec: dict[str, Any]) -> dict[str, Any]:

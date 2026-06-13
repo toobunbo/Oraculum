@@ -11,7 +11,13 @@ from typing import Any
 
 import yaml
 
-from oraculum.oracle.llm_client import call_llm, parse_oracle_spec, validate_oracle_spec
+from oraculum.core.strategy import validate_strategy
+from oraculum.oracle.llm_client import (
+    call_llm,
+    normalize_oracle_spec,
+    parse_oracle_spec,
+    validate_oracle_spec,
+)
 from oraculum.oracle.paths import OraclePaths, resolve_oracle_paths, target_id_for_artifact
 from oraculum.oracle.prompt_builder import build_user_prompt, load_system_prompt
 from oraculum.oracle.signature_builder import (
@@ -52,6 +58,8 @@ def run_oracle(
     ingest_summary: Path | None = None,
     finding_id: str | None = None,
     finding: Path | None = None,
+    classification_status: Path | None = None,
+    classification: Path | None = None,
     config_path: Path = Path("config/oracle.yaml"),
     model: str | None = None,
     force: bool = False,
@@ -73,6 +81,11 @@ def run_oracle(
         ingest_summary=ingest_summary,
         finding_id=finding_id,
         finding=finding,
+    )
+    classifications, source_classification_status, classification_required = _select_classifications(
+        paths=paths,
+        classification_status=classification_status,
+        classification=classification,
     )
 
     paths.fuzz_oracles_dir.mkdir(parents=True, exist_ok=True)
@@ -101,10 +114,16 @@ def run_oracle(
                     on_finding_complete(index, total, artifact, "skipped_existing", str(oracle_path))
                 continue
 
+            selected_classification = _classification_for_target(
+                target_id=target_id,
+                classifications=classifications,
+                required=classification_required,
+            )
             spec = _generate_spec(
                 artifact=artifact,
                 artifact_path=artifact_path,
                 target_id=target_id,
+                classification=selected_classification,
                 config=config,
                 prompts_dir=prompts_dir,
                 model=resolved_model,
@@ -145,7 +164,12 @@ def run_oracle(
         "lang": lang,
         "model": resolved_model,
         "config": str(config_path),
-        "source": {"ingest_summary_path": str(source_summary) if source_summary else ""},
+        "source": {
+            "ingest_summary_path": str(source_summary) if source_summary else "",
+            "classification_status_path": (
+                str(source_classification_status) if source_classification_status else ""
+            ),
+        },
         "counts": {
             "selected": len(artifacts),
             "generated": generated,
@@ -232,6 +256,82 @@ def _select_artifacts(
     return selected, summary_path
 
 
+def _select_classifications(
+    *,
+    paths: OraclePaths,
+    classification_status: Path | None,
+    classification: Path | None,
+) -> tuple[dict[str, dict[str, Any]], Path | None, bool]:
+    if classification is not None:
+        path = classification.expanduser()
+        spec = _load_classification(path)
+        target_id = _target_id_from_classification_path_or_meta(path, spec)
+        return {target_id: spec}, None, True
+
+    status_path = (classification_status or paths.repo_output / "classifications" / "status.json").expanduser()
+    if not status_path.exists():
+        if classification_status is not None:
+            raise OracleError(f"Could not read classification status: {status_path}")
+        return {}, None, False
+
+    try:
+        status = json.loads(status_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise OracleError(f"Invalid classification status JSON: {status_path}: {exc}") from exc
+    except OSError as exc:
+        raise OracleError(f"Could not read classification status: {status_path}: {exc}") from exc
+    raw_entries = status.get("classifications")
+    if not isinstance(raw_entries, list):
+        raise OracleError(f"Classification status missing classifications list: {status_path}")
+
+    selected: dict[str, dict[str, Any]] = {}
+    for entry in raw_entries:
+        if not isinstance(entry, dict) or entry.get("status") not in {"generated", "skipped_existing"}:
+            continue
+        target_id = str(entry.get("target_id") or "")
+        raw_path = str(entry.get("classification") or "")
+        if not target_id or not raw_path:
+            continue
+        selected[target_id] = _load_classification(_resolve_artifact_path(raw_path, status_path))
+    return selected, status_path, True
+
+
+def _load_classification(path: Path) -> dict[str, Any]:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise OracleError(f"Invalid classification JSON: {path}: {exc}") from exc
+    except OSError as exc:
+        raise OracleError(f"Could not read classification: {path}: {exc}") from exc
+    if not isinstance(data, dict):
+        raise OracleError(f"Classification artifact must be a JSON object: {path}")
+    strategy = data.get("strategy")
+    if not isinstance(strategy, str) or not strategy:
+        raise OracleError(f"Classification missing strategy: {path}")
+    validate_strategy(strategy)
+    return data
+
+
+def _target_id_from_classification_path_or_meta(path: Path, spec: dict[str, Any]) -> str:
+    meta = spec.get("_meta") if isinstance(spec.get("_meta"), dict) else {}
+    target_id = str(meta.get("target_id") or "")
+    if target_id:
+        return target_id
+    return path.stem
+
+
+def _classification_for_target(
+    *,
+    target_id: str,
+    classifications: dict[str, dict[str, Any]],
+    required: bool,
+) -> dict[str, Any] | None:
+    classification = classifications.get(target_id)
+    if required and classification is None:
+        raise OracleError(f"Classification not found for target: {target_id}")
+    return classification
+
+
 def _resolve_artifact_path(raw: str, summary_path: Path) -> Path:
     path = Path(raw).expanduser()
     if path.is_absolute():
@@ -287,6 +387,7 @@ def _generate_spec(
     artifact: dict[str, Any],
     artifact_path: Path,
     target_id: str,
+    classification: dict[str, Any] | None,
     config: dict[str, Any],
     prompts_dir: Path,
     model: str,
@@ -298,10 +399,18 @@ def _generate_spec(
     signature = build_signature_from_artifact(artifact)
     input_strategy = get_input_strategy_from_artifact(artifact)
     verification = artifact.get("verification") if isinstance(artifact.get("verification"), dict) else {}
-    answers = verification.get("answers") if isinstance(verification.get("answers"), list) else None
+    answers = verification.get("answers") if isinstance(verification.get("answers"), (list, dict)) else None
 
-    system_prompt = load_system_prompt(str(prompts_dir))
-    user_prompt = build_user_prompt(artifact, signature, input_strategy, str(prompts_dir), answers)
+    strategy = str(classification.get("strategy")) if classification else None
+    system_prompt = load_system_prompt(str(prompts_dir), strategy)
+    user_prompt = build_user_prompt(
+        artifact,
+        signature,
+        input_strategy,
+        str(prompts_dir),
+        answers,
+        classification=classification,
+    )
     if on_llm_exchange is not None:
         on_llm_exchange(index, total, artifact, system_prompt, user_prompt, None)
     raw = call_llm(
@@ -315,7 +424,9 @@ def _generate_spec(
     )
     if on_llm_exchange is not None:
         on_llm_exchange(index, total, artifact, system_prompt, user_prompt, raw)
-    spec = parse_oracle_spec(raw)
+    spec = normalize_oracle_spec(parse_oracle_spec(raw))
+    if classification:
+        _apply_classification_strategy(spec, classification)
     _add_meta(
         spec=spec,
         artifact=artifact,
@@ -327,6 +438,25 @@ def _generate_spec(
     )
     validate_oracle_spec(spec)
     return spec
+
+
+def _apply_classification_strategy(spec: dict[str, Any], classification: dict[str, Any]) -> None:
+    strategy = str(classification.get("strategy") or "")
+    validate_strategy(strategy)
+    monitor = spec.setdefault("monitor", {})
+    if not isinstance(monitor, dict):
+        raise OracleError("oracle_spec.monitor must be an object")
+    monitor["strategy"] = strategy
+    if strategy == "recorded_call" and not monitor.get("patch_target"):
+        mock_guidance = classification.get("mock_guidance")
+        if isinstance(mock_guidance, dict) and mock_guidance.get("target"):
+            monitor["patch_target"] = str(mock_guidance["target"])
+    meta = spec.setdefault("_meta", {})
+    if isinstance(meta, dict):
+        meta["classification_strategy"] = strategy
+        meta["classification_confidence"] = str(classification.get("confidence", ""))
+        if classification.get("mock_guidance") is not None:
+            meta["mock_guidance"] = classification["mock_guidance"]
 
 
 def _add_meta(
@@ -352,10 +482,27 @@ def _add_meta(
             "function": function["name"],
             "input_strategy": input_strategy,
             "function_signature": signature,
+            "tainted_params": meta.get("tainted_params")
+            or _tainted_params_from_signature(signature, input_strategy),
             "model": model,
             "source_finding_artifact": str(artifact_path),
         }
     )
+
+
+def _tainted_params_from_signature(signature: str, input_strategy: str) -> list[dict[str, Any]]:
+    if input_strategy == "flask_view":
+        return [{"name": "request", "index": -1, "type": "flask_request"}]
+    inside = signature.partition("(")[2].rpartition(")")[0]
+    params: list[dict[str, Any]] = []
+    for index, raw_param in enumerate(part.strip() for part in inside.split(",")):
+        if not raw_param or raw_param in {"self", "cls"}:
+            continue
+        name = raw_param.split(":", 1)[0].strip().lstrip("*")
+        param_type = raw_param.split(":", 1)[1].strip() if ":" in raw_param else "Any"
+        if name:
+            params.append({"name": name, "index": index, "type": param_type or "Any"})
+    return params or [{"name": "data", "index": 0, "type": "bytes"}]
 
 
 def _entry_base(

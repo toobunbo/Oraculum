@@ -204,6 +204,10 @@ def cmd_oracle(args: argparse.Namespace) -> int:
         print(f"  Finding id: {args.finding_id}")
     if args.finding:
         print(f"  Finding: {Path(args.finding)}")
+    if args.classification_status:
+        print(f"  Classification status: {Path(args.classification_status)}")
+    if args.classification:
+        print(f"  Classification: {Path(args.classification)}")
     sys.stdout.flush()
 
     def write_log(line: str = "") -> None:
@@ -274,6 +278,10 @@ def cmd_oracle(args: argparse.Namespace) -> int:
             ingest_summary=Path(args.ingest_summary) if args.ingest_summary else None,
             finding_id=args.finding_id,
             finding=Path(args.finding) if args.finding else None,
+            classification_status=(
+                Path(args.classification_status) if args.classification_status else None
+            ),
+            classification=Path(args.classification) if args.classification else None,
             config_path=Path(args.config),
             model=args.model,
             force=args.force,
@@ -619,6 +627,10 @@ def _write_oracle_log_header(log_fh: TextIO, args: argparse.Namespace) -> None:
     log_fh.write(f"- Output dir: `{Path(args.output_dir)}`\n")
     if args.ingest_summary:
         log_fh.write(f"- Ingest summary: `{Path(args.ingest_summary)}`\n")
+    if getattr(args, "classification_status", None):
+        log_fh.write(f"- Classification status: `{Path(args.classification_status)}`\n")
+    if getattr(args, "classification", None):
+        log_fh.write(f"- Classification: `{Path(args.classification)}`\n")
     if args.finding_id:
         log_fh.write(f"- Finding id: `{args.finding_id}`\n")
     if args.finding:

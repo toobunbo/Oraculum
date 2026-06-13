@@ -308,7 +308,6 @@ def _validate_artifact(artifact: dict[str, Any], path: Path) -> None:
         (finding, "finding.file"),
         (finding, "finding.start_line"),
         (verification, "verification.reasoning"),
-        (verification, "verification.data_flow"),
         (function, "function.name"),
     ]
     missing = [name for obj, name in required_pairs if obj.get(name.split(".", 1)[1]) in (None, "")]
