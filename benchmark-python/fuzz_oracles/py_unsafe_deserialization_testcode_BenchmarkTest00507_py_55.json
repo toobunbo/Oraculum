@@ -1,0 +1,76 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "target": "pickle.loads",
+    "module": "pickle",
+    "capture": {
+      "argument_index": 0,
+      "type": "bytes"
+    },
+    "patch_target": "pickle.pickle.loads",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "captured value",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "predicate": "lambda arg: isinstance(arg, bytes) and (b'__reduce__' in arg or b'__getattr__' in arg or b'__setattr__' in arg or b'__delattr__' in arg or b'__getstate__' in arg or b'__setstate__' in arg or b'__reduce_ex__' in arg or b'exec' in arg or b'eval' in arg or b'compile' in arg or b'import' in arg or b'open' in arg or b'os' in arg or b'subprocess' in arg or b'system' in arg or b'popen' in arg or b'pickle' in arg or b'loads' in arg or b'load' in arg)",
+    "condition_description": "lambda arg: isinstance(arg, bytes) and (b'__reduce__' in arg or b'__getattr__' in arg or b'__setattr__' in arg or b'__delattr__' in arg or b'__getstate__' in arg or b'__setstate__' in arg or b'__reduce_ex__' in arg or b'exec' in arg or b'eval' in arg or b'compile' in arg or b'import' in arg or b'open' in arg or b'os' in arg or b'subprocess' in arg or b'system' in arg or b'popen' in arg or b'pickle' in arg or b'loads' in arg or b'load' in arg)",
+    "trigger_patterns": [
+      "[\\s\\S]+"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "ORACULUM_VIOLATION: captured={captured}"
+  },
+  "fuzz_guidance": {
+    "sink_trigger": "The fuzzer should provide a payload that reaches the HTTP header 'BenchmarkTest00507', which will be base64-decoded and passed to pickle.loads.",
+    "input_structure": {
+      "type": "http_header",
+      "name": "BenchmarkTest00507",
+      "encoding": "base64"
+    },
+    "target_sink": "pickle.loads",
+    "expected_violation": "Payloads containing dangerous pickle opcodes or suspicious substrings should trigger the oracle.",
+    "seed_corpus": [],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "aliasing_risk": "Ensure no aliasing of pickle.loads through variable assignment or import renaming (e.g., import pickle as p; p.loads()).",
+    "import_risk": "Verify that pickle is imported directly as 'import pickle' and not through wildcard or aliasing.",
+    "async_risk": "Not applicable for this synchronous Flask view function.",
+    "notes": [
+      "The mock should prevent actual deserialization to avoid RCE during fuzzing.",
+      "The captured argument is the output of base64.urlsafe_b64decode(bar), which is bytes.",
+      "The predicate checks for known dangerous pickle opcodes and common exploit patterns."
+    ],
+    "classification_strategy": "recorded_call",
+    "classification_confidence": "high",
+    "mock_guidance": {
+      "required": true,
+      "target": "Mock the `pickle.loads()` call to prevent actual deserialization of untrusted data.",
+      "capture": "Capture the argument passed to `pickle.loads()` to verify it originates from user input.",
+      "fake_behavior": "Return a safe dummy object or raise an exception to simulate defense against unsafe deserialization.",
+      "notes": [
+        "Ensure the mock prevents execution of arbitrary code during deserialization.",
+        "Verify that base64 decoding occurs before the mocked pickle.loads call."
+      ]
+    },
+    "target_id": "py_unsafe_deserialization_testcode_BenchmarkTest00507_py_55",
+    "finding_id": "24",
+    "rule_id": "py/unsafe-deserialization",
+    "rule_slug": "py_unsafe-deserialization",
+    "file": "testcode/BenchmarkTest00507.py",
+    "function": "BenchmarkTest00507_post",
+    "input_strategy": "flask_view",
+    "function_signature": "def BenchmarkTest00507_post()",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": -1,
+        "type": "flask_request"
+      }
+    ],
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "output/python/benchmark-python/verification_results/findings/finding_24_py_unsafe-deserialization.json"
+  }
+}

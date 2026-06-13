@@ -1,0 +1,83 @@
+{
+  "id": "13",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/tuonglnc/repo/VulnHunterX",
+    "vhx_repo_root": "/home/tuonglnc/repo/VulnHunterX/repos/python/benchmark-python",
+    "vhx_output_root": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python",
+    "summary_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/verification_results/summary_benchmark-python_filtered_20260610_105228.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "testcode/BenchmarkTest00005.py",
+    "start_line": 60,
+    "end_line": 60,
+    "repo_name": "benchmark-python",
+    "lang": "python",
+    "sarif_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/benchmark-python.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 39: ControlFlowNode for request",
+      "line 39: ControlFlowNode for Attribute",
+      "line 39: ControlFlowNode for Attribute()",
+      "line 39: ControlFlowNode for Attribute()",
+      "line 39: ControlFlowNode for param",
+      "line 43: ControlFlowNode for param",
+      "line 43: [post] ControlFlowNode for map44013 [Dictionary element at key keyB-44013]",
+      "line 44: ControlFlowNode for map44013 [Dictionary element at key keyB-44013]",
+      "line 45: ControlFlowNode for map44013 [Dictionary element at key keyB-44013]",
+      "line 45: ControlFlowNode for Subscript",
+      "line 45: ControlFlowNode for bar",
+      "line 59: ControlFlowNode for fileName",
+      "line 60: ControlFlowNode for fileName"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [],
+    "tags": [
+      "correctness",
+      "security",
+      "external/cwe/cwe-022",
+      "external/cwe/cwe-023",
+      "external/cwe/cwe-036",
+      "external/cwe/cwe-073",
+      "external/cwe/cwe-099"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-06-10T10:45:02.265312",
+    "context_needed": [],
+    "data_flow": "",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "answers": [
+      "The exact file-operation sink is not visible in the provided code context. The flagged line 60 is mentioned in the CodeQL finding but not shown in the code snippet.",
+      "The assignments to the path value are not visible as the relevant code lines are not provided.",
+      "The data flow from user input (request.cookies.get) to the parameter 'param' is visible on line 8, but the subsequent flow to the sink is not visible.",
+      "No constant-time conditions or reassignments can be identified as the relevant code is not visible.",
+      "No specific defense can be identified as the relevant code is not visible.",
+      "Cannot definitively determine if user-tainted value reaches the sink because the sink and relevant code path are not visible in the provided context."
+    ],
+    "confidence_score": 0.6,
+    "iterations": 11,
+    "input_tokens": 44620,
+    "elapsed_seconds": 65.47751188278198,
+    "confidence": "Low",
+    "cached_input_tokens": 0,
+    "tokens_used": 47423,
+    "reasoning": "The CodeQL tool has high precision and flags a path injection vulnerability. User input from cookies flows into the function, and while we can see the beginning of the data flow, the sink code is not visible. Given the high precision of the finding and the presence of user input in a file path context, this leans toward being a true positive, though we cannot see the specific sink to confirm adequate defenses.",
+    "verdict": "True Positive",
+    "output_tokens": 2803
+  },
+  "function": {
+    "name": "BenchmarkTest00005_post",
+    "file": "testcode/BenchmarkTest00005.py",
+    "start_line": 35,
+    "end_line": 77,
+    "scope": "Function init"
+  }
+}

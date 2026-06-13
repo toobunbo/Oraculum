@@ -1,0 +1,254 @@
+{
+  "stage": "ingest",
+  "repo": "benchmark-python",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/tuonglnc/repo/VulnHunterX",
+    "vhx_repo_root": "/home/tuonglnc/repo/VulnHunterX/repos/python/benchmark-python",
+    "vhx_output_root": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python",
+    "summary_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/verification_results/summary_benchmark-python_filtered_20260610_105228.json"
+  },
+  "counts": {
+    "total_verdicts": 45,
+    "selected": 33,
+    "enriched": 33,
+    "skipped": 12,
+    "failed": 0
+  },
+  "findings": [
+    {
+      "id": "0",
+      "rule_id": "py/code-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_0_py_code-injection.json",
+      "function_name": "BenchmarkTest00073_post"
+    },
+    {
+      "id": "1",
+      "rule_id": "py/code-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_1_py_code-injection.json",
+      "function_name": "BenchmarkTest00156_post"
+    },
+    {
+      "id": "3",
+      "rule_id": "py/code-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_3_py_code-injection.json",
+      "function_name": "BenchmarkTest00158_post"
+    },
+    {
+      "id": "4",
+      "rule_id": "py/code-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_4_py_code-injection.json",
+      "function_name": "BenchmarkTest00159_post"
+    },
+    {
+      "id": "5",
+      "rule_id": "py/command-line-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_5_py_command-line-injection.json",
+      "function_name": "BenchmarkTest00165_post"
+    },
+    {
+      "id": "7",
+      "rule_id": "py/command-line-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_7_py_command-line-injection.json",
+      "function_name": "BenchmarkTest00167_post"
+    },
+    {
+      "id": "8",
+      "rule_id": "py/command-line-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_8_py_command-line-injection.json",
+      "function_name": "BenchmarkTest00168_post"
+    },
+    {
+      "id": "9",
+      "rule_id": "py/command-line-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_9_py_command-line-injection.json",
+      "function_name": "BenchmarkTest00267_post"
+    },
+    {
+      "id": "10",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_10_py_path-injection.json",
+      "function_name": "BenchmarkTest00001_post"
+    },
+    {
+      "id": "11",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_11_py_path-injection.json",
+      "function_name": "BenchmarkTest00002_post"
+    },
+    {
+      "id": "13",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_13_py_path-injection.json",
+      "function_name": "BenchmarkTest00005_post"
+    },
+    {
+      "id": "15",
+      "rule_id": "py/reflective-xss",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_15_py_reflective-xss.json",
+      "function_name": "BenchmarkTest00150_post"
+    },
+    {
+      "id": "16",
+      "rule_id": "py/reflective-xss",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_16_py_reflective-xss.json",
+      "function_name": "BenchmarkTest00256_post"
+    },
+    {
+      "id": "17",
+      "rule_id": "py/reflective-xss",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_17_py_reflective-xss.json",
+      "function_name": "BenchmarkTest00257_post"
+    },
+    {
+      "id": "18",
+      "rule_id": "py/reflective-xss",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_18_py_reflective-xss.json",
+      "function_name": "BenchmarkTest00591_post"
+    },
+    {
+      "id": "19",
+      "rule_id": "py/reflective-xss",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_19_py_reflective-xss.json",
+      "function_name": "BenchmarkTest01083_post"
+    },
+    {
+      "id": "20",
+      "rule_id": "py/unsafe-deserialization",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_20_py_unsafe-deserialization.json",
+      "function_name": "BenchmarkTest00078_post"
+    },
+    {
+      "id": "21",
+      "rule_id": "py/unsafe-deserialization",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_21_py_unsafe-deserialization.json",
+      "function_name": "BenchmarkTest00164_post"
+    },
+    {
+      "id": "22",
+      "rule_id": "py/unsafe-deserialization",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_22_py_unsafe-deserialization.json",
+      "function_name": "BenchmarkTest00270_post"
+    },
+    {
+      "id": "24",
+      "rule_id": "py/unsafe-deserialization",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_24_py_unsafe-deserialization.json",
+      "function_name": "BenchmarkTest00507_post"
+    },
+    {
+      "id": "25",
+      "rule_id": "py/url-redirection",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_25_py_url-redirection.json",
+      "function_name": "BenchmarkTest00067_post"
+    },
+    {
+      "id": "26",
+      "rule_id": "py/url-redirection",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_26_py_url-redirection.json",
+      "function_name": "BenchmarkTest00068_post"
+    },
+    {
+      "id": "27",
+      "rule_id": "py/url-redirection",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_27_py_url-redirection.json",
+      "function_name": "BenchmarkTest00151_post"
+    },
+    {
+      "id": "28",
+      "rule_id": "py/url-redirection",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_28_py_url-redirection.json",
+      "function_name": "BenchmarkTest00258_post"
+    },
+    {
+      "id": "30",
+      "rule_id": "py/xml-bomb",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_30_py_xml-bomb.json",
+      "function_name": "BenchmarkTest00017_post"
+    },
+    {
+      "id": "31",
+      "rule_id": "py/xml-bomb",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_31_py_xml-bomb.json",
+      "function_name": "BenchmarkTest00204_post"
+    },
+    {
+      "id": "32",
+      "rule_id": "py/xml-bomb",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_32_py_xml-bomb.json",
+      "function_name": "BenchmarkTest00459_post"
+    },
+    {
+      "id": "33",
+      "rule_id": "py/xml-bomb",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_33_py_xml-bomb.json",
+      "function_name": "BenchmarkTest00460_post"
+    },
+    {
+      "id": "34",
+      "rule_id": "py/xml-bomb",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_34_py_xml-bomb.json",
+      "function_name": "BenchmarkTest00539_post"
+    },
+    {
+      "id": "37",
+      "rule_id": "py/xpath-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_37_py_xpath-injection.json",
+      "function_name": "BenchmarkTest00021_post"
+    },
+    {
+      "id": "40",
+      "rule_id": "py/xxe",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_40_py_xxe.json",
+      "function_name": "BenchmarkTest00460_post"
+    },
+    {
+      "id": "42",
+      "rule_id": "py/xxe",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_42_py_xxe.json",
+      "function_name": "BenchmarkTest00679_post"
+    },
+    {
+      "id": "43",
+      "rule_id": "py/xxe",
+      "verdict": "True Positive",
+      "artifact": "output/python/benchmark-python/verification_results/findings/finding_43_py_xxe.json",
+      "function_name": "BenchmarkTest00930_post"
+    }
+  ],
+  "errors": []
+}

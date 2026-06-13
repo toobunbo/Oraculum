@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink involves subprocess execution with user-controlled input via f-string formatting, which is dangerous due to potential command injection."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "Not evaluated because Q1 was true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated because Q1 was true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "subprocess call that executes argStr",
+    "capture": "the constructed argStr value and possibly the request.form input",
+    "fake_behavior": "stub the subprocess execution to prevent actual shell command execution while capturing the command string for verification",
+    "notes": [
+      "Ensure the subprocess call is mocked to avoid arbitrary command execution during testing.",
+      "Capture the final argStr value to verify it contains the expected user input.",
+      "Consider mocking at a higher level if the exact subprocess call site is not directly accessible."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}
