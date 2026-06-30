@@ -1,9 +1,0 @@
-# Oraculum Classification Run
-
-- Started: `2026-06-12T16:01:10`
-- Repo: `python/benchmark-python`
-- Output dir: `output`
-
-## Failed
-
-`[Errno 17] File exists: 'output/python/benchmark-python/classifications'`
