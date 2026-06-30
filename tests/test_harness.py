@@ -61,7 +61,7 @@ def _make_harness_fixture(tmp_path: Path) -> Path:
     }
     oracle = {
         "monitor": {
-            "strategy": "patch_call",
+            "strategy": "recorded_call",
             "patch_target": "pkg.app.open",
             "target_arg_index": 0,
             "target_arg_name": None,
@@ -107,7 +107,7 @@ def _make_harness_fixture(tmp_path: Path) -> Path:
                 "finding_artifact": str(artifact_path),
                 "oracle": str(oracle_path),
                 "status": "generated",
-                "strategy": "patch_call",
+                "strategy": "recorded_call",
             }
         ],
         "errors": [],

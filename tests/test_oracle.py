@@ -91,7 +91,7 @@ def _oracle_response() -> str:
     return json.dumps(
         {
             "monitor": {
-                "strategy": "patch_call",
+                "strategy": "recorded_call",
                 "patch_target": "pkg.app.open",
                 "target_arg_index": 0,
                 "target_arg_name": None,
@@ -226,7 +226,7 @@ def test_oracle_cli_writes_markdown_log(tmp_path: Path, monkeypatch, capsys) -> 
     assert "### LLM Response (Iteration 1)" in log_text
     assert "You are a fuzzing oracle designer" in log_text
     assert "user-controlled path reaches open" in log_text
-    assert '"strategy": "patch_call"' in log_text
+    assert '"strategy": "recorded_call"' in log_text
     assert "- Result: `generated`" in log_text
     assert "## Summary" in log_text
 
