@@ -101,6 +101,16 @@ def run_oracle(
                     on_finding_complete(index, total, artifact, "skipped_existing", str(oracle_path))
                 continue
 
+            # Load classification output JSON from repo_output / "classifications" / f"{target_id}.json"
+            classifications_dir = paths.repo_output / "classifications"
+            classification_path = classifications_dir / f"{target_id}.json"
+            classification = None
+            if classification_path.is_file():
+                try:
+                    classification = json.loads(classification_path.read_text(encoding="utf-8"))
+                except Exception:
+                    pass
+
             spec = _generate_spec(
                 artifact=artifact,
                 artifact_path=artifact_path,
@@ -112,6 +122,7 @@ def run_oracle(
                 index=index,
                 total=total,
                 on_llm_exchange=on_llm_exchange,
+                classification=classification,
             )
             oracle_path.write_text(
                 json.dumps(spec, indent=2, ensure_ascii=False),
@@ -294,14 +305,16 @@ def _generate_spec(
     index: int,
     total: int,
     on_llm_exchange: OracleLLMCallback | None,
+    classification: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     signature = build_signature_from_artifact(artifact)
     input_strategy = get_input_strategy_from_artifact(artifact)
     verification = artifact.get("verification") if isinstance(artifact.get("verification"), dict) else {}
     answers = verification.get("answers") if isinstance(verification.get("answers"), list) else None
 
-    system_prompt = load_system_prompt(str(prompts_dir))
-    user_prompt = build_user_prompt(artifact, signature, input_strategy, str(prompts_dir), answers)
+    strategy = classification.get("strategy") if classification else None
+    system_prompt = load_system_prompt(str(prompts_dir), strategy)
+    user_prompt = build_user_prompt(artifact, signature, input_strategy, str(prompts_dir), answers, classification)
     if on_llm_exchange is not None:
         on_llm_exchange(index, total, artifact, system_prompt, user_prompt, None)
     raw = call_llm(

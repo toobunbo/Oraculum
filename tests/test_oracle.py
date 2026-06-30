@@ -248,3 +248,65 @@ def test_oracle_signature_uses_flask_view_for_no_param_functions(tmp_path: Path)
 
     assert build_signature_from_artifact(artifact) == "def view()"
     assert get_input_strategy_from_artifact(artifact) == "flask_view"
+
+
+def test_oracle_loads_classification_and_routes_prompt(tmp_path: Path, monkeypatch) -> None:
+    vhx_root = _make_vhx_fixture(tmp_path)
+    output_dir = tmp_path / "output"
+    run_ingest(vhx_root=vhx_root, repo="demo", output_dir=output_dir)
+
+    # Write a mocked classification file
+    target_id = "py_path_injection_pkg_app_py_2"
+    classifications_dir = output_dir / "python/demo/classifications"
+    classifications_dir.mkdir(parents=True, exist_ok=True)
+    classification_data = {
+        "strategy": "recorded_call",
+        "mock_guidance": {
+            "required": True,
+            "patch_target": "pkg.app.open",
+            "target_arg_index": 0,
+            "target_arg_name": None,
+            "capture_what": "path passed to open"
+        }
+    }
+    _write_json(classifications_dir / f"{target_id}.json", classification_data)
+
+    captured_system_prompt = None
+    captured_user_prompt = None
+
+    def mock_call_llm(system_prompt, user_prompt, *args, **kwargs):
+        nonlocal captured_system_prompt, captured_user_prompt
+        captured_system_prompt = system_prompt
+        captured_user_prompt = user_prompt
+        return _oracle_response()
+
+    monkeypatch.setattr("oraculum.oracle.runner.call_llm", mock_call_llm)
+
+    result = run_oracle(repo="demo", output_dir=output_dir, model="test/model")
+    assert result.ok
+    assert captured_system_prompt is not None
+    assert "specializing in sink-mocking (recorded_call) strategy" in captured_system_prompt
+    assert "## Classification Result" in captured_user_prompt
+    assert "Strategy: recorded_call" in captured_user_prompt
+    assert "pkg.app.open" in captured_user_prompt
+
+
+def test_oracle_fallback_when_classification_missing(tmp_path: Path, monkeypatch) -> None:
+    vhx_root = _make_vhx_fixture(tmp_path)
+    output_dir = tmp_path / "output"
+    run_ingest(vhx_root=vhx_root, repo="demo", output_dir=output_dir)
+
+    captured_system_prompt = None
+
+    def mock_call_llm(system_prompt, user_prompt, *args, **kwargs):
+        nonlocal captured_system_prompt
+        captured_system_prompt = system_prompt
+        return _oracle_response()
+
+    monkeypatch.setattr("oraculum.oracle.runner.call_llm", mock_call_llm)
+
+    result = run_oracle(repo="demo", output_dir=output_dir, model="test/model")
+    assert result.ok
+    assert captured_system_prompt is not None
+    assert "You are a fuzzing oracle designer for Python security vulnerabilities" in captured_system_prompt
+
