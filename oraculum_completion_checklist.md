@@ -69,6 +69,7 @@ Chúng ta sẽ thống nhất sử dụng duy nhất 3 tên chiến lược: **`
   * `harness_system_return_value.txt`
   * `harness_system_filesystem_state.txt`
 * [x] Cập nhật Stage 3 runner ([harness/runner.py](file:///home/tuonglnc/repo/Oraculum/src/oraculum/harness/runner.py)) để nạp đúng prompt sinh harness dựa theo strategy có trong oracle spec.
+* [ ] Tối ưu hóa prompt sinh harness (Stage 3 prompts) để ép LLM phân bổ buffer an toàn hơn khi target function có nhiều tham số (tránh tự trừ thủ công gây lỗi logic số âm, khuyến khích sử dụng `fdp.remaining_bytes() // N`).
 
 ### ⬜ Giai đoạn 4: Viết End-to-End Pipeline Test
 * [ ] Tạo file `tests/test_pipeline.py` chạy tuần tự:
