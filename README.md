@@ -340,3 +340,63 @@ Responsible for determining the state diff check when `oracle_approach` is `file
 - What constitutes a new file appearing outside the allowed boundary
 - Cleanup strategy to prevent disk exhaustion across fuzz iterations
 - Symlink and race condition caveats
+
+---
+
+## Hướng dẫn chạy thử nghiệm Pipeline các Stages (0 đến 3)
+
+Oraculum cung cấp giao diện dòng lệnh (CLI) để chạy các Stage của pipeline. Dưới đây là hướng dẫn chạy từ đầu đến cuối sử dụng dữ liệu mini-benchmark có sẵn:
+
+### 0. Thiết lập môi trường
+Copy file `env.example` thành `.env` và cấu hình các biến môi trường cho LLM Provider của bạn. Sau đó kích hoạt môi trường ảo:
+```bash
+source .venv/bin/activate
+```
+
+### 1. Ingest: Nhập kết quả xác minh từ VulnHunterX (Stage 0)
+Đọc kết quả True Positive findings từ VulnHunterX và cấu trúc lại dưới dạng *enriched findings*:
+```bash
+python -m oraculum.cli.main ingest \
+  --vhx-root tests/mini_benchmark/vhx_root \
+  --repo mini-bench \
+  --output-dir tests/mini_benchmark/oraculum_output \
+  --force
+```
+
+### 2. Classify: Phân loại Chiến lược (Stage 1)
+LLM phân tích enriched findings để đưa ra chiến lược giám sát thích hợp (`recorded_call`, `return_value`, hoặc `filesystem_state`):
+```bash
+python -m oraculum.cli.main classify \
+  --repo mini-bench \
+  --output-dir tests/mini_benchmark/oraculum_output \
+  --log-file tests/mini_benchmark/classify_log.md \
+  --force
+```
+
+### 3. Oracle: Sinh Đặc tả Oracle (Stage 2)
+Nạp kết quả phân loại, LLM sẽ tải prompt của chiến lược tương ứng để sinh đặc tả Oracle Spec chi tiết:
+```bash
+python -m oraculum.cli.main oracle \
+  --repo mini-bench \
+  --output-dir tests/mini_benchmark/oraculum_output \
+  --force
+```
+
+### 4. Harness: Sinh Atheris Harness Fuzzer (Stage 3)
+LLM sinh mã nguồn fuzzer Atheris hoàn chỉnh và seed corpus mutation dựa trên Oracle Spec và template:
+```bash
+python -m oraculum.cli.main harness \
+  --repo mini-bench \
+  --output-dir tests/mini_benchmark/oraculum_output \
+  --force
+```
+Các tệp harness sau khi sinh sẽ nằm tại:
+`tests/mini_benchmark/oraculum_output/python/mini-bench/fuzz_targets/`
+
+### 5. Chạy thử nghiệm và xác minh Harness
+* **Smoke test**: Chạy thử fuzzer 1 lần (`-runs=1`) để kiểm tra cú pháp và import:
+  ```bash
+  python tests/mini_benchmark/oraculum_output/python/mini-bench/fuzz_targets/py_command_line_injection_target_app_py_4.py -runs=1
+  ```
+* **Phát hiện bug**: Chạy fuzzer để xem nó có phát hiện lỗ hổng thành công và ném ra đúng lỗi cấu hình khi gặp payload độc hại trong Seed Corpus hay không.
+```
