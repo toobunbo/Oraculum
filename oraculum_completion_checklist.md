@@ -38,23 +38,23 @@ Tài liệu này xác nhận hiện trạng dự án trên nhánh `main`, giải
 
 Chúng ta sẽ thống nhất sử dụng duy nhất 3 tên chiến lược: **`recorded_call`**, **`return_value`**, và **`filesystem_state`** xuyên suốt toàn bộ codebase (không dùng tên cũ `patch_call` hay `inspect_return` nữa).
 
-### ⬜ Giai đoạn 1: Chuẩn hóa tên Chiến lược (Strategy Naming Cleanup)
-* [ ] Xóa bỏ toàn bộ tên cũ (`patch_call`, `inspect_return`, `catch_exception`) trong:
+### ☑️ Giai đoạn 1: Chuẩn hóa tên Chiến lược (Strategy Naming Cleanup)
+* [x] Xóa bỏ toàn bộ tên cũ (`patch_call`, `inspect_return`, `catch_exception`) trong:
   * Validator của oracle và harness.
   * Các prompt cũ trong `config/prompts/`.
   * Các cấu trúc xử lý kết quả ở tầng runner.
 
-### ⬜ Giai đoạn 2: Tích hợp đầu ra Stage 1 vào Stage 2 (Oracle Research)
-* [ ] Cập nhật Stage 2 runner ([oracle/runner.py](file:///home/tuonglnc/repo/Oraculum/src/oraculum/oracle/runner.py)):
+### ☑️ Giai đoạn 2: Tích hợp đầu ra Stage 1 vào Stage 2 (Oracle Research)
+* [x] Cập nhật Stage 2 runner ([oracle/runner.py](file:///home/tuonglnc/repo/Oraculum/src/oraculum/oracle/runner.py)):
   * Đọc file classification JSON tương ứng từ thư mục classifications (`output/python/<repo>/classifications/<target_id>.json`) dựa theo `target_id`.
   * Trích xuất trực tiếp `strategy` và `mock_guidance` từ file JSON đó để làm đầu vào cho LLM ở Stage 2.
-* [ ] Xây dựng cơ chế điều hướng Prompt (Prompt Routing) dựa trên 3 chiến lược:
+* [x] Xây dựng cơ chế điều hướng Prompt (Prompt Routing) dựa trên 3 chiến lược:
   * Tải prompt hệ thống tương ứng cho mỗi chiến lược:
     * [oracle_system_recorded_call.txt](file:///home/tuonglnc/repo/Oraculum/config/prompts/oracle_system_recorded_call.txt)
     * [oracle_system_return_value.txt](file:///home/tuonglnc/repo/Oraculum/config/prompts/oracle_system_return_value.txt)
     * [oracle_system_filesystem_state.txt](file:///home/tuonglnc/repo/Oraculum/config/prompts/oracle_system_filesystem_state.txt)
-* [ ] Tích hợp `mock_guidance` vào User Prompt của LLM khi strategy là `recorded_call` để hướng dẫn LLM sinh spec mock chuẩn xác.
-* [ ] Viết unit tests kiểm tra tích hợp và prompt routing tại `tests/test_oracle.py`.
+* [x] Tích hợp `mock_guidance` vào User Prompt của LLM khi strategy là `recorded_call` để hướng dẫn LLM sinh spec mock chuẩn xác.
+* [x] Viết unit tests kiểm tra tích hợp và prompt routing tại `tests/test_oracle.py`.
 
 ### ☑️ Giai đoạn 3: Tối ưu & Dọn dẹp Template sinh Harness (Stage 3)
 * [x] Cải tạo và dọn dẹp file template [base_harness.j2](file:///home/tuonglnc/repo/Oraculum/src/oraculum/harness/templates/base_harness.j2):
