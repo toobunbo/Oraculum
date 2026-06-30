@@ -230,3 +230,99 @@ def test_harness_validation_rejects_incomplete_fenced_skeleton() -> None:
     assert code.startswith("import atheris")
     with pytest.raises(ValueError, match="missing TestOneInput"):
         validate_harness(code)
+
+
+def test_harness_generates_filesystem_state_skeleton() -> None:
+    from oraculum.harness.template_builder import build_skeleton
+    
+    artifact = {
+        "id": "1",
+        "rule_slug": "py_path_traversal",
+        "source": {
+            "vhx_repo_root": "/tmp/dummy",
+        },
+        "finding": {
+            "rule_id": "py/path-traversal",
+            "message": "untrusted input is written to file",
+            "file": "pkg/writer.py",
+            "start_line": 5,
+            "end_line": 5,
+        },
+        "verification": {
+            "verdict": "True Positive",
+            "reasoning": "untrusted input goes directly to write",
+        },
+        "function": {
+            "name": "write_data",
+            "start_line": 1,
+            "end_line": 6,
+        },
+    }
+    
+    oracle_spec = {
+        "monitor": {
+            "strategy": "filesystem_state",
+            "patch_target": None,
+            "target_arg_index": None,
+            "target_arg_name": None,
+            "capture_what": "files written outside path",
+            "additional_imports": [],
+        },
+        "oracle_check": {
+            "condition_description": "writes outside path",
+            "trigger_patterns": [],
+            "raise_type": "RuntimeError",
+            "raise_message_template": "TRAVERSAL: file written outside boundary",
+        },
+        "fuzz_guidance": {
+            "seed_corpus": ["../passwd"],
+            "skip_condition": "False",
+        },
+        "_meta": {
+            "target_id": "py_path_traversal_pkg_writer_py_5",
+            "finding_id": "1",
+            "rule_id": "py/path-traversal",
+            "rule_slug": "py_path_traversal",
+            "file": "pkg/writer.py",
+            "function": "write_data",
+            "input_strategy": "direct_params",
+            "function_signature": "def write_data(path: str, data: str)",
+            "tainted_params": [
+                {"name": "path", "index": 0, "type": "str"},
+                {"name": "data", "index": 1, "type": "str"},
+            ],
+            "source_finding_artifact": "dummy_path",
+        },
+    }
+    
+    skeleton = build_skeleton(
+        artifact=artifact,
+        spec=oracle_spec,
+        repo_root="/tmp/dummy",
+        corpus_dir="/tmp/dummy/corpus",
+    )
+    
+    assert "import tempfile" in skeleton
+    assert "import shutil" in skeleton
+    assert "=== FILESYSTEM_STATE SKELETON ===" in skeleton
+    assert "tempfile.TemporaryDirectory" in skeleton
+
+
+def test_harness_loader_loads_all_prompts(tmp_path: Path) -> None:
+    from oraculum.harness.runner import _load_system_prompt
+    
+    prompts_dir = tmp_path / "prompts"
+    prompts_dir.mkdir()
+    (prompts_dir / "harness_system_recorded_call.txt").write_text("recorded_call_content", encoding="utf-8")
+    (prompts_dir / "harness_system_return_value.txt").write_text("return_value_content", encoding="utf-8")
+    (prompts_dir / "harness_system_filesystem_state.txt").write_text("filesystem_state_content", encoding="utf-8")
+    
+    p1 = _load_system_prompt(prompts_dir, {"monitor": {"strategy": "recorded_call"}})
+    p2 = _load_system_prompt(prompts_dir, {"monitor": {"strategy": "return_value"}})
+    p3 = _load_system_prompt(prompts_dir, {"monitor": {"strategy": "filesystem_state"}})
+    p4 = _load_system_prompt(prompts_dir, {})  # should default to return_value
+    
+    assert p1 == "recorded_call_content"
+    assert p2 == "return_value_content"
+    assert p3 == "filesystem_state_content"
+    assert p4 == "return_value_content"

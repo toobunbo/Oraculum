@@ -56,19 +56,19 @@ Chúng ta sẽ thống nhất sử dụng duy nhất 3 tên chiến lược: **`
 * [ ] Tích hợp `mock_guidance` vào User Prompt của LLM khi strategy là `recorded_call` để hướng dẫn LLM sinh spec mock chuẩn xác.
 * [ ] Viết unit tests kiểm tra tích hợp và prompt routing tại `tests/test_oracle.py`.
 
-### ⬜ Giai đoạn 3: Tối ưu & Dọn dẹp Template sinh Harness (Stage 3)
-* [ ] Cải tạo và dọn dẹp file template [base_harness.j2](file:///home/tuonglnc/repo/Oraculum/src/oraculum/harness/templates/base_harness.j2):
+### ☑️ Giai đoạn 3: Tối ưu & Dọn dẹp Template sinh Harness (Stage 3)
+* [x] Cải tạo và dọn dẹp file template [base_harness.j2](file:///home/tuonglnc/repo/Oraculum/src/oraculum/harness/templates/base_harness.j2):
   * Cấu trúc lại file rõ ràng thành 3 block độc lập tương ứng với 3 chiến lược mới:
     * **`recorded_call` Block**: Dựng mock bằng `unittest.mock.patch`, hứng tham số kiểm tra regex, trả về giá trị giả lập.
     * **`return_value` Block**: Gọi trực tiếp, kiểm tra giá trị trả về của hàm bằng regex.
     * **`filesystem_state` Block**: Thêm setup snapshot thư mục trước khi fuzz, gọi hàm, quét diff thư mục phát hiện file lạ, và bắt buộc cleanup thư mục tạm trong khối `finally`.
   * Loại bỏ các comment rác, tối ưu cách phân chia dữ liệu fuzz (`FuzzedDataProvider`) khi target function có nhiều tham số.
   * Tối ưu hóa khối `try/except`: Không swallow các ngoại lệ liên quan tới Oracle (ví dụ `RuntimeError`), đảm bảo fuzzer crash đúng lúc phát hiện bug.
-* [ ] Viết prompt sinh harness tương ứng cho 3 chiến lược mới:
+* [x] Viết prompt sinh harness tương ứng cho 3 chiến lược mới:
   * `harness_system_recorded_call.txt`
   * `harness_system_return_value.txt`
   * `harness_system_filesystem_state.txt`
-* [ ] Cập nhật Stage 3 runner ([harness/runner.py](file:///home/tuonglnc/repo/Oraculum/src/oraculum/harness/runner.py)) để nạp đúng prompt sinh harness dựa theo strategy có trong oracle spec.
+* [x] Cập nhật Stage 3 runner ([harness/runner.py](file:///home/tuonglnc/repo/Oraculum/src/oraculum/harness/runner.py)) để nạp đúng prompt sinh harness dựa theo strategy có trong oracle spec.
 
 ### ⬜ Giai đoạn 4: Viết End-to-End Pipeline Test
 * [ ] Tạo file `tests/test_pipeline.py` chạy tuần tự:
