@@ -59,11 +59,11 @@ Return exactly one JSON object with this shape:
     },
     "q2_observable_after_return": {
       "answer": false,
-      "evidence": "short evidence from input, or not evaluated because Q1 was true"
+      "evidence": "short evidence from input"
     },
     "q3_result_in_memory": {
       "answer": null,
-      "evidence": "short evidence from returns, or not evaluated"
+      "evidence": "short evidence from returns"
     }
   },
   "mock_guidance": {
@@ -79,4 +79,4 @@ Return exactly one JSON object with this shape:
 
 For return_value and filesystem_state, mock_guidance must be null.
 For recorded_call, mock_guidance must be an object with required=true.
-Use JSON booleans/null only: true, false, null. Do not use YES/NO strings.
+Use JSON booleans/null only: true, false, null. Do not use YES/NO or any other strings in the "answer" fields.

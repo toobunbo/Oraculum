@@ -1,0 +1,40 @@
+{
+  "id": "2",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/tuonglnc/repo/Oraculum/tests/mini_benchmark/vhx_root",
+    "vhx_repo_root": "/home/tuonglnc/repo/Oraculum/tests/mini_benchmark/vhx_root/repos/python/mini-bench",
+    "vhx_output_root": "/home/tuonglnc/repo/Oraculum/tests/mini_benchmark/vhx_root/output/python/mini-bench",
+    "summary_path": "/home/tuonglnc/repo/Oraculum/tests/mini_benchmark/vhx_root/output/python/mini-bench/verification_results/summary_mini-bench_20260630_000000.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "Path traversal vulnerability in write_log",
+    "file": "target_app.py",
+    "start_line": 12,
+    "end_line": 17,
+    "repo_name": "mini-bench",
+    "lang": "python",
+    "severity": "8.5",
+    "precision": "high"
+  },
+  "verification": {
+    "confidence_score": 0.97,
+    "answers": {
+      "sink_identity": "open",
+      "taint_confirmed": "yes",
+      "sanitization_absent": "yes"
+    },
+    "reasoning": "The filename parameter is concatenated with the logs directory without path traversal check, enabling writing arbitrary files outside the logs directory.",
+    "confidence": "High",
+    "verdict": "True Positive",
+    "data_flow": "filename -> os.path.join -> open"
+  },
+  "function": {
+    "name": "write_log",
+    "file": "target_app.py",
+    "start_line": 12,
+    "end_line": 17,
+    "scope": "Function write_log"
+  }
+}

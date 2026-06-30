@@ -15,3 +15,6 @@ output/
 
 *:Zone.Identifier
 .claude
+tests/mini_benchmark/oraculum_output/
+tests/mini_benchmark/classify_log.md
+

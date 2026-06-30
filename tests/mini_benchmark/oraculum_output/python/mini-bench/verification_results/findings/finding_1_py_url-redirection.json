@@ -1,0 +1,40 @@
+{
+  "id": "1",
+  "rule_slug": "py_url-redirection",
+  "source": {
+    "vhx_root": "/home/tuonglnc/repo/Oraculum/tests/mini_benchmark/vhx_root",
+    "vhx_repo_root": "/home/tuonglnc/repo/Oraculum/tests/mini_benchmark/vhx_root/repos/python/mini-bench",
+    "vhx_output_root": "/home/tuonglnc/repo/Oraculum/tests/mini_benchmark/vhx_root/output/python/mini-bench",
+    "summary_path": "/home/tuonglnc/repo/Oraculum/tests/mini_benchmark/vhx_root/output/python/mini-bench/verification_results/summary_mini-bench_20260630_000000.json"
+  },
+  "finding": {
+    "rule_id": "py/url-redirection",
+    "message": "Open redirect vulnerability in get_safe_url",
+    "file": "target_app.py",
+    "start_line": 8,
+    "end_line": 10,
+    "repo_name": "mini-bench",
+    "lang": "python",
+    "severity": "6.1",
+    "precision": "high"
+  },
+  "verification": {
+    "confidence_score": 0.95,
+    "answers": {
+      "sink_identity": "return value",
+      "taint_confirmed": "yes",
+      "sanitization_absent": "yes"
+    },
+    "reasoning": "The function returns the user-provided URL directly, which is then used by the caller to redirect the user to a potentially malicious third-party site.",
+    "confidence": "High",
+    "verdict": "True Positive",
+    "data_flow": "user_url -> return user_url"
+  },
+  "function": {
+    "name": "get_safe_url",
+    "file": "target_app.py",
+    "start_line": 8,
+    "end_line": 10,
+    "scope": "Function get_safe_url"
+  }
+}
