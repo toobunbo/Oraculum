@@ -466,11 +466,13 @@ def _generate_harness_code(
 
 
 def _load_system_prompt(prompts_dir: Path, oracle_spec: dict[str, Any]) -> str:
-    strategy = str(oracle_spec.get("monitor", {}).get("strategy") or "inspect_return")
-    if strategy == "patch_call":
-        filename = "harness_system_patch_call.txt"
+    strategy = str(oracle_spec.get("monitor", {}).get("strategy") or "return_value")
+    if strategy == "recorded_call":
+        filename = "harness_system_recorded_call.txt"
+    elif strategy == "filesystem_state":
+        filename = "harness_system_filesystem_state.txt"
     else:
-        filename = "harness_system_inspect_return.txt"
+        filename = "harness_system_return_value.txt"
     return (prompts_dir / filename).read_text(encoding="utf-8")
 
 

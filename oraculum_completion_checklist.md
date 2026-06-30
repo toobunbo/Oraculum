@@ -1,6 +1,6 @@
 # Oraculum: Kế hoạch hoàn thiện Stages & Xây dựng Benchmark kiểm thử
 
-Tài liệu này xác nhận hiện trạng dự án trên nhánh `main`, giải thích chi tiết hoạt động của Stage 1, và cung cấp checklist chi tiết để hoàn thiện các Stage còn lại (Stage 2 & Stage 3) cùng kế hoạch thiết lập một Benchmark nhỏ.
+Tài liệu này xác nhận hiện trạng dự án trên nhánh `main`, giải thích chi tiết hoạt động của Stage 1, và cung cấp checklist chi tiết để hoàn thiện các Stage còn lại (Stage 2 & Stage 3) cùng kế hoạch thiết lập một Benchmark kiểm thử và đo lường hiệu năng.
 
 ---
 
@@ -114,3 +114,38 @@ oraculum harness --repo mini-bench
 2. **Chứng minh Fuzzer phát hiện được Bug (Crash / Oracle Violation)**:
    * Chạy fuzzer với payload độc hại nằm trong thư mục Seed Corpus được tự động tạo ra.
    * Kết quả mong muốn: Fuzzer phải dừng lại ngay lập tức và raise đúng ngoại lệ cấu hình (ví dụ: `RuntimeError: COMMAND_INJECTION` hoặc `RuntimeError: PATH_TRAVERSAL`), chứng minh Oracle hoạt động chính xác.
+
+---
+
+## 4. Kế hoạch Nâng cấp Benchmark & Hệ thống Chỉ số đo lường (Tương lai)
+
+Khi dự án Oraculum đã ổn định, chúng ta sẽ mở rộng quy mô kiểm thử bằng cách nâng cấp từ Mini-Benchmark lên các Dataset chuẩn công nghiệp và xây dựng bộ chỉ số đo lường hiệu năng (Metrics).
+
+### ⬜ Mở rộng Dataset kiểm thử (OWASP Benchmark Python)
+* [ ] **Tích hợp OWASP Benchmark cho Python**:
+  * OWASP Benchmark là bộ test-suite chuẩn chứa hàng nghìn trường hợp kiểm thử lỗ hổng bảo mật thực tế lẫn nhân tạo (SQLi, Path Traversal, Command Injection, XSS...).
+  * Tải và thiết lập OWASP Python Benchmark làm repository mục tiêu đầu vào cho VulnHunterX $\rightarrow$ Oraculum.
+* [ ] **Phân nhóm TestCase theo Strategy**:
+  * Ánh xạ các CWE trong OWASP Benchmark vào 3 Strategy tương ứng của Oraculum để kiểm tra khả năng phủ (Coverage).
+
+### ⬜ Xây dựng Bộ chỉ số Đo lường (Evaluation Metrics)
+Chúng ta sẽ viết script tự động thu thập và xuất báo cáo hiệu năng dựa trên 3 nhóm chỉ số sau:
+
+1. **Syntax & Compilation Validity Rate (Tỷ lệ biên dịch thành công)**:
+   * Công thức: $Validity = \frac{\text{Số harness compile thành công (py\_compile)}}{\text{Tổng số harness sinh ra}} \times 100\%$
+   * Đo lường khả năng sinh mã Python chuẩn của LLM.
+2. **Detection Rate / Recall (Tỷ lệ phát hiện lỗi)**:
+   * Công thức: $Recall = \frac{\text{Số lỗ hổng True Positive gây crash/oracle violation}}{\text{Tổng số lỗ hổng True Positive thực tế}} \times 100\%$
+   * Đo lường khả năng phát hiện lỗi bảo mật của các custom oracle được chèn vào.
+3. **Fuzzing Overhead (Độ trễ do Oracle chèn vào)**:
+   * Đo lường thông lượng fuzzing (executions per second) của:
+     * Harness thông thường (không chèn check).
+     * Harness chèn Oracle (đặc biệt là nhóm `filesystem_state` và `recorded_call` vì có I/O hoặc mock overhead).
+   * Mục tiêu: Đảm bảo Oracle Overhead $< 15\%$ để không làm giảm hiệu suất của Atheris.
+
+### ⬜ Script tự động hóa báo cáo (Benchmark Runner & Reporter)
+* [ ] Viết tệp script `scripts/run_benchmark.py` thực hiện:
+  1. Chạy tự động pipeline Oraculum trên toàn bộ dataset OWASP.
+  2. Khởi chạy Atheris với thời gian giới hạn (ví dụ: 30 giây mỗi target).
+  3. Thu thập logs: Target nào compile fail, target nào tìm thấy bug, tốc độ fuzzing trung bình.
+  4. Xuất ra tệp báo cáo dạng Markdown/CSV hiển thị bảng so sánh chi tiết.

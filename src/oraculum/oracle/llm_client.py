@@ -62,15 +62,15 @@ def validate_oracle_spec(spec: dict) -> None:
         if field not in monitor:
             raise ValueError(f"monitor missing field: '{field}'")
 
-    valid_strategies = {"inspect_return", "patch_call", "catch_exception"}
+    valid_strategies = {"return_value", "recorded_call", "filesystem_state"}
     if monitor["strategy"] not in valid_strategies:
         raise ValueError(f"monitor.strategy invalid: '{monitor['strategy']}'. Must be one of {valid_strategies}")
 
-    if monitor["strategy"] == "patch_call" and not monitor["patch_target"]:
-        raise ValueError("monitor.patch_target must be set when strategy is 'patch_call'")
+    if monitor["strategy"] == "recorded_call" and not monitor["patch_target"]:
+        raise ValueError("monitor.patch_target must be set when strategy is 'recorded_call'")
 
-    # if monitor["strategy"] != "inspect_return" and spec["oracle_check"].get("trigger_patterns"):
-    #     raise ValueError("oracle_check.trigger_patterns must be [] when strategy is not 'inspect_return'")
+    # if monitor["strategy"] != "return_value" and spec["oracle_check"].get("trigger_patterns"):
+    #     raise ValueError("oracle_check.trigger_patterns must be [] when strategy is not 'return_value'")
 
     # oracle_check fields
     oracle_check = spec["oracle_check"]
@@ -78,8 +78,8 @@ def validate_oracle_spec(spec: dict) -> None:
         if field not in oracle_check:
             raise ValueError(f"oracle_check missing field: '{field}'")
 
-    if monitor["strategy"] in {"patch_call", "inspect_return"} and not oracle_check["trigger_patterns"]:
-        raise ValueError("oracle_check.trigger_patterns must not be empty for patch_call/inspect_return")
+    if monitor["strategy"] in {"recorded_call", "return_value"} and not oracle_check["trigger_patterns"]:
+        raise ValueError("oracle_check.trigger_patterns must not be empty for recorded_call/return_value")
 
     # fuzz_guidance fields
     fuzz_guidance = spec["fuzz_guidance"]

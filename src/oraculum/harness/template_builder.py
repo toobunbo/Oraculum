@@ -24,7 +24,7 @@ def build_skeleton(
     function_name    = meta.get("function") or artifact.get("function", {}).get("name", "")
     file_path        = meta.get("file") or f.get("file", "")
     input_strategy   = meta.get("input_strategy", "direct_params")
-    monitor_strategy = monitor.get("strategy", "inspect_return")
+    monitor_strategy = monitor.get("strategy", "return_value")
 
     # Resolve import
     raw_import   = resolve_import(file_path, function_name, repo_root)
