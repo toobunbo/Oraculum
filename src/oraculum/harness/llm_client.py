@@ -22,15 +22,17 @@ def call_llm(system_prompt: str, user_prompt: str, model: str,
 
 def extract_code(raw: str) -> str:
     """Strip markdown fences, return clean Python source."""
+    # Try to find content inside standard code fences
     fence = re.search(r"```(?:python)?\s*([\s\S]+?)\s*```", raw)
     if fence:
-        return fence.group(1).strip()
+        code = fence.group(1).strip()
+    else:
+        code = raw.strip()
 
-    text = raw.strip()
-    if text.startswith("```"):
-        _, _, remainder = text.partition("\n")
-        return remainder.strip()
-    return text
+    # Clean up any residual code block start/end markers
+    code = re.sub(r"^```(?:python)?\s*", "", code)
+    code = re.sub(r"\s*```$", "", code)
+    return code.strip()
 
 
 def validate_harness(code: str) -> None:

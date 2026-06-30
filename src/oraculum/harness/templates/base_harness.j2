@@ -9,6 +9,9 @@ import re
 import os
 {% if monitor_strategy == "recorded_call" %}
 from unittest.mock import patch, MagicMock
+{% elif monitor_strategy == "filesystem_state" %}
+import tempfile
+import shutil
 {% endif %}
 {% for imp in extra_imports %}
 {{ imp }}
@@ -46,69 +49,36 @@ _TAINTED_PARAMS = {{ tainted_params | tojson }}
 # ========================================
 
 {% if monitor_strategy == "recorded_call" %}
-# === PATCH_CALL SKELETON ===
-# 1. INPUT GENERATION
-#    - Generate inputs for tainted params using FuzzedDataProvider.
-#    - For MULTIPLE params: split the buffer proportionally by param count.
-#      For str/bytes params divide remaining bytes evenly; consume the last
-#      str/bytes param with remaining bytes. Fixed-size types (int, float,
-#      bool) consume their natural byte width first.
-#      FORBIDDEN: Do NOT use ConsumeIntInRange() to index a strategy or branch.
-#    - DO NOT embed a seed list inside TestOneInput or use ConsumeBool() to
-#      select from a hardcoded list — seeds are managed externally in _SEED_CORPUS.
-#
-# 2. SKIP CONDITION
-#    - Apply skip_hint early, return immediately if not met.
-#
-# 3. MOCK SETUP
-#    - Patch `{{ patch_target }}` using `with patch(...) as mock_get:`.
-#    - Return a realistic MagicMock so the function continues past the patched call.
-#
-# 4. ORACLE CHECK
-#    - After the call, iterate mock_get.call_args_list.
-#    - For each call: check call.args[{{ target_arg_index }}] first,
-#      fall back to call.kwargs.get("{{ target_arg_name }}").
-#    - Match against every pattern in _COMPILED_PATTERNS.
-#    - On match → raise RuntimeError(_RAISE_MESSAGE)
-#
-# 5. EXCEPTION HANDLING
-#    - except RuntimeError: raise   → never swallow oracle signals
-#    - except Exception:    return  → only around the target function call
+# === RECORDED_CALL SKELETON ===
+# TODO: Complete TestOneInput following these steps:
+# 1. Generate inputs using FuzzedDataProvider.
+# 2. Apply skip_hint (if applicable).
+# 3. Mock the patch target using patch/MagicMock.
+# 4. Call target function inside the mock context.
+# 5. Compare mock call arguments against _COMPILED_PATTERNS.
+# 6. Propagate RuntimeError; swallow other exceptions.
 # ==========================================
 
 {% elif monitor_strategy == "return_value" %}
-# === INSPECT_RETURN SKELETON ===
-# 1. INPUT GENERATION
-#    - Generate inputs for tainted params using FuzzedDataProvider.
-#    - For a SINGLE str param: consume ALL remaining bytes as one string:
-#        svg_input = fdp.ConsumeString(len(data))
-#    - For MULTIPLE params: split the buffer proportionally by param count.
-#      For str/bytes params divide remaining bytes evenly; consume the last
-#      str/bytes param with remaining bytes. Fixed-size types (int, float,
-#      bool) consume their natural byte width first.
-#      FORBIDDEN: Do NOT use ConsumeIntInRange() to index a strategy or branch.
-#    - DO NOT embed a seed list inside TestOneInput or use ConsumeBool() to
-#      select from a hardcoded list — seeds are managed externally in _SEED_CORPUS.
-#
-# 2. SKIP CONDITION
-#    - Apply skip_hint early, return immediately if not met.
-#
-# 3. FUNCTION CALL
-#    - No mocking needed. Call target function directly.
-#    - Wrap in try/except Exception: return — return early if it raises.
-#    - except RuntimeError: raise must come BEFORE except Exception.
-#
-# 4. RETURN VALUE HANDLING
-#    - If return value is None or not str → return early.
-#    - captured = return value (per capture_what: {{ capture_what }})
-#
-# 5. ORACLE CHECK  ← MUST be OUTSIDE the try/except above
-#    - Match captured against every pattern in _COMPILED_PATTERNS.
-#    - On match → raise RuntimeError(_RAISE_MESSAGE)
-#
-# 6. EXCEPTION HANDLING
-#    - except RuntimeError: raise   → never swallow oracle signals
-#    - except Exception:    return  → only around the function call
+# === RETURN_VALUE SKELETON ===
+# TODO: Complete TestOneInput following these steps:
+# 1. Generate inputs using FuzzedDataProvider.
+# 2. Apply skip_hint (if applicable).
+# 3. Call target function directly and capture the return value.
+# 4. Extract string content from the return value (based on capture_what).
+# 5. Compare captured string against _COMPILED_PATTERNS.
+# 6. Propagate RuntimeError; swallow other exceptions.
+# ==========================================
+
+{% elif monitor_strategy == "filesystem_state" %}
+# === FILESYSTEM_STATE SKELETON ===
+# TODO: Complete TestOneInput following these steps:
+# 1. Generate inputs using FuzzedDataProvider.
+# 2. Apply skip_hint (if applicable).
+# 3. Create temp sandbox directory (tempfile.TemporaryDirectory) and snapshot it.
+# 4. Call target function inside a try/finally block.
+# 5. Scan temp directory (and snapshot parent directory if needed), compare against baseline.
+# 6. Clean up sandbox in finally. Propagate RuntimeError.
 # ==========================================
 {% endif %}
 
