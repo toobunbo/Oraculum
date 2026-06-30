@@ -77,11 +77,11 @@ Chúng ta sẽ thống nhất sử dụng duy nhất 3 tên chiến lược: **`
 
 ---
 
-## 3. Kế hoạch xây dựng Benchmark kiểm thử nhỏ (Mini-Benchmark)
+## 3. Kế hoạch xây dựng Benchmark kiểm thử nhỏ (Mini-Benchmark) (Đã hoàn thành)
 
 Để chứng minh Oraculum hoạt động ổn định và sinh ra được harness có khả năng phát hiện lỗi thực tế, chúng ta sẽ xây dựng một dự án test nhỏ độc lập.
 
-### Bước 1: Tạo dự án mục tiêu (Target Project)
+### ☑️ Bước 1: Tạo dự án mục tiêu (Target Project)
 Tạo một thư mục test tại `tests/mini_benchmark/` chứa code Python có lỗ hổng bảo mật thật:
 1. **Hàm `run_shell(cmd_input)`** (Lỗi Command Injection $\rightarrow$ Test `recorded_call`):
    * Nhận đầu vào, thực hiện gọi trực tiếp `subprocess.run(cmd_input, shell=True)`.
@@ -90,10 +90,10 @@ Tạo một thư mục test tại `tests/mini_benchmark/` chứa code Python có
 3. **Hàm `write_log(filename, content)`** (Lỗi Path Traversal $\rightarrow$ Test `filesystem_state`):
    * Nhận tên file ghi log từ người dùng, thực hiện mở file ghi log mà không validate đường dẫn (cho phép ghi file ra ngoài thư mục log chỉ định).
 
-### Bước 2: Giả lập Đầu ra của VulnHunterX (Mock VHX Results)
+### ☑️ Bước 2: Giả lập Đầu ra của VulnHunterX (Mock VHX Results)
 Tạo file JSON giả lập kết quả verify của VHX cho 3 lỗ hổng trên (chứa `data_flow` cụ thể, `rule_id`, vị trí file và dòng code bị lỗi).
 
-### Bước 3: Chạy thử nghiệm toàn bộ Pipeline
+### ☑️ Bước 3: Chạy thử nghiệm toàn bộ Pipeline
 Chạy các dòng lệnh tuần tự để tạo mã nguồn fuzzer:
 ```bash
 # 1. Ingest kết quả VHX giả lập
@@ -109,7 +109,7 @@ oraculum oracle --repo mini-bench
 oraculum harness --repo mini-bench
 ```
 
-### Bước 4: Chạy thử nghiệm và Chứng minh Hoạt động (Verification)
+### ☑️ Bước 4: Chạy thử nghiệm và Chứng minh Hoạt động (Verification)
 1. **Kiểm tra tính đúng đắn của mã nguồn sinh ra (Smoke Test)**:
    * Chạy harness với tham số `-runs=1` để chứng minh Atheris khởi tạo thành công, không gặp lỗi cú pháp hay import.
 2. **Chứng minh Fuzzer phát hiện được Bug (Crash / Oracle Violation)**:
