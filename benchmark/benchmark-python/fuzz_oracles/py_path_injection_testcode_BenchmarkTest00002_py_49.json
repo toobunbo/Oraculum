@@ -1,0 +1,80 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "target": "codecs.open",
+    "capture": {
+      "argument_index": 0,
+      "type": "str"
+    },
+    "patch_target": "codecs.open",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "captured value",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "predicate": "lambda path: '..' in path or path.startswith('/') or ':\\\\' in path",
+    "description": "Path contains directory traversal or absolute path indicators",
+    "condition_description": "Path contains directory traversal or absolute path indicators",
+    "trigger_patterns": [
+      "[\\s\\S]+"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "ORACULUM_VIOLATION: captured={captured}"
+  },
+  "fuzz_guidance": {
+    "sink_method": "codecs.open",
+    "sink_module": "codecs",
+    "fake_behavior": {
+      "type": "mock_file",
+      "return_value": "<MockFile handle>",
+      "side_effect": null
+    },
+    "payload_injection_points": [
+      {
+        "source": "request.cookies.get",
+        "strategy": "flask_view"
+      }
+    ],
+    "seed_corpus": [],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "aliasing_risks": [
+      "codecs.open aliases built-in open(); patch both if needed"
+    ],
+    "import_risks": [
+      "Ensure `import codecs` is patched, not just function references"
+    ],
+    "async_risks": [],
+    "classification_strategy": "recorded_call",
+    "classification_confidence": "high",
+    "mock_guidance": {
+      "required": true,
+      "target": "Mock the `codecs.open()` call to prevent actual file system access during testing.",
+      "capture": "Capture the file path argument passed to `codecs.open()` to verify it does not contain malicious traversal sequences.",
+      "fake_behavior": "Return a mock file object that simulates read operations without accessing the real file system.",
+      "notes": [
+        "Ensure the mock prevents actual file I/O while allowing the test to proceed.",
+        "Validate that the path does not escape the intended directory."
+      ]
+    },
+    "target_id": "py_path_injection_testcode_BenchmarkTest00002_py_49",
+    "finding_id": "11",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "file": "testcode/BenchmarkTest00002.py",
+    "function": "BenchmarkTest00002_post",
+    "input_strategy": "flask_view",
+    "function_signature": "def BenchmarkTest00002_post()",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": -1,
+        "type": "flask_request"
+      }
+    ],
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "output/python/benchmark-python/verification_results/findings/finding_11_py_path-injection.json"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "subprocess.run",
+    "target_arg_index": 0,
+    "target_arg_name": "args",
+    "capture_what": "command string passed to subprocess.run",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "subprocess.run is called with shell=True and a command containing dangerous patterns like '&&', '|', or ';'",
+    "trigger_patterns": [
+      ".*[&]{2}.*",
+      ".*[|]{1}.*",
+      ".*[;]{1}.*",
+      ".*\\bcat\\b.*",
+      ".*\\b/etc/passwd\\b.*"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_COMMAND-LINE-INJECTION: Command injection detected — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "ls && cat /etc/passwd",
+      "echo test | cat",
+      "whoami; id",
+      "ls; cat /etc/passwd",
+      "id | grep root"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "run_shell",
+    "file": "target_app.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def run_shell(cmd_input: str)",
+    "tainted_params": [
+      {
+        "name": "cmd_input",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_command_line_injection_target_app_py_4",
+    "finding_id": "0",
+    "rule_id": "py/command-line-injection",
+    "rule_slug": "py_command-line-injection",
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "benchmark/mini_benchmark/oraculum_output/python/mini-bench/verification_results/findings/finding_0_py_command-line-injection.json"
+  }
+}

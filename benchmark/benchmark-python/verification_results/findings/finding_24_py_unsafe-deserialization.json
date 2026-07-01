@@ -1,0 +1,82 @@
+{
+  "id": "24",
+  "rule_slug": "py_unsafe-deserialization",
+  "source": {
+    "vhx_root": "/home/tuonglnc/repo/VulnHunterX",
+    "vhx_repo_root": "/home/tuonglnc/repo/VulnHunterX/repos/python/benchmark-python",
+    "vhx_output_root": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python",
+    "summary_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/verification_results/summary_benchmark-python_filtered_20260610_105228.json"
+  },
+  "finding": {
+    "rule_id": "py/unsafe-deserialization",
+    "message": "Unsafe deserialization depends on a [user-provided value](1).",
+    "file": "testcode/BenchmarkTest00507.py",
+    "start_line": 55,
+    "end_line": 55,
+    "repo_name": "benchmark-python",
+    "lang": "python",
+    "sarif_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/benchmark-python.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 31: ControlFlowNode for request",
+      "line 31: ControlFlowNode for Attribute",
+      "line 31: ControlFlowNode for Attribute()",
+      "line 31: ControlFlowNode for param",
+      "line 40: ControlFlowNode for bar",
+      "line 55: ControlFlowNode for Attribute()",
+      "--- Flow 2 ---",
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 31: ControlFlowNode for request",
+      "line 31: ControlFlowNode for Attribute",
+      "line 31: ControlFlowNode for Attribute()",
+      "line 31: ControlFlowNode for param",
+      "line 44: ControlFlowNode for bar",
+      "line 55: ControlFlowNode for Attribute()"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [],
+    "tags": [
+      "external/cwe/cwe-502",
+      "security",
+      "serialization"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-06-10T10:45:49.326779",
+    "context_needed": [],
+    "data_flow": "request.headers.get('BenchmarkTest00507') (line 31) → param → bar (line 37) → base64.urlsafe_b64decode(bar) (line 55) → pickle.loads() (line 55)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "answers": [
+      "The EXACT deserialization sink is `pickle.loads(base64.urlsafe_b64decode(bar))` on line 55. The value passed to it is `bar`.",
+      "The assignments to `bar` are:\n- Line 37: `bar = param` (when `guess` is 'A')\n- Line 41: `bar = param` (when `guess` is 'C' or 'D')\n- Line 43: `bar = 'bob'` (default case)\n- Line 39: `bar = 'bob'` (when `guess` is 'B')\n\nSince `guess = possible[0]` and `possible = 'ABC'`, `guess` is always 'A'. Thus, the LAST assignment is `bar = param` on line 37.",
+      "The value of `bar` derives from `param`, which is assigned on line 31: `param = request.headers.get('BenchmarkTest00507')`. This is user-controlled input from HTTP headers. The data flow is: `request.headers.get()` (line 31) → `param` → `bar` (line 37).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The `match` statement resolves statically to `guess = 'A'`, so `bar = param` is always executed (line 37).",
+      "There is no defense preventing code execution. The code uses `pickle.loads()` directly on user input after base64 decoding. No safe loader, HMAC, schema validation, or allow-list is used. The `base64.urlsafe_b64decode()` function does not provide any security protection against malicious pickle data.",
+      "User-controlled data (`param` from HTTP headers) reaches the unsafe sink `pickle.loads()` via `bar`. There is no defense mechanism in place. The callees context confirms that `pickle.loads` and `base64.urlsafe_b64decode` are called directly."
+    ],
+    "confidence_score": 0.95,
+    "iterations": 3,
+    "input_tokens": 8823,
+    "elapsed_seconds": 27.79809069633484,
+    "confidence": "High",
+    "cached_input_tokens": 0,
+    "tokens_used": 10331,
+    "reasoning": "User input from HTTP headers flows directly into pickle.loads() without any sanitization or safe deserialization mechanism. The callees context confirms direct calls to unsafe functions with no intervening defenses.",
+    "verdict": "True Positive",
+    "output_tokens": 1508
+  },
+  "function": {
+    "name": "BenchmarkTest00507_post",
+    "file": "testcode/BenchmarkTest00507.py",
+    "start_line": 28,
+    "end_line": 66,
+    "scope": "Function init"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "filesystem_state",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink is 'open' which performs file system I/O that could write to arbitrary locations due to path injection, making it dangerous in a test environment."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "The function does not return any observable state that would indicate the path injection occurred - the violation is in the side effect of file writing."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "returns.kind is 'none' and returns.exprs is empty, indicating no return value captures the result in memory."
+    }
+  },
+  "mock_guidance": {
+    "required": false,
+    "target": "os.open or built-in open function",
+    "capture": "The filename parameter and the final path being opened",
+    "fake_behavior": "Mock the open call to prevent actual file creation while capturing the attempted file path",
+    "notes": [
+      "Need to intercept the open call before it writes to disk",
+      "Should capture the full path that would be written to"
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

@@ -1,0 +1,40 @@
+{
+  "id": "0",
+  "rule_slug": "py_command-line-injection",
+  "source": {
+    "vhx_root": "/home/tuonglnc/repo/Oraculum/benchmark/mini_benchmark/vhx_root",
+    "vhx_repo_root": "/home/tuonglnc/repo/Oraculum/benchmark/mini_benchmark/vhx_root/repos/python/mini-bench",
+    "vhx_output_root": "/home/tuonglnc/repo/Oraculum/benchmark/mini_benchmark/vhx_root/output/python/mini-bench",
+    "summary_path": "/home/tuonglnc/repo/Oraculum/benchmark/mini_benchmark/vhx_root/output/python/mini-bench/verification_results/summary_mini-bench_20260630_000000.json"
+  },
+  "finding": {
+    "rule_id": "py/command-line-injection",
+    "message": "Command injection vulnerability in run_shell",
+    "file": "target_app.py",
+    "start_line": 4,
+    "end_line": 6,
+    "repo_name": "mini-bench",
+    "lang": "python",
+    "severity": "9.8",
+    "precision": "high"
+  },
+  "verification": {
+    "reasoning": "The user input is passed directly to subprocess.run without sanitization or validation, allowing command injection when shell=True.",
+    "confidence": "High",
+    "confidence_score": 0.98,
+    "data_flow": "cmd_input -> subprocess.run",
+    "answers": {
+      "sink_identity": "subprocess.run",
+      "taint_confirmed": "yes",
+      "sanitization_absent": "yes"
+    },
+    "verdict": "True Positive"
+  },
+  "function": {
+    "name": "run_shell",
+    "file": "target_app.py",
+    "start_line": 4,
+    "end_line": 6,
+    "scope": "Function run_shell"
+  }
+}

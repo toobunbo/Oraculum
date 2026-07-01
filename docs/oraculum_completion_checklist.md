@@ -122,14 +122,14 @@ oraculum harness --repo mini-bench
 
 Khi dự án Oraculum đã ổn định, chúng ta sẽ mở rộng quy mô kiểm thử bằng cách nâng cấp từ Mini-Benchmark lên các Dataset chuẩn công nghiệp và xây dựng bộ chỉ số đo lường hiệu năng (Metrics).
 
-### ⬜ Mở rộng Dataset kiểm thử (OWASP Benchmark Python)
-* [ ] **Tích hợp OWASP Benchmark cho Python**:
+### ☑️ Mở rộng Dataset kiểm thử (OWASP Benchmark Python)
+* [x] **Tích hợp OWASP Benchmark cho Python**:
   * OWASP Benchmark là bộ test-suite chuẩn chứa hàng nghìn trường hợp kiểm thử lỗ hổng bảo mật thực tế lẫn nhân tạo (SQLi, Path Traversal, Command Injection, XSS...).
   * Tải và thiết lập OWASP Python Benchmark làm repository mục tiêu đầu vào cho VulnHunterX $\rightarrow$ Oraculum.
-* [ ] **Phân nhóm TestCase theo Strategy**:
+* [x] **Phân nhóm TestCase theo Strategy**:
   * Ánh xạ các CWE trong OWASP Benchmark vào 3 Strategy tương ứng của Oraculum để kiểm tra khả năng phủ (Coverage).
 
-### ⬜ Xây dựng Bộ chỉ số Đo lường (Evaluation Metrics)
+### ☑️ Xây dựng Bộ chỉ số Đo lường (Evaluation Metrics)
 Chúng ta sẽ viết script tự động thu thập và xuất báo cáo hiệu năng dựa trên 3 nhóm chỉ số sau:
 
 1. **Syntax & Compilation Validity Rate (Tỷ lệ biên dịch thành công)**:
@@ -144,8 +144,8 @@ Chúng ta sẽ viết script tự động thu thập và xuất báo cáo hiệu
      * Harness chèn Oracle (đặc biệt là nhóm `filesystem_state` và `recorded_call` vì có I/O hoặc mock overhead).
    * Mục tiêu: Đảm bảo Oracle Overhead $< 15\%$ để không làm giảm hiệu suất của Atheris.
 
-### ⬜ Script tự động hóa báo cáo (Benchmark Runner & Reporter)
-* [ ] Viết tệp script `scripts/run_benchmark.py` thực hiện:
+### ☑️ Script tự động hóa báo cáo (Benchmark Runner & Reporter)
+* [x] Viết tệp script `benchmark/run_benchmark.py` thực hiện:
   1. Chạy tự động pipeline Oraculum trên toàn bộ dataset OWASP.
   2. Khởi chạy Atheris với thời gian giới hạn (ví dụ: 30 giây mỗi target).
   3. Thu thập logs: Target nào compile fail, target nào tìm thấy bug, tốc độ fuzzing trung bình.

@@ -1,0 +1,67 @@
+{
+  "stage": "harness",
+  "repo": "mini-bench",
+  "lang": "python",
+  "model": "ollama/qwen3-coder:480b-cloud",
+  "config": "config/harness.yaml",
+  "source": {
+    "oracle_status_path": "benchmark/mini_benchmark/oraculum_output/python/mini-bench/fuzz_oracles/status.json"
+  },
+  "counts": {
+    "selected": 3,
+    "generated": 3,
+    "skipped": 0,
+    "failed": 0
+  },
+  "harnesses": [
+    {
+      "id": "0",
+      "target_id": "py_command_line_injection_target_app_py_4",
+      "rule_id": "py/command-line-injection",
+      "file": "target_app.py",
+      "start_line": "4",
+      "function_name": "run_shell",
+      "harness": "benchmark/mini_benchmark/oraculum_output/python/mini-bench/fuzz_targets/py_command_line_injection_target_app_py_4.py",
+      "oracle": "benchmark/mini_benchmark/oraculum_output/python/mini-bench/fuzz_oracles/py_command_line_injection_target_app_py_4.json",
+      "finding_artifact": "benchmark/mini_benchmark/oraculum_output/python/mini-bench/verification_results/findings/finding_0_py_command-line-injection.json",
+      "corpus": "benchmark/mini_benchmark/oraculum_output/python/mini-bench/fuzz_corpus/py_command_line_injection_target_app_py_4",
+      "strategy": "recorded_call",
+      "status": "generated",
+      "seed_count": 5,
+      "errors": ""
+    },
+    {
+      "id": "1",
+      "target_id": "py_url_redirection_target_app_py_8",
+      "rule_id": "py/url-redirection",
+      "file": "target_app.py",
+      "start_line": "8",
+      "function_name": "get_safe_url",
+      "harness": "benchmark/mini_benchmark/oraculum_output/python/mini-bench/fuzz_targets/py_url_redirection_target_app_py_8.py",
+      "oracle": "benchmark/mini_benchmark/oraculum_output/python/mini-bench/fuzz_oracles/py_url_redirection_target_app_py_8.json",
+      "finding_artifact": "benchmark/mini_benchmark/oraculum_output/python/mini-bench/verification_results/findings/finding_1_py_url-redirection.json",
+      "corpus": "benchmark/mini_benchmark/oraculum_output/python/mini-bench/fuzz_corpus/py_url_redirection_target_app_py_8",
+      "strategy": "return_value",
+      "status": "generated",
+      "seed_count": 6,
+      "errors": ""
+    },
+    {
+      "id": "2",
+      "target_id": "py_path_injection_target_app_py_12",
+      "rule_id": "py/path-injection",
+      "file": "target_app.py",
+      "start_line": "12",
+      "function_name": "write_log",
+      "harness": "benchmark/mini_benchmark/oraculum_output/python/mini-bench/fuzz_targets/py_path_injection_target_app_py_12.py",
+      "oracle": "benchmark/mini_benchmark/oraculum_output/python/mini-bench/fuzz_oracles/py_path_injection_target_app_py_12.json",
+      "finding_artifact": "benchmark/mini_benchmark/oraculum_output/python/mini-bench/verification_results/findings/finding_2_py_path-injection.json",
+      "corpus": "benchmark/mini_benchmark/oraculum_output/python/mini-bench/fuzz_corpus/py_path_injection_target_app_py_12",
+      "strategy": "filesystem_state",
+      "status": "generated",
+      "seed_count": 5,
+      "errors": ""
+    }
+  ],
+  "errors": []
+}

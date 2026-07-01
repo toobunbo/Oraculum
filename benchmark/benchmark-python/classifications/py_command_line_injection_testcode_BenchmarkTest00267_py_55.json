@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink is subprocess.run (line 55), which executes shell commands and is dangerous in a test environment due to potential RCE."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "Not evaluated because Q1 was true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated because Q1 was true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "subprocess.run call at line 55",
+    "capture": "The `argList` argument passed to subprocess.run, which contains the user-controlled command string.",
+    "fake_behavior": "Stub the subprocess.run call to prevent actual command execution, possibly returning a safe mock result.",
+    "notes": [
+      "Ensure the mock captures the full command being executed for verification purposes.",
+      "Consider mocking at a higher level if subprocess.run is indirectly called."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

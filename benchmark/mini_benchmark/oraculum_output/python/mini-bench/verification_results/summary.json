@@ -1,0 +1,44 @@
+{
+  "stage": "ingest",
+  "repo": "mini-bench",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/tuonglnc/repo/Oraculum/benchmark/mini_benchmark/vhx_root",
+    "vhx_repo_root": "/home/tuonglnc/repo/Oraculum/benchmark/mini_benchmark/vhx_root/repos/python/mini-bench",
+    "vhx_output_root": "/home/tuonglnc/repo/Oraculum/benchmark/mini_benchmark/vhx_root/output/python/mini-bench",
+    "summary_path": "/home/tuonglnc/repo/Oraculum/benchmark/mini_benchmark/vhx_root/output/python/mini-bench/verification_results/summary_mini-bench_20260630_000000.json"
+  },
+  "counts": {
+    "total_verdicts": 3,
+    "selected": 3,
+    "enriched": 3,
+    "skipped": 0,
+    "failed": 0
+  },
+  "findings": [
+    {
+      "id": "0",
+      "rule_id": "py/command-line-injection",
+      "verdict": "True Positive",
+      "artifact": "benchmark/mini_benchmark/oraculum_output/python/mini-bench/verification_results/findings/finding_0_py_command-line-injection.json",
+      "function_name": "run_shell"
+    },
+    {
+      "id": "1",
+      "rule_id": "py/url-redirection",
+      "verdict": "True Positive",
+      "artifact": "benchmark/mini_benchmark/oraculum_output/python/mini-bench/verification_results/findings/finding_1_py_url-redirection.json",
+      "function_name": "get_safe_url"
+    },
+    {
+      "id": "2",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "benchmark/mini_benchmark/oraculum_output/python/mini-bench/verification_results/findings/finding_2_py_path-injection.json",
+      "function_name": "write_log"
+    }
+  ],
+  "errors": []
+}

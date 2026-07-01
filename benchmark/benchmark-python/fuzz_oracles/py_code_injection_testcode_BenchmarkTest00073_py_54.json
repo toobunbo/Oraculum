@@ -1,0 +1,73 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "target": {
+      "module": "builtins",
+      "function": "eval"
+    },
+    "capture": {
+      "argument_index": 0,
+      "name": "expression"
+    },
+    "patch_target": "builtins.eval",
+    "target_arg_index": 0,
+    "target_arg_name": "expression",
+    "capture_what": "expression",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "predicate": "captured_value != None and isinstance(captured_value, str)",
+    "regex": null,
+    "condition_description": "captured_value != None and isinstance(captured_value, str)",
+    "trigger_patterns": [
+      "[\\s\\S]+"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "ORACULUM_VIOLATION: captured={captured}"
+  },
+  "fuzz_guidance": {
+    "sink_trigger": "eval(bar)",
+    "taint_source": "request.cookies.get('foo', '')",
+    "expected_flow": "cookie value → param → string41416 → bar → eval(bar)",
+    "validation_bypass": "quote-wrapped strings like \"'print(123)'\" pass validation but still execute",
+    "seed_corpus": [],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "aliasing_risks": [
+      "The variable `bar` is derived from `string41416` which is built from `param`, ensure slicing operation [4:-17] is correctly modeled in harness"
+    ],
+    "import_risks": [],
+    "async_risks": [],
+    "mock_scope": "Patch builtins.eval globally or within test module context to intercept calls",
+    "classification_strategy": "recorded_call",
+    "classification_confidence": "high",
+    "mock_guidance": {
+      "required": true,
+      "target": "eval(bar) on line 54",
+      "capture": "the value of bar which is derived from user input via string41416 slicing",
+      "fake_behavior": "prevent actual code execution by mocking eval to return a safe dummy value or raise an exception",
+      "notes": [
+        "The validation check only ensures bar starts and ends with single quotes and has no internal quotes, but this does not prevent code injection.",
+        "Mocking eval is necessary to prevent arbitrary code execution in test environments."
+      ]
+    },
+    "target_id": "py_code_injection_testcode_BenchmarkTest00073_py_54",
+    "finding_id": "0",
+    "rule_id": "py/code-injection",
+    "rule_slug": "py_code-injection",
+    "file": "testcode/BenchmarkTest00073.py",
+    "function": "BenchmarkTest00073_post",
+    "input_strategy": "flask_view",
+    "function_signature": "def BenchmarkTest00073_post()",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": -1,
+        "type": "flask_request"
+      }
+    ],
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "output/python/benchmark-python/verification_results/findings/finding_0_py_code-injection.json"
+  }
+}

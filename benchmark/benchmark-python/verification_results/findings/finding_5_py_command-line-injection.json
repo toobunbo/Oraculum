@@ -1,0 +1,93 @@
+{
+  "id": "5",
+  "rule_slug": "py_command-line-injection",
+  "source": {
+    "vhx_root": "/home/tuonglnc/repo/VulnHunterX",
+    "vhx_repo_root": "/home/tuonglnc/repo/VulnHunterX/repos/python/benchmark-python",
+    "vhx_output_root": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python",
+    "summary_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/verification_results/summary_benchmark-python_filtered_20260610_105228.json"
+  },
+  "finding": {
+    "rule_id": "py/command-line-injection",
+    "message": "This command line depends on a [user-provided value](1).\nThis command line depends on a [user-provided value](1).",
+    "file": "testcode/BenchmarkTest00165.py",
+    "start_line": 57,
+    "end_line": 57,
+    "repo_name": "benchmark-python",
+    "lang": "python",
+    "sarif_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/benchmark-python.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 31: ControlFlowNode for request",
+      "line 31: ControlFlowNode for Attribute",
+      "line 31: ControlFlowNode for Attribute()",
+      "line 31: ControlFlowNode for param",
+      "line 39: ControlFlowNode for param",
+      "line 39: [post] ControlFlowNode for lst",
+      "line 42: ControlFlowNode for bar",
+      "line 55: ControlFlowNode for Fstring",
+      "line 55: [post] ControlFlowNode for argList",
+      "line 57: ControlFlowNode for argList",
+      "--- Flow 2 ---",
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 31: ControlFlowNode for request",
+      "line 31: ControlFlowNode for Attribute",
+      "line 31: ControlFlowNode for Attribute()",
+      "line 31: ControlFlowNode for param",
+      "line 39: ControlFlowNode for param",
+      "line 39: [post] ControlFlowNode for lst [List element]",
+      "line 42: ControlFlowNode for lst [List element]",
+      "line 42: ControlFlowNode for Subscript",
+      "line 42: ControlFlowNode for bar",
+      "line 55: ControlFlowNode for Fstring",
+      "line 55: [post] ControlFlowNode for argList",
+      "line 57: ControlFlowNode for argList"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [],
+    "tags": [
+      "correctness",
+      "security",
+      "external/cwe/cwe-078",
+      "external/cwe/cwe-088"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-06-10T10:43:25.985619",
+    "context_needed": [],
+    "data_flow": "request.form.get(\"BenchmarkTest00165\") (line 31) → param (line 31) → lst[0] (line 42) → bar (line 42) → f\"echo {bar}\" (line 55) → argList (line 55) → subprocess call (line 57)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "answers": [
+      "The EXACT sink is the subprocess execution, which occurs on line 57. The value passed as the command argument is `argList`, which contains the user-controlled string from the f-string: `f\"echo {bar}\"` (line 55).",
+      "The assignments to `argList` occur at lines 46, 47, 49, 50, and 55. The last assignment is line 55: `argList.append(f\"echo {bar}\")`.",
+      "The value of `bar` derives from user input. Data flow: `request.form.get(\"BenchmarkTest00165\")` (line 31) → `param` (line 31) → `lst[0]` (line 42) → `bar` (line 42) → `f\"echo {bar}\"` (line 55).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value `bar` before it reaches the sink.",
+      "No specific defense sanitizes the value. There is no use of `shlex.quote()`, `subprocess.run(..., shell=False)`, or any other sanitization mechanism. The command is constructed via an f-string, which is unsafe for untrusted input.",
+      "The user-tainted value `bar` reaches the sink via line 55 (`f\"echo {bar}\"`) and is appended to `argList`. There is no sanitization or escaping. Therefore, this is a real vulnerability."
+    ],
+    "confidence_score": 0.95,
+    "iterations": 3,
+    "input_tokens": 9066,
+    "elapsed_seconds": 31.460561990737915,
+    "confidence": "High",
+    "cached_input_tokens": 0,
+    "tokens_used": 10433,
+    "reasoning": "User input flows directly into a shell command via an f-string without sanitization, leading to command injection. The subprocess call is not shown, but argList is prepared unsafely for shell execution.",
+    "verdict": "True Positive",
+    "output_tokens": 1367
+  },
+  "function": {
+    "name": "BenchmarkTest00165_post",
+    "file": "testcode/BenchmarkTest00165.py",
+    "start_line": 28,
+    "end_line": 62,
+    "scope": "Function init"
+  }
+}

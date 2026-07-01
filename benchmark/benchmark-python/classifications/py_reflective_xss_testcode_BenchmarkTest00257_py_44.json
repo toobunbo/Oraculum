@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "The sink is related to reflective XSS, which typically involves HTML/JavaScript output rather than direct dangerous operations like network I/O or shell execution."
+    },
+    "q2_observable_after_return": {
+      "answer": true,
+      "evidence": "XSS vulnerabilities are observable after the function returns, as the malicious script would be executed in the browser context when the response is rendered."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated because Q2 was true and Q1 was false, leading to further evaluation of Q3, but the result is ambiguous based on provided information."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "HTML response generation or output context where `superstring` is used",
+    "capture": "The value of `superstring` or the final response content that includes the unsanitized user input",
+    "fake_behavior": "Stub the response rendering to capture the output without actually sending it, preventing XSS execution in test environments",
+    "notes": [
+      "The actual XSS trigger depends on how the response is consumed by the client; mocking should focus on intercepting the unsafe output.",
+      "Ensure the test does not render the malicious script in a real browser context."
+    ]
+  },
+  "confidence": "medium",
+  "warnings": []
+}

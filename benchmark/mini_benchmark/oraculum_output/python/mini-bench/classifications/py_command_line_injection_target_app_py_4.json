@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "subprocess.run with shell=True is dangerous as it enables command injection and arbitrary shell execution"
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "not applicable since Q1 is true"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "not applicable since Q1 is true"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "subprocess.run call",
+    "capture": "command string and shell parameter",
+    "fake_behavior": "return a safe CompletedProcess object without actual execution",
+    "notes": [
+      "prevent actual shell execution in test environment"
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}
