@@ -369,6 +369,21 @@ def _add_meta(
             "source_finding_artifact": str(artifact_path),
         }
     )
+    
+    # Update tainted_params for flask_view using extracted/merged web request parameters
+    web_params = artifact.get("web_params", [])
+    if not web_params:
+        from oraculum.oracle.signature_builder import extract_web_params_from_source
+        try:
+            web_params = extract_web_params_from_source(artifact)
+        except Exception:
+            pass
+
+    if input_strategy == "flask_view" and web_params:
+        meta["tainted_params"] = [
+            {"name": p["name"], "index": -1, "type": "str"}
+            for p in web_params
+        ]
 
 
 def _entry_base(

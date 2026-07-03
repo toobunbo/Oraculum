@@ -67,8 +67,87 @@ def get_input_strategy_from_artifact(artifact: dict[str, Any]) -> str:
     if "Class" in scope:
         return "flask_view"
     if node is not None:
-        return "flask_view" if _has_only_self_or_cls(node) else "direct_params"
+        if _has_only_self_or_cls(node):
+            return "flask_view"
+        
+    if extract_web_params_from_source(artifact):
+        return "flask_view"
+
     return "direct_params"
+
+
+def extract_web_params_from_source(artifact: dict[str, Any]) -> list[dict[str, Any]]:
+    """Analyze the AST of the target function to extract request parameters."""
+    node = _find_function_node(artifact)
+    if node is None:
+        return []
+
+    params: list[dict[str, Any]] = []
+    seen: set[str] = set()
+
+    for child in ast.walk(node):
+        # Match pattern: request.args.get('expr')
+        if isinstance(child, ast.Call):
+            func = child.func
+            if isinstance(func, ast.Attribute) and func.attr == "get":
+                obj = func.value
+                if isinstance(obj, ast.Attribute) and obj.attr in ("args", "form", "values", "json"):
+                    if isinstance(obj.value, ast.Name) and obj.value.id == "request":
+                        if child.args:
+                            first_arg = child.args[0]
+                            val = None
+                            if isinstance(first_arg, ast.Constant) and isinstance(first_arg.value, str):
+                                val = first_arg.value
+                            elif hasattr(first_arg, "s") and isinstance(first_arg.s, str):
+                                val = first_arg.s
+                            if val and val not in seen:
+                                seen.add(val)
+                                params.append({"name": val, "source": obj.attr})
+
+        # Match pattern: request.args['expr']
+        elif isinstance(child, ast.Subscript):
+            obj = child.value
+            if isinstance(obj, ast.Attribute) and obj.attr in ("args", "form", "values"):
+                if isinstance(obj.value, ast.Name) and obj.value.id == "request":
+                    val = None
+                    sl = child.slice
+                    if isinstance(sl, ast.Constant) and isinstance(sl.value, str):
+                        val = sl.value
+                    elif hasattr(sl, "s") and isinstance(sl.s, str):
+                        val = sl.s
+                    elif isinstance(sl, ast.Index):
+                        idx_val = sl.value
+                        if isinstance(idx_val, ast.Constant) and isinstance(idx_val.value, str):
+                            val = idx_val.value
+                        elif hasattr(idx_val, "s") and isinstance(idx_val.s, str):
+                            val = idx_val.s
+                    if val and val not in seen:
+                        seen.add(val)
+                        params.append({"name": val, "source": obj.attr})
+
+    return params
+
+
+def merge_web_params(artifact: dict[str, Any], web_params_csv_rows: list[Any]) -> list[dict[str, Any]]:
+    """Merge web parameters from CSV (matching this function and file) and fallback to AST."""
+    function = _function_object(artifact)
+    function_name = str(function.get("name") or "")
+    
+    finding = artifact.get("finding") if isinstance(artifact.get("finding"), dict) else {}
+    file_path = str(finding.get("file") or "")
+
+    csv_params: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for row in web_params_csv_rows:
+        if row.function_name == function_name and Path(row.file).as_posix() == Path(file_path).as_posix():
+            if row.param_name not in seen:
+                seen.add(row.param_name)
+                csv_params.append({"name": row.param_name, "source": row.source_type})
+                
+    if csv_params:
+        return csv_params
+        
+    return extract_web_params_from_source(artifact)
 
 
 def _find_function_node(artifact: dict[str, Any]) -> ast.FunctionDef | ast.AsyncFunctionDef | None:
