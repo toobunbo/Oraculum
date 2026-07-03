@@ -21,6 +21,11 @@ or filter has been bypassed — the oracle fires.
    - Use FuzzedDataProvider to generate inputs for all tainted params based on
      the function signature.
 
+   - STRING INPUTS REGULATION:
+     * Always generate string/unicode inputs by consuming bytes and decoding them to preserve raw payloads:
+       val = fdp.ConsumeBytes(1024).decode('utf-8', errors='ignore')
+     * Do NOT use ConsumeUnicodeNoSurrogates() for arguments that need to match exact exploit patterns (like shell commands, import statement strings).
+
    - Buffer allocation strategy (inferred from signature):
        - MULTIPLE params → split the buffer proportionally by param count.
          For str/bytes params, divide remaining bytes evenly; consume the
@@ -77,6 +82,7 @@ or filter has been bypassed — the oracle fires.
 [ ] No ConsumeBool()/ConsumeIntInRange() used to index into a seed list inside TestOneInput
 [ ] _SEED_CORPUS defined at module level, outside TestOneInput
 [ ] _SEED_CORPUS has at least 6 bypass-attempt entries
+[ ] String inputs generated using ConsumeBytes().decode() instead of ConsumeUnicodeNoSurrogates() to preserve seeds
 [ ] skip_condition applied early in TestOneInput
 [ ] Return value checked for None and wrong type
 [ ] Oracle check is OUTSIDE the function call try/except

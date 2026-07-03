@@ -84,6 +84,8 @@ _TAINTED_PARAMS = {{ tainted_params | tojson }}
 
 def TestOneInput(data):
     fdp = atheris.FuzzedDataProvider(data)
+    # NOTE: For string inputs, use fdp.ConsumeBytes(1024).decode('utf-8', errors='ignore')
+    #       instead of ConsumeUnicodeNoSurrogates() to preserve raw seed payloads.
     # [FILL HERE — follow the skeleton above]
 
 

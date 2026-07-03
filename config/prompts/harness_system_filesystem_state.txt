@@ -16,6 +16,10 @@ You call the target function directly with fuzz-generated input, and detect chan
 
 1. INPUT GENERATION
    - Use FuzzedDataProvider to generate inputs for all tainted params based on the function signature.
+   - STRING INPUTS REGULATION:
+     * Always generate string/unicode inputs by consuming bytes and decoding them to preserve raw payloads:
+       val = fdp.ConsumeBytes(1024).decode('utf-8', errors='ignore')
+     * Do NOT use ConsumeUnicodeNoSurrogates() for arguments that need to match exact exploit patterns (like path traversal payloads, file names).
    - Buffer allocation strategy:
      - For a SINGLE str/bytes param: consume ALL remaining bytes/string.
      - For MULTIPLE params: split the buffer proportionally by param count.
@@ -60,6 +64,7 @@ You call the target function directly with fuzz-generated input, and detect chan
 [ ] No ConsumeBool()/ConsumeIntInRange() used inside TestOneInput
 [ ] _SEED_CORPUS defined at module level, outside TestOneInput
 [ ] _SEED_CORPUS has at least 6 bypass-attempt entries
+[ ] String inputs generated using ConsumeBytes().decode() instead of ConsumeUnicodeNoSurrogates() to preserve seeds
 [ ] skip_condition applied early in TestOneInput
 [ ] Temporary directory created and snapshot taken before function call
 [ ] Target function executes inside try/finally block
