@@ -24,6 +24,7 @@ class IngestPaths:
     vhx_verification_dir: Path
     vhx_context_dir: Path
     vhx_functions_csv: Path
+    vhx_web_params_csv: Path
     summary_path: Path
     repo_output: Path
     ingest_dir: Path
@@ -50,6 +51,7 @@ def resolve_ingest_paths(
     vhx_verification_dir = vhx_output_root / "verification_results"
     vhx_context_dir = vhx_output_root / "context"
     vhx_functions_csv = vhx_context_dir / "functions.csv"
+    vhx_web_params_csv = vhx_context_dir / "web_params.csv"
 
     if not vhx_output_root.is_dir():
         raise IngestPathError(f"VulnHunterX repo output not found: {vhx_output_root}")
@@ -78,6 +80,7 @@ def resolve_ingest_paths(
         vhx_verification_dir=vhx_verification_dir,
         vhx_context_dir=vhx_context_dir,
         vhx_functions_csv=vhx_functions_csv,
+        vhx_web_params_csv=vhx_web_params_csv,
         summary_path=summary_path,
         repo_output=repo_output,
         ingest_dir=ingest_dir,

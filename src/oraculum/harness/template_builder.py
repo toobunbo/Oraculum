@@ -28,6 +28,11 @@ def build_skeleton(
 
     # Resolve import
     raw_import   = resolve_import(file_path, function_name, repo_root)
+    if input_strategy == "flask_view":
+        if isinstance(raw_import, str):
+            raw_import = raw_import.replace(f" import {function_name}", f" import app, {function_name}")
+        elif isinstance(raw_import, list):
+            raw_import = [r.replace(f" import {function_name}", f" import app, {function_name}") for r in raw_import]
     import_stmts = raw_import if isinstance(raw_import, list) else [raw_import]
 
     # Extra imports — skip builtins and unittest.mock (template handles it)

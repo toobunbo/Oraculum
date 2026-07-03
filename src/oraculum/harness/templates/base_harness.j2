@@ -86,7 +86,23 @@ def TestOneInput(data):
     fdp = atheris.FuzzedDataProvider(data)
     # NOTE: For string inputs, use fdp.ConsumeBytes(1024).decode('utf-8', errors='ignore')
     #       instead of ConsumeUnicodeNoSurrogates() to preserve raw seed payloads.
+    {% if input_strategy == "flask_view" %}
+    # 1. Generate inputs from fdp
+    {% for param in tainted_params %}
+    param_{{ param.name }} = fdp.ConsumeBytes(1024).decode('utf-8', errors='ignore')
+    {% endfor %}
+    query_params = {
+        {% for param in tainted_params %}
+        "{{ param.name }}": param_{{ param.name }},
+        {% endfor %}
+    }
+    
+    # 2. Wrap in Flask Request Context
+    with app.test_request_context(query_string=query_params):
+        pass  # [FILL HERE — follow the skeleton above]
+    {% else %}
     # [FILL HERE — follow the skeleton above]
+    {% endif %}
 
 
 # === SEED CORPUS — bypass-oriented, derived from trigger_patterns ===

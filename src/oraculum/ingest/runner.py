@@ -71,6 +71,15 @@ def run_ingest(
 
     source_summary = load_summary(paths.summary_path)
     functions = load_functions_csv(paths.vhx_functions_csv)
+    
+    web_params = []
+    if paths.vhx_web_params_csv.is_file():
+        from oraculum.oracle.csv_loader import load_web_params
+        try:
+            web_params = load_web_params(str(paths.vhx_web_params_csv))
+        except Exception:
+            pass
+
     verdicts = source_summary["verdicts"]
     normalized_filter = normalize_verdict_filter(verdict_filter)
 
@@ -103,6 +112,7 @@ def run_ingest(
                 finding=finding,
                 verification=verification,
                 function=function,
+                web_params=web_params,
             )
             enriched_count += 1
             finding_entries.append(
@@ -187,9 +197,19 @@ def _write_enriched_finding(
     finding: dict[str, Any],
     verification: dict[str, Any],
     function: FunctionInfo,
+    web_params: list[Any] = None,
 ) -> Path:
     slug = rule_slug(str(finding.get("rule_id", "")))
     artifact_path = paths.ingest_findings_dir / f"finding_{idx}_{slug}.json"
+    
+    from oraculum.oracle.signature_builder import merge_web_params
+    temp_artifact = {
+        "finding": finding,
+        "function": function.to_dict(),
+        "source": _source_metadata(paths)
+    }
+    extracted_params = merge_web_params(temp_artifact, web_params or [])
+    
     payload = {
         "id": str(idx),
         "rule_slug": slug,
@@ -197,6 +217,7 @@ def _write_enriched_finding(
         "finding": finding,
         "verification": verification,
         "function": function.to_dict(),
+        "web_params": extracted_params,
     }
     artifact_path.write_text(
         json.dumps(payload, indent=2, ensure_ascii=False),
