@@ -2,10 +2,10 @@
   "id": "2",
   "rule_slug": "py_path-injection",
   "source": {
-    "vhx_root": "/home/tuonglnc/repo/Oraculum/tests/mini_benchmark/vhx_root",
-    "vhx_repo_root": "/home/tuonglnc/repo/Oraculum/tests/mini_benchmark/vhx_root/repos/python/mini-bench",
-    "vhx_output_root": "/home/tuonglnc/repo/Oraculum/tests/mini_benchmark/vhx_root/output/python/mini-bench",
-    "summary_path": "/home/tuonglnc/repo/Oraculum/tests/mini_benchmark/vhx_root/output/python/mini-bench/verification_results/summary_mini-bench_20260630_000000.json"
+    "vhx_root": "tests/mini_benchmark/vhx_root",
+    "vhx_repo_root": "tests/mini_benchmark/vhx_root/repos/python/mini-bench",
+    "vhx_output_root": "tests/mini_benchmark/vhx_root/output/python/mini-bench",
+    "summary_path": "tests/mini_benchmark/vhx_root/output/python/mini-bench/verification_results/summary_mini-bench_20260630_000000.json"
   },
   "finding": {
     "rule_id": "py/path-injection",

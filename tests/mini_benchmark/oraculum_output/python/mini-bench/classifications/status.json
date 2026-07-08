@@ -38,7 +38,7 @@
       "classification": "tests/mini_benchmark/oraculum_output/python/mini-bench/classifications/py_url_redirection_target_app_py_8.json",
       "status": "generated",
       "strategy": "return_value",
-      "confidence": "medium"
+      "confidence": "high"
     },
     {
       "id": "2",

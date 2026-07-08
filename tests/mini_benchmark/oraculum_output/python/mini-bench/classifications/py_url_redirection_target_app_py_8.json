@@ -4,18 +4,18 @@
   "decision": {
     "q1_sink_dangerous": {
       "answer": false,
-      "evidence": "return value"
+      "evidence": "The sink is a return value, not a dangerous operation like network I/O, shell execution, DB write, RCE, unsafe parser, external resolution, or irreversible side effects."
     },
     "q2_observable_after_return": {
       "answer": true,
-      "evidence": "The function returns the user-provided URL directly, which is then used by the caller to redirect the user to a potentially malicious third-party site."
+      "evidence": "The function returns the user-provided URL directly, which can be observed by the caller and used for redirection to potentially malicious sites."
     },
     "q3_result_in_memory": {
-      "answer": null,
-      "evidence": "returns.kind is unknown"
+      "answer": true,
+      "evidence": "returns.kind is 'value' and returns.exprs contains 'user_url', indicating the result is accessible in memory on return."
     }
   },
   "mock_guidance": null,
-  "confidence": "medium",
+  "confidence": "high",
   "warnings": []
 }

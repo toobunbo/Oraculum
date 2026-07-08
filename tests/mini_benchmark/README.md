@@ -16,22 +16,19 @@ Môi trường giả lập VulnHunterX (VHX Workspace) nằm tại `tests/mini_b
 
 Khi phát triển Stage 2 và Stage 3, các bạn có thể sử dụng bộ dữ liệu này để chạy thử và xác minh kết quả.
 
-### Bước 0: Ingest (Nhập dữ liệu VHX)
-Chạy lệnh sau để import dữ liệu từ VHX Workspace giả lập vào Oraculum:
-```bash
-.venv/bin/python -m oraculum.cli.main ingest \
-  --vhx-root tests/mini_benchmark/vhx_root \
-  --repo mini-bench \
-  --output-dir tests/mini_benchmark/oraculum_output \
-  --force
-```
-* **Mục tiêu**: Đọc finding gốc từ VHX và lưu cấu trúc enriched finding thành công tại:
-  `tests/mini_benchmark/oraculum_output/python/mini-bench/verification_results/findings/`
+> [!IMPORTANT]
+> Trước khi chạy các lệnh `oraculum`, hãy kích hoạt môi trường ảo (virtual environment):
+> ```bash
+> source .venv/bin/activate
+> ```
+
+> [!NOTE]
+> Bộ benchmark này đã đi kèm với dữ liệu findings được ingest sẵn tại `tests/mini_benchmark/oraculum_output/`. Bạn có thể bỏ qua **Bước 0** và bắt đầu chạy trực tiếp từ **Bước 1** mà không cần phụ thuộc vào `vhx-root`.
 
 ### Bước 1: Classify (Phân loại Chiến lược)
-Chạy lệnh sau để LLM phân loại chiến lược cho các finding vừa ingest:
+Chạy lệnh sau để LLM phân loại chiến lược cho các finding:
 ```bash
-.venv/bin/python -m oraculum.cli.main classify \
+oraculum classify \
   --repo mini-bench \
   --output-dir tests/mini_benchmark/oraculum_output \
   --log-file tests/mini_benchmark/classify_log.md \
@@ -44,10 +41,24 @@ Chạy lệnh sau để LLM phân loại chiến lược cho các finding vừa 
 
 ---
 
+### Không bắt buộc: Bước 0: Ingest (Nhập dữ liệu VHX)
+Nếu muốn tự import lại dữ liệu từ VHX Workspace giả lập vào Oraculum (yêu cầu cài đặt/cấu hình `vhx-root`):
+```bash
+oraculum ingest \
+  --vhx-root tests/mini_benchmark/vhx_root \
+  --repo mini-bench \
+  --output-dir tests/mini_benchmark/oraculum_output \
+  --force
+```
+* **Mục tiêu**: Đọc finding gốc từ VHX và lưu cấu trúc enriched finding thành công tại:
+  `tests/mini_benchmark/oraculum_output/python/mini-bench/verification_results/findings/`
+
+---
+
 ### Bước 2: Oracle Research (Phát triển Stage 2)
 Sau khi hoàn thiện code Stage 2, chạy lệnh sau:
 ```bash
-.venv/bin/python -m oraculum.cli.main oracle \
+oraculum oracle \
   --repo mini-bench \
   --output-dir tests/mini_benchmark/oraculum_output \
   --force
@@ -63,7 +74,7 @@ Sau khi hoàn thiện code Stage 2, chạy lệnh sau:
 ### Bước 3: Harness Generation (Phát triển Stage 3)
 Sau khi hoàn thiện code Stage 3, chạy lệnh sau:
 ```bash
-.venv/bin/python -m oraculum.cli.main harness \
+oraculum harness \
   --repo mini-bench \
   --output-dir tests/mini_benchmark/oraculum_output \
   --force
@@ -80,6 +91,6 @@ Sau khi hoàn thiện code Stage 3, chạy lệnh sau:
 ### Bước 4: Chạy xác minh Fuzzer (Smoke test & Violation)
 * **Smoke test**: Chạy harness với tham số `-runs=1` để kiểm tra lỗi cú pháp/import:
   ```bash
-  .venv/bin/python tests/mini_benchmark/oraculum_output/python/mini-bench/fuzz_targets/<target_harness>.py -runs=1
+  python tests/mini_benchmark/oraculum_output/python/mini-bench/fuzz_targets/<target_harness>.py -runs=1
   ```
 * **Bug verification**: Chạy fuzzer để kiểm tra xem nó có phát hiện ra lỗ hổng bảo mật và raise ngoại lệ mong muốn khi gặp seed độc hại hay không.

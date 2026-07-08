@@ -56,41 +56,31 @@ Oraculum operates in a 4-stage pipeline:
 
 ## 3. Running the Pipeline
 
-You can run the pipeline on the included `mini-bench` target project to verify everything is working.
+Oraculum comes pre-packaged with pre-ingested benchmark findings inside `tests/mini_benchmark/oraculum_output/`, so you can run and test the pipeline immediately **without** depending on VulnHunterX (`vhx-root`).
 
-### Step 1: Ingest VulnHunterX Findings (Stage 0)
-Import VHX scan findings:
-```bash
-python -m oraculum.cli.main ingest \
-  --vhx-root tests/mini_benchmark/vhx_root \
-  --repo mini-bench \
-  --output-dir tests/mini_benchmark/oraculum_output \
-  --force
-```
-
-### Step 2: Classify Strategies (Stage 1)
+### Step 1: Classify Strategies (Stage 1)
 Classify findings into their respective fuzzer monitoring strategies:
 ```bash
-python -m oraculum.cli.main classify \
+oraculum classify \
   --repo mini-bench \
   --output-dir tests/mini_benchmark/oraculum_output \
   --log-file tests/mini_benchmark/classify_log.md \
   --force
 ```
 
-### Step 3: Generate Oracle Specifications (Stage 2)
+### Step 2: Generate Oracle Specifications (Stage 2)
 Generate target oracle definitions:
 ```bash
-python -m oraculum.cli.main oracle \
+oraculum oracle \
   --repo mini-bench \
   --output-dir tests/mini_benchmark/oraculum_output \
   --force
 ```
 
-### Step 4: Generate Atheris Fuzzer Harnesses (Stage 3)
+### Step 3: Generate Atheris Fuzzer Harnesses (Stage 3)
 Generate the ready-to-run fuzz target scripts and corpus files:
 ```bash
-python -m oraculum.cli.main harness \
+oraculum harness \
   --repo mini-bench \
   --output-dir tests/mini_benchmark/oraculum_output \
   --force
@@ -98,6 +88,18 @@ python -m oraculum.cli.main harness \
 
 Generated targets are placed in:
 `tests/mini_benchmark/oraculum_output/python/mini-bench/fuzz_targets/`
+
+---
+
+### Optional: Ingest VulnHunterX Findings (Stage 0)
+If you want to re-import raw scan findings from a local VulnHunterX installation (which requires configuring the `--vhx-root` path containing the scanned repository and verification results):
+```bash
+oraculum ingest \
+  --vhx-root tests/mini_benchmark/vhx_root \
+  --repo mini-bench \
+  --output-dir tests/mini_benchmark/oraculum_output \
+  --force
+```
 
 ---
 

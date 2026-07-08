@@ -4,25 +4,25 @@
   "decision": {
     "q1_sink_dangerous": {
       "answer": true,
-      "evidence": "subprocess.run is dangerous due to potential shell execution and command injection when shell=True"
+      "evidence": "subprocess.run is dangerous due to shell execution capability"
     },
     "q2_observable_after_return": {
       "answer": false,
-      "evidence": "not evaluated because Q1 was true"
+      "evidence": "not applicable due to Q1 being true"
     },
     "q3_result_in_memory": {
       "answer": null,
-      "evidence": "not evaluated"
+      "evidence": "returns.kind is none"
     }
   },
   "mock_guidance": {
     "required": true,
     "target": "subprocess.run call",
-    "capture": "cmd_input argument passed to subprocess.run",
+    "capture": "command argument passed to subprocess.run",
     "fake_behavior": "mock subprocess.run to prevent actual shell execution while capturing the command that would be executed",
     "notes": [
       "prevent actual shell execution in test environment",
-      "capture command string for validation"
+      "capture cmd_input for validation"
     ]
   },
   "confidence": "high",

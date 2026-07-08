@@ -188,7 +188,25 @@ def _source_file_path(artifact: dict[str, Any]) -> Path | None:
     file_path = finding.get("file")
     if not root or not file_path:
         return None
-    return Path(str(root)) / str(file_path)
+    
+    path = Path(str(root)) / str(file_path)
+    if path.is_file():
+        return path
+        
+    # Fallback for relative or mismatch paths in cloned workspace
+    root_str = str(root)
+    for marker in ["tests/mini_benchmark/vhx_root", "vhx_root"]:
+        if marker in root_str:
+            rel_parts = root_str.split(marker, 1)[1].lstrip("/")
+            fallback_path = Path.cwd() / marker / rel_parts / str(file_path)
+            if fallback_path.is_file():
+                return fallback_path
+                
+    fallback_simple = Path.cwd() / "tests/mini_benchmark/vhx_root/repos/python/mini-bench" / str(file_path)
+    if fallback_simple.is_file():
+        return fallback_simple
+
+    return path
 
 
 def _format_function_signature(node: ast.FunctionDef | ast.AsyncFunctionDef) -> str:

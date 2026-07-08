@@ -439,6 +439,19 @@ def _generate_harness_code(
 ) -> str:
     source = artifact.get("source") if isinstance(artifact.get("source"), dict) else {}
     repo_root = str(source.get("vhx_repo_root") or "")
+    if repo_root and not os.path.isdir(repo_root):
+        for marker in ["tests/mini_benchmark/vhx_root", "vhx_root"]:
+            if marker in repo_root:
+                rel_parts = repo_root.split(marker, 1)[1].lstrip("/")
+                fallback_root = Path.cwd() / marker / rel_parts
+                if fallback_root.is_dir():
+                    repo_root = str(fallback_root)
+                    break
+        else:
+            fallback_simple = Path.cwd() / "tests/mini_benchmark/vhx_root/repos/python/mini-bench"
+            if fallback_simple.is_dir():
+                repo_root = str(fallback_simple)
+
     skeleton = build_skeleton(
         artifact,
         oracle_spec,
