@@ -42,11 +42,38 @@ Oraculum operates in a 4-stage pipeline:
    ```bash
    cp env.example .env
    ```
-2. Configure the LLM provider in `.env` (supports `openai`, `anthropic`, or `ollama`):
-   ```ini
-   LLM_PROVIDER=ollama
-   LLM_MODEL=qwen3-coder:480b-cloud
-   ```
+2. Configure the LLM provider in `.env`. Oraculum officially supports `openai`, `anthropic`, and `ollama` (both local and cloud/multi-key configurations). Choose one of the setups below:
+
+   * **Option A: Ollama Cloud (Rotated multi-key)**
+     ```ini
+     LLM_PROVIDER=ollama
+     LLM_MODEL=qwen3-coder:480b-cloud
+     OLLAMA_API_BASE=https://ollama.com
+     OLLAMA_API_KEYS=key1,key2,key3
+     ```
+
+   * **Option B: Ollama (Local)**
+     ```ini
+     LLM_PROVIDER=ollama
+     LLM_MODEL=qwen3-coder
+     OLLAMA_API_BASE=http://localhost:11434
+     ```
+
+   * **Option C: OpenAI**
+     ```ini
+     LLM_PROVIDER=openai
+     LLM_MODEL=gpt-4o
+     OPENAI_API_KEY=your-openai-api-key
+     # Optional: OPENAI_BASE_URL=https://custom-proxy.com/v1
+     ```
+
+   * **Option D: Anthropic**
+     ```ini
+     LLM_PROVIDER=anthropic
+     LLM_MODEL=claude-3-5-sonnet-latest
+     ANTHROPIC_API_KEY=your-anthropic-api-key
+     ```
+
 3. Activate the virtual environment:
    ```bash
    source .venv/bin/activate
