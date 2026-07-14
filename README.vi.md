@@ -6,7 +6,14 @@
 
 ## Hướng dẫn chạy thử nghiệm Pipeline các Stages (0 đến 3)
 
-Oraculum cung cấp giao diện dòng lệnh (CLI) để chạy các Stage của pipeline. Dưới đây là hướng dẫn chạy từ đầu đến cuối sử dụng dữ liệu mini-benchmark có sẵn:
+Oraculum cung cấp giao diện dòng lệnh (CLI) để chạy các Stage của pipeline. 
+
+Đầu vào của **Stage 1 (Classification)** là các *enriched findings* (tệp JSON chứa siêu dữ liệu lỗ hổng, mã nguồn và suy luận xác minh từ VulnHunterX) cùng với file tóm tắt `summary.json` liên kết chúng.
+
+* **Đối với thử nghiệm với benchmark mẫu:** Oraculum đã đi kèm sẵn các tệp findings đã được ingest tại `tests/mini_benchmark/oraculum_output/`. Do đó, Stage 0 là tùy chọn (optional) và bạn có thể bắt đầu trực tiếp từ **Stage 1 (Classify)** mà không cần cài đặt hay phụ thuộc vào VulnHunterX (`vhx-root`).
+* **Đối với quét các phát hiện mới:** Bạn bắt buộc phải chạy **Stage 0 (Ingest)** trước để import và làm giàu dữ liệu trước khi chuyển sang Stage 1.
+
+Dưới đây là hướng dẫn chạy từ đầu đến cuối sử dụng dữ liệu mini-benchmark có sẵn:
 
 ### 0. Thiết lập môi trường
 Copy file `env.example` thành `.env` và cấu hình các biến môi trường cho LLM Provider của bạn. Sau đó kích hoạt môi trường ảo:

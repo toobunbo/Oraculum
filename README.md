@@ -83,7 +83,10 @@ Oraculum operates in a 4-stage pipeline:
 
 ## 3. Running the Pipeline
 
-Oraculum comes pre-packaged with pre-ingested benchmark findings inside `tests/mini_benchmark/oraculum_output/`, so you can run and test the pipeline immediately **without** depending on VulnHunterX (`vhx-root`).
+The inputs of **Stage 1 (Classification)** are *enriched findings* (JSON files containing vulnerability metadata, source code, and VulnHunterX verification reasoning) and an ingest `summary.json` mapping them.
+
+* **For the test benchmark:** Oraculum comes pre-packaged with these pre-ingested findings inside `tests/mini_benchmark/oraculum_output/`. Thus, Stage 0 is optional and you can run/test the pipeline immediately **without** depending on VulnHunterX (`vhx-root`).
+* **For new scan reports:** Stage 0 (Ingest) is **required** to import and enrich raw findings before you can run Stage 1.
 
 ### Step 1: Classify Strategies (Stage 1)
 Classify findings into their respective fuzzer monitoring strategies:
@@ -118,8 +121,8 @@ Generated targets are placed in:
 
 ---
 
-### Optional: Ingest VulnHunterX Findings (Stage 0)
-If you want to re-import raw scan findings from a local VulnHunterX installation (which requires configuring the `--vhx-root` path containing the scanned repository and verification results):
+### Ingest VulnHunterX Findings (Stage 0)
+This step is required for new scan reports (optional for testing the pre-packaged benchmark). To import raw scan findings from a local VulnHunterX installation (which requires configuring the `--vhx-root` path containing the scanned repository and verification results):
 ```bash
 oraculum ingest \
   --vhx-root tests/mini_benchmark/vhx_root \
