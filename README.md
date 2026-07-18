@@ -67,12 +67,20 @@ Oraculum operates in a 4-stage pipeline:
      # Optional: OPENAI_BASE_URL=https://custom-proxy.com/v1
      ```
 
-   * **Option D: Anthropic**
-     ```ini
-     LLM_PROVIDER=anthropic
-     LLM_MODEL=claude-3-5-sonnet-latest
-     ANTHROPIC_API_KEY=your-anthropic-api-key
-     ```
+    * **Option D: Anthropic**
+      ```ini
+      LLM_PROVIDER=anthropic
+      LLM_MODEL=claude-3-5-sonnet-latest
+      ANTHROPIC_API_KEY=your-anthropic-api-key
+      ```
+
+    * **Option E: DeepSeek via shopaikey.com**
+      ```ini
+      LLM_PROVIDER=openai
+      LLM_MODEL=deepseek-v3-1-250821
+      OPENAI_API_KEY=sk-your-deepseek-api-key
+      OPENAI_API_BASE=https://api.shopaikey.com/v1
+      ```
 
 3. Activate the virtual environment:
    ```bash
@@ -156,6 +164,111 @@ python tests/mini_benchmark/oraculum_output/python/mini-bench/fuzz_targets/py_co
   * **`classification/`**: Stage 1 classification models & rules.
   * **`oracle/`**: Stage 2 prompt routing & oracle spec generator.
   * **`harness/`**: Stage 3 template structures, code generator, and CLI logic.
+  * **`harness/repair/`**: **Post-generation Repair Loop** — tự động sửa lỗi runtime của harness (xem chi tiết tại `docs/repair-loop-guide.md`).
+    * `runner.py`: `RepairLoop` class — dry-run → classify → fix → retry (max 3 iterations)
+    * `error_classifier.py`: Phân loại lỗi từ stderr → ErrorType (9 types)
+    * `dry_run.py`: Chạy harness với timeout + infer repo root
+    * `fixers/`: 4 static fixers (seed encoding, Django/Flask/FastAPI context, Atheris timeout)
+    * `fixers/llm_agent.py`: DeepSeek V3.1 fallback cho error types không có static fix
+* **`experiments/`**: Thí nghiệm và kết quả thực nghiệm.
+  * **`results/final_results_v3.json`**: Kết quả cuối — 123 harnesses
+  * **`results/repair_v6_results.json`**: Kết quả so sánh
+  * **`scripts/run_repair_v7.sh`**: Script chạy Repair Loop (v7, mới nhất)
+  * **`config/realvuln_testing_guide.md`**: Hướng dẫn chạy thí nghiệm
+  * **`archive/`**: Dữ liệu thô từ các lần chạy trước
 * **`config/`**: System and user prompt configuration files used by the LLM.
-* **`tests/`**: Unit tests (`test_harness.py`, `test_oracle.py`, etc.).
-* **`tests/mini_benchmark/`**: Target project containing vulnerable code and simulated VulnHunterX reports for testing.
+  * **`prompts/repair_agent.txt`**: System prompt cho LLM Agent repair
+* **`docs/`**: Tài liệu kỹ thuật.
+  * **`repair-loop-guide.md`**: Tài liệu chi tiết về Repair Loop (kiến trúc, metrics, kết quả)
+
+---
+
+## 6. Experimental Results (RealVuln Benchmark)
+
+### 6.1 Pipeline Overview
+
+Oraculum was evaluated on the **RealVuln benchmark** — 62 Python repositories containing 2,182 ground-truth vulnerability findings. After VHX verification (CodeQL + LLM), **671 True Positives** were fed into the Oraculum pipeline. From these, **123 Atheris fuzz harnesses** were automatically generated (Harness Generation Rate: 18.3%).
+
+### 6.2 Metrics
+
+We do not report Precision, Recall, or F1-Score because ground truth for "fuzzable vulnerabilities" does not exist — there is no labeled dataset indicating which vulnerabilities can be triggered via Atheris within N fuzz iterations. Instead, we report pipeline-conversion metrics that measure what the system demonstrably achieves:
+
+| Metric | Formula | Track A (auto) | Track B (assisted) |
+|--------|---------|----------------|-------------------|
+| **Harness Generation Rate** | harness / VHX TP | **18.3%** | **18.3%** |
+| **Runtime Pass Rate** | (PASS+BUG) / total | **54.5%** (67/123) | **71.5%** (88/123) |
+| **First-Run Bug Detection Rate** | BUG / total | — | **13.8%** (17/123) |
+| **End-to-End Confirmation Rate** | BUG / VHX TP | — | **2.5%** (17/671) |
+| **Stage Survival Rate** | output / input per stage | varies (see below) | varies |
+
+These metrics are verifiable, reproducible, and do not require unverifiable assumptions about ground truth. The First-Run Bug Detection Rate serves as a **lower bound** on precision: at least 13.8% of generated harnesses trigger a crash on the first fuzz input, confirming a true vulnerability.
+
+### 6.3 Repair Loop Impact
+
+The Repair Loop improved the pass rate from **26.8% (baseline)** to **71.5% (full repair)** — a **2.7x improvement** across 7 iterative versions:
+
+| Version | Fixes applied | PASS rate |
+|---------|--------------|-----------|
+| V1 (baseline) | None | 26.8% |
+| V2 (45s timeout, correct deps) | Package resolution | 26.8% |
+| V3 (uv pip) | Correct dependency installation | 32.5% |
+| V4 (static fixers) | Seed encoding, framework context, markdown cleanup | 35.8% |
+| V5 (cwd fix) | Repo root working directory | 44.7% |
+| V6 (instrument_all) | Atheris timeout workaround | 54.5% |
+| V7 (full repair) | All static + LLM Agent | **71.5%** |
+
+### 6.4 Bug Detection
+
+17 out of 123 harnesses triggered an Atheris crash (return code 77) on the first fuzz input — confirmed exploitable vulnerabilities:
+
+| Vulnerability class | Count |
+|--------------------|-------|
+| Command injection | 4 |
+| SQL injection | 3 |
+| Path injection | 3 |
+| Reflective XSS | 2 |
+| Unsafe deserialization | 2 |
+| Template injection | 1 |
+| Full SSRF | 1 |
+| Weak sensitive data hashing | 1 |
+
+### 6.5 Failure Analysis
+
+35 harnesses (28.5%) remain in FAIL status. All are attributable to **Atheris runtime limitations**, not pipeline errors:
+- 25 harnesses import modules with C extensions (`lxml`, `psycopg2`, `cryptography`) that Atheris cannot instrument
+- 10 harnesses trigger `SystemError` during instrumentation of complex Django model chains
+
+These harnesses are syntactically valid and semantically correct. They fail solely because of Atheris internals — a documented limitation of the fuzzing engine, not the harness generation or repair pipeline.
+
+---
+
+## 7. Running the Repair Loop
+
+To reproduce the repair results on generated harnesses:
+
+```bash
+# Run repair on all harnesses in the output directory
+python3 -c "
+from oraculum.harness.repair.runner import RepairLoop
+import glob
+
+loop = RepairLoop(timeout=90)
+for f in glob.glob('output/python/*/fuzz_targets/*.py'):
+    result = loop.repair_one(f)
+    print(result.summary)
+"
+```
+
+```bash
+# Or use the experiment script
+bash experiments/scripts/run_repair_v7.sh
+```
+
+---
+
+## 8. References
+
+- **RealVuln Benchmark**: Kolega et al. https://realvuln.kolega.dev
+- **Atheris**: Google. https://github.com/google/atheris
+- **CKG-Fuzzer**: Dynamic Program Repair for C/C++ fuzz harnesses
+- **VulnHunterX**: LLM-based SAST verification. https://github.com/toobunbo/VulnHunterX
