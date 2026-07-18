@@ -11,10 +11,10 @@ By consuming verified vulnerability findings from [VulnHunterX](https://github.c
 Oraculum operates in a 4-stage pipeline:
 
 ```
-  Verified         Enriched          {Strategy,         Oracle            Atheris          Crash /
-  Finding    ──►   Finding    ──►    Mock Guidance} ──►  Spec       ──►    Harness   ──►    Violation
- (VHX Output)      (Stage 0:          (Stage 1:         (Stage 2:         (Stage 3:        (Fuzzer Run)
-                    Ingest)           Classify)         Research)         Harness)
+  Verified         Enriched          {Strategy,         Oracle            Atheris         Repaired         Crash /
+  Finding    ──►   Finding    ──►    Mock Guidance} ──►  Spec       ──►    Harness   ──►   Harness   ──►   Violation
+ (VHX Output)      (Stage 0:          (Stage 1:         (Stage 2:         (Stage 3:        (Stage 4:       (Fuzzer Run)
+                   Ingest)           Classify)         Oracle)            Harness)        Repair Loop)
 ```
 
 1. **Stage 0: Ingest**
@@ -28,6 +28,8 @@ Oraculum operates in a 4-stage pipeline:
    Generates a JSON-formatted **Oracle Specification** defining the precise rules, targets, regex matching patterns, and parameters to fuzz.
 4. **Stage 3: Harness Generation**
    Applies Jinja2 skeletons to construct the complete, runnable Python fuzzer target (Atheris code) and initializes a mutation seed corpus directory.
+5. **Stage 4: Repair Loop**
+   Automatically repairs runtime errors in generated fuzz harnesses. Each harness is dry-run with `-runs=1` (90s timeout). If it fails, the error is classified and a fix is applied — either a static transformation (seed encoding, framework context, Atheris timeout) or an LLM Agent call (DeepSeek V3.1). The process repeats for up to 3 iterations. Achieved a 71.5% pass rate (88/123) across the RealVuln benchmark, including 17 confirmed BUGs. See `docs/repair-loop-guide.md` for details.
 
 ---
 
@@ -164,22 +166,22 @@ python tests/mini_benchmark/oraculum_output/python/mini-bench/fuzz_targets/py_co
   * **`classification/`**: Stage 1 classification models & rules.
   * **`oracle/`**: Stage 2 prompt routing & oracle spec generator.
   * **`harness/`**: Stage 3 template structures, code generator, and CLI logic.
-  * **`harness/repair/`**: **Post-generation Repair Loop** — tự động sửa lỗi runtime của harness (xem chi tiết tại `docs/repair-loop-guide.md`).
+  * **`harness/repair/`**: **Post-generation Repair Loop** — automatically repairs runtime errors in generated harnesses (see `docs/repair-loop-guide.md`).
     * `runner.py`: `RepairLoop` class — dry-run → classify → fix → retry (max 3 iterations)
-    * `error_classifier.py`: Phân loại lỗi từ stderr → ErrorType (9 types)
-    * `dry_run.py`: Chạy harness với timeout + infer repo root
+    * `error_classifier.py`: Classifies runtime errors from stderr → ErrorType (9 types)
+    * `dry_run.py`: Runs harness with timeout + infers repo root
     * `fixers/`: 4 static fixers (seed encoding, Django/Flask/FastAPI context, Atheris timeout)
-    * `fixers/llm_agent.py`: DeepSeek V3.1 fallback cho error types không có static fix
-* **`experiments/`**: Thí nghiệm và kết quả thực nghiệm.
-  * **`results/final_results_v3.json`**: Kết quả cuối — 123 harnesses
-  * **`results/repair_v6_results.json`**: Kết quả so sánh
-  * **`scripts/run_repair_v7.sh`**: Script chạy Repair Loop (v7, mới nhất)
-  * **`config/realvuln_testing_guide.md`**: Hướng dẫn chạy thí nghiệm
-  * **`archive/`**: Dữ liệu thô từ các lần chạy trước
+    * `fixers/llm_agent.py`: DeepSeek V3.1 fallback for error types without static fixers
+* **`experiments/`**: Experiment scripts and results.
+  * **`results/final_results_v3.json`**: Final results — 123 harnesses, 88 pass, 17 BUGs
+  * **`results/repair_v6_results.json`**: Comparison results (V6, 67 pass)
+  * **`scripts/run_repair_v7.sh`**: Repair Loop runner script (v7, latest)
+  * **`config/realvuln_testing_guide.md`**: RealVuln experiment guide
+  * **`archive/`**: Raw data from previous experiment runs
 * **`config/`**: System and user prompt configuration files used by the LLM.
-  * **`prompts/repair_agent.txt`**: System prompt cho LLM Agent repair
-* **`docs/`**: Tài liệu kỹ thuật.
-  * **`repair-loop-guide.md`**: Tài liệu chi tiết về Repair Loop (kiến trúc, metrics, kết quả)
+  * **`prompts/repair_agent.txt`**: System prompt for LLM Agent repair
+* **`docs/`**: Technical documentation.
+  * **`repair-loop-guide.md`**: Repair Loop technical documentation (architecture, metrics, experimental results)
 
 ---
 
