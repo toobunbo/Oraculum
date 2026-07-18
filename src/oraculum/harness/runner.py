@@ -458,24 +458,43 @@ def _generate_harness_code(
         repo_root=repo_root,
         corpus_dir=str(corpus_dir),
     )
+    # Deterministic skeletons (e.g. the Flask framework branch) are emitted
+    # complete, with no [FILL HERE] / TODO markers. Skip the LLM fill step and
+    # use the skeleton directly.
+    if "[FILL HERE]" not in skeleton and "TODO: Complete" not in skeleton:
+        validate_harness(skeleton)
+        return skeleton
     system_prompt = _load_system_prompt(prompts_dir, oracle_spec)
     user_prompt = _load_user_prompt(prompts_dir).format(skeleton=skeleton)
     if on_llm_exchange is not None:
         on_llm_exchange(index, total, artifact, oracle_spec, system_prompt, user_prompt, None)
-    raw = call_llm(
-        system_prompt,
-        user_prompt,
-        model,
-        float(config.get("temperature", 0.15)),
-        int(config.get("max_tokens", 8192)),
-        int(config.get("timeout", 120)),
-        ollama_key_state_path=ollama_key_state_path,
-    )
-    if on_llm_exchange is not None:
-        on_llm_exchange(index, total, artifact, oracle_spec, system_prompt, user_prompt, raw)
-    code = extract_code(raw)
-    validate_harness(code)
-    return code
+    last_error: Exception | None = None
+    for attempt in range(1, 4):
+        try:
+            raw = call_llm(
+                system_prompt,
+                user_prompt,
+                model,
+                float(config.get("temperature", 0.15)),
+                int(config.get("max_tokens", 8192)),
+                int(config.get("timeout", 120)),
+                ollama_key_state_path=ollama_key_state_path,
+            )
+            if on_llm_exchange is not None:
+                on_llm_exchange(index, total, artifact, oracle_spec, system_prompt, user_prompt, raw)
+            if not raw or not raw.strip():
+                raise ValueError("LLM returned empty content")
+            code = extract_code(raw)
+            validate_harness(code)
+            return code
+        except ValueError as e:
+            last_error = e
+            if attempt < 3:
+                logger.warning(
+                    "Harness generation failed (attempt %d/3): %s; retrying...",
+                    attempt, e,
+                )
+    raise HarnessError(str(last_error)) from last_error
 
 
 def _load_system_prompt(prompts_dir: Path, oracle_spec: dict[str, Any]) -> str:

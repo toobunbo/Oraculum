@@ -1,5 +1,6 @@
+model: "openai/deepseek-v3-1-250821"
 temperature: 0.2   
 max_tokens: 8192    
-timeout: 180
+timeout: 300
 
 prompts_dir: "config/prompts"

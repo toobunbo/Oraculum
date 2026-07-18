@@ -72,6 +72,9 @@ def check_ollama_keys(model: str, api_base: str | None = None) -> tuple[bool, st
     return failures == 0, summary
 
 
+import time
+
+
 def call_llm(
     *,
     system_prompt: str,
@@ -100,11 +103,31 @@ def call_llm(
         ollama_key_state_path=ollama_key_state_path,
     )
     pool = kwargs.pop("_oraculum_ollama_pool", None)
-    response = _completion_with_rotation(litellm, kwargs, pool)
 
-    content = cast(str, response.choices[0].message.content)
-    logging.debug("========== LLM RESPONSE ==========\n%s\n==================================", content)
-    return content
+    max_attempts = 4
+    last_error: Exception | None = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            response = _completion_with_rotation(litellm, kwargs, pool)
+            content = cast(str, response.choices[0].message.content)
+            logging.debug("========== LLM RESPONSE ==========\n%s\n==================================", content)
+            return content
+        except (litellm.RateLimitError, litellm.Timeout) as e:
+            last_error = e
+            if attempt < max_attempts:
+                delay = min(30, 2 ** (attempt + 1))
+                etype = "Rate limited" if isinstance(e, litellm.RateLimitError) else "Timed out"
+                logger.warning(
+                    "%s on %s (attempt %d/%d); retrying in %ds...",
+                    etype, model, attempt, max_attempts, delay,
+                )
+                time.sleep(delay)
+            else:
+                raise
+        except Exception:
+            raise
+
+    raise last_error  # type: ignore[misc]
 
 
 def _build_completion_kwargs(
