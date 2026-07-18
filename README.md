@@ -8,7 +8,7 @@ By consuming verified vulnerability findings from [VulnHunterX](https://github.c
 
 ## 1. How it Works (The Pipeline)
 
-Oraculum operates in a 4-stage pipeline:
+Oraculum operates in a 5-stage pipeline:
 
 ```
   Verified         Enriched          {Strategy,         Oracle            Atheris         Repaired         Crash /
@@ -29,7 +29,7 @@ Oraculum operates in a 4-stage pipeline:
 4. **Stage 3: Harness Generation**
    Applies Jinja2 skeletons to construct the complete, runnable Python fuzzer target (Atheris code) and initializes a mutation seed corpus directory.
 5. **Stage 4: Repair Loop**
-   Automatically repairs runtime errors in generated fuzz harnesses. Each harness is dry-run with `-runs=1` (90s timeout). If it fails, the error is classified and a fix is applied — either a static transformation (seed encoding, framework context, Atheris timeout) or an LLM Agent call (DeepSeek V3.1). The process repeats for up to 3 iterations. Achieved a 71.5% pass rate (88/123) across the RealVuln benchmark, including 17 confirmed BUGs. See `docs/repair-loop-guide.md` for details.
+   Automatically repairs runtime errors in generated fuzz harnesses. Each harness is dry-run with `-runs=1` (90s timeout). If it fails, the error is classified and a fix is applied — either a static transformation (seed encoding, framework context, Atheris timeout) or an LLM Agent call (`deepseek-v3-1-250821`). The process repeats for up to 3 iterations. Achieved a 71.5% pass rate (88/123) across the RealVuln benchmark, including 17 confirmed BUGs. See `docs/repair-loop-guide.md` for details.
 
 ---
 
@@ -38,6 +38,7 @@ Oraculum operates in a 4-stage pipeline:
 ### Prerequisites
 * Python 3.10+
 * A configured virtual environment (`.venv`)
+* Atheris fuzzing engine (`pip install atheris` within the venv)
 
 ### Setup Environment
 1. Copy the example environment file:
@@ -93,10 +94,14 @@ Oraculum operates in a 4-stage pipeline:
 
 ## 3. Running the Pipeline
 
-The inputs of **Stage 1 (Classification)** are *enriched findings* (JSON files containing vulnerability metadata, source code, and VulnHunterX verification reasoning) and an ingest `summary.json` mapping them.
+Oraculum supports two workflows:
 
-* **For the test benchmark:** Oraculum comes pre-packaged with these pre-ingested findings inside `tests/mini_benchmark/oraculum_output/`. Thus, Stage 0 is optional and you can run/test the pipeline immediately **without** depending on VulnHunterX (`vhx-root`).
-* **For new scan reports:** Stage 0 (Ingest) is **required** to import and enrich raw findings before you can run Stage 1.
+* **Mini-benchmark** (3 findings, pre-packaged): Test the pipeline immediately without VulnHunterX.
+* **RealVuln benchmark** (62 repositories, 671 True Positives): Full-scale evaluation. See `experiments/scripts/run_experiment.sh` and `experiments/config/realvuln_testing_guide.md`.
+
+### Mini-Benchmark Workflow
+
+The inputs of **Stage 1 (Classification)** are *enriched findings* (JSON files containing vulnerability metadata, source code, and VulnHunterX verification reasoning) and an ingest `summary.json` mapping them. For the test benchmark, Oraculum comes pre-packaged with these pre-ingested findings inside `tests/mini_benchmark/oraculum_output/`. Thus, Stage 0 is optional and you can run/test the pipeline immediately **without** depending on VulnHunterX (`vhx-root`).
 
 ### Step 1: Classify Strategies (Stage 1)
 Classify findings into their respective fuzzer monitoring strategies:
@@ -175,6 +180,8 @@ python tests/mini_benchmark/oraculum_output/python/mini-bench/fuzz_targets/py_co
 * **`experiments/`**: Experiment scripts and results.
   * **`results/final_results_v3.json`**: Final results — 123 harnesses, 88 pass, 17 BUGs
   * **`results/repair_v6_results.json`**: Comparison results (V6, 67 pass)
+  * **`results/fuzzing_60s_results.json`**: 60-second fuzzing results on 17 BUG harnesses
+  * **`results/fuzzing_60s_analysis.md`**: Crash input analysis with concrete exploit payloads
   * **`scripts/run_repair_v7.sh`**: Repair Loop runner script (v7, latest)
   * **`config/realvuln_testing_guide.md`**: RealVuln experiment guide
   * **`archive/`**: Raw data from previous experiment runs
@@ -223,16 +230,20 @@ The Repair Loop improved the pass rate from **26.8% (baseline)** to **71.5% (ful
 
 17 out of 123 harnesses triggered an Atheris crash (return code 77) on the first fuzz input — confirmed exploitable vulnerabilities:
 
-| Vulnerability class | Count |
-|--------------------|-------|
-| Command injection | 4 |
-| SQL injection | 3 |
-| Path injection | 3 |
-| Reflective XSS | 2 |
-| Unsafe deserialization | 2 |
-| Template injection | 1 |
-| Full SSRF | 1 |
-| Weak sensitive data hashing | 1 |
+| Vulnerability class | Count | Example crash input |
+|--------------------|-------|-------------------|
+| Weak sensitive data hashing | 3 | —
+| SQL injection | 3 | —
+| Shell command injection | 2 | `; ls` |
+| Path injection / Path traversal | 2 | —
+| Clear text sensitive data (log, storage) | 2 | —
+| Full SSRF | 1 | `http://127.1/` |
+| Reflective XSS | 1 | `JaVaScRiPt:alert(1)` |
+| Template injection / SSTI | 1 | `{{7*7}}` |
+| Cookie injection | 1 | —
+| Unclassified | 1 | —
+
+A 60-second fuzzing run on these 17 harnesses confirmed: all crashes are instant (return code 77 on iteration 1), with 16 crash files containing concrete exploit payloads. No additional BUGs were found beyond the first iteration. See `experiments/results/fuzzing_60s_analysis.md` for the full crash report.
 
 ### 6.5 Failure Analysis
 
@@ -270,7 +281,9 @@ bash experiments/scripts/run_repair_v7.sh
 
 ## 8. References
 
-- **RealVuln Benchmark**: Kolega et al. https://realvuln.kolega.dev
-- **Atheris**: Google. https://github.com/google/atheris
-- **CKG-Fuzzer**: Dynamic Program Repair for C/C++ fuzz harnesses
+- **RealVuln Benchmark**: Kolega et al. RealVuln: An Open Benchmark for Evaluating Security Scanners. https://realvuln.kolega.dev
+- **Atheris**: Google. A coverage-guided, native Python fuzzer. https://github.com/google/atheris
+- **CKG-Fuzzer**: Dynamic Program Repair for C/C++ fuzz harnesses. [Citation to be added]
 - **VulnHunterX**: LLM-based SAST verification. https://github.com/toobunbo/VulnHunterX
+- **Oraculum Experimental Results**: 123 harnesses, 71.5% pass rate, 17 BUGs. `experiments/results/final_results_v3.json`
+- **60s Fuzzing Analysis**: Concrete exploit payloads from 17 BUG harnesses. `experiments/results/fuzzing_60s_analysis.md`

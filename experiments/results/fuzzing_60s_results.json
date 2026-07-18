@@ -1,0 +1,121 @@
+[
+  {
+    "repo": "realvuln-damn-vulnerable-graphql-application",
+    "harness": "py_shell_command_constructed_from_input_core_views_py_352.py",
+    "rc": 77,
+    "crash_count": 0,
+    "crashes": []
+  },
+  {
+    "repo": "realvuln-djangoat",
+    "harness": "py_path_injection_app_models_Benefits_benefits_py_68.py",
+    "rc": 77,
+    "crash_count": 0,
+    "crashes": []
+  },
+  {
+    "repo": "realvuln-dsvw",
+    "harness": "py_full_ssrf_dsvw_py_56.py",
+    "rc": 77,
+    "crash_count": 0,
+    "crashes": []
+  },
+  {
+    "repo": "realvuln-dsvw",
+    "harness": "py_sql_injection_dsvw_py_67.py",
+    "rc": 77,
+    "crash_count": 0,
+    "crashes": []
+  },
+  {
+    "repo": "realvuln-dvblab",
+    "harness": "py_sql_injection_backend_routes_auth_routes_py_37.py",
+    "rc": 77,
+    "crash_count": 0,
+    "crashes": []
+  },
+  {
+    "repo": "realvuln-flask-xss",
+    "harness": "py_clear_text_logging_sensitive_data_manage_py_21.py",
+    "rc": 77,
+    "crash_count": 0,
+    "crashes": []
+  },
+  {
+    "repo": "realvuln-insecure-web",
+    "harness": "py_reflective_xss_app_app_py_53.py",
+    "rc": 77,
+    "crash_count": 0,
+    "crashes": []
+  },
+  {
+    "repo": "realvuln-pythonssti",
+    "harness": "py_template_injection_main_py_14.py",
+    "rc": 77,
+    "crash_count": 0,
+    "crashes": []
+  },
+  {
+    "repo": "realvuln-threatbyte",
+    "harness": "py_path_injection_server_routes_py_264.py",
+    "rc": 77,
+    "crash_count": 0,
+    "crashes": []
+  },
+  {
+    "repo": "realvuln-threatbyte",
+    "harness": "py_sql_injection_server_routes_py_138.py",
+    "rc": 77,
+    "crash_count": 0,
+    "crashes": []
+  },
+  {
+    "repo": "realvuln-vfapi",
+    "harness": "py_weak_sensitive_data_hashing_main_py_113.py",
+    "rc": 77,
+    "crash_count": 0,
+    "crashes": []
+  },
+  {
+    "repo": "realvuln-vfapi",
+    "harness": "py_weak_sensitive_data_hashing_main_py_187.py",
+    "rc": 77,
+    "crash_count": 0,
+    "crashes": []
+  },
+  {
+    "repo": "realvuln-vulnpy",
+    "harness": "py_shell_command_constructed_from_input_apps_falcon_app_py_63.py",
+    "rc": 77,
+    "crash_count": 0,
+    "crashes": []
+  },
+  {
+    "repo": "realvuln-vulpy",
+    "harness": "py_clear_text_logging_sensitive_data_bad_api_post_py_24.py",
+    "rc": 77,
+    "crash_count": 0,
+    "crashes": []
+  },
+  {
+    "repo": "realvuln-vulpy",
+    "harness": "py_clear_text_storage_sensitive_data_bad_api_post_py_27.py",
+    "rc": 77,
+    "crash_count": 0,
+    "crashes": []
+  },
+  {
+    "repo": "realvuln-vulpy",
+    "harness": "py_cookie_injection_bad_libsession_py_7.py",
+    "rc": 77,
+    "crash_count": 0,
+    "crashes": []
+  },
+  {
+    "repo": "vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "harness": "py_weak_sensitive_data_hashing_app_security_py_92.py",
+    "rc": 77,
+    "crash_count": 0,
+    "crashes": []
+  }
+]

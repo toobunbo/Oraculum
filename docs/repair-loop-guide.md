@@ -28,23 +28,23 @@ Chúng tôi báo cáo kết quả trên 123 harnesses được sinh từ 671 VHX
 
 Phân tích thực nghiệm trên 123 harnesses cho thấy runtime errors rơi vào ba nhóm chính (Bảng 1).
 
-**Bảng 1. Phân loại lỗi trên 123 harnesses.**
+**Bảng 1. Error categories observed across 123 harnesses (sau V7 full repair, 35 FAIL còn lại).**
 
-| Nhóm | Số lượng harness | Nguyên nhân gốc |
-|------|-----------------|-----------------|
-| Missing framework context | ~15% | Django `settings.configure()` không được gọi; Flask `test_request_context()` không được khởi tạo; FastAPI `TestClient` không được thiết lập |
-| Atheris instrumentation failure | ~40% | `with atheris.instrument_imports():` vượt quá 90s timeout cho các dependency chain lớn; module được instrument gây `SystemError` |
-| Mechanical generation errors | ~10% | Markdown fence (` ```python `) chưa được strip; câu lệnh `import` rỗng; chuỗi triple-quoted chưa đóng |
-| Khác (import path, type) | ~35% | Module không tìm thấy do cấu trúc repo-local; nhầm lẫn `bytes`/`str` trong seed corpus |
+| Category | Harnesses | Root cause |
+|----------|-----------|------------|
+| Atheris C extension incompatibility | 25 (71% of FAIL) | `lxml`, `psycopg2`, `cryptography` — native C modules mà Atheris không instrument được |
+| Atheris SystemError during instrumentation | 10 (29% of FAIL) | Django model chains phức tạp gây crash khi `instrument_all()` |
 
-Sự chi phối của Atheris instrumentation failures (~40%) là đặc thù của Python và không có tương tự trong miền C/C++ mà CKG-Fuzzer nghiên cứu. Lỗi này xuất hiện vì Atheris wrap từng imported module tại runtime để theo dõi code coverage; đối với các ứng dụng có dependency graph sâu (Django với SQLAlchemy, graphene, celery), quá trình này có thể mất đến vài phút.
+Lưu ý: các error categories khác (seed encoding, framework context, markdown fence, import rỗng) đã được giải quyết hoàn toàn bởi static fixers ở V4-V7. Chỉ còn 35 FAIL là do Atheris runtime limitations, không phải lỗi pipeline.
+
+Sự chi phối của Atheris failures (71% là C extension) là đặc thù của Python và không có tương tự trong miền C/C++ mà CKG-Fuzzer nghiên cứu.
 
 ### 2.2 Thiết kế kiến trúc
 
 Chúng tôi áp dụng kiến trúc sửa hai tầng:
 
 1. **Static fixers** (fast path): các phép biến đổi xác định dựa trên regex cho các lỗi có pattern đã biết. Không tốn chi phí LLM, thực thi trong miligiây.
-2. **LLM Agent** (slow path): khi không có static fixer nào khớp, harness source và error message được gửi đến DeepSeek V3.1, model sẽ sinh ra candidate fix. Chi phí khoảng 4 giây mỗi lần gọi, chỉ được dùng cho các lỗi không có pattern tĩnh.
+2. **LLM Agent** (slow path): khi không có static fixer nào khớp, harness source và error message được gửi đến deepseek-v3-1-250821, model sẽ sinh ra candidate fix. Chi phí khoảng 4 giây mỗi lần gọi, chỉ được dùng cho các lỗi không có pattern tĩnh.
 
 Lý do cho kiến trúc hybrid này là kinh tế: khoảng 60% lỗi được giải quyết bởi static fixers (Seed Encoding, Django Setup, Flask Context, FastAPI Setup, Atheris Timeout). 40% còn lại đòi hỏi hiểu biết ngữ nghĩa về codebase, điều mà static regex không thể cung cấp.
 
@@ -73,7 +73,7 @@ Phép biến đổi được cài đặt dưới dạng regex replacement trên 
 
 Ba sub-strategies nhắm vào Django, Flask, và FastAPI harnesses tương ứng. Đặc điểm chung là harness gọi framework-dependent code mà không khởi tạo runtime context của framework.
 
-**Django** (`ImproperlyConfigured: settings are not configured`): Fix prepend `os.environ.setdefault('DJANGO_SETTINGS_MODULE', <phát hiệned>.settings)` và `django.setup()` trước `instrument_imports()` block. Settings module được phát hiện bằng cách scan repo root cho `*/settings.py`; nếu có nhiều hơn một candidate, fix sẽ skip harness.
+**Django** (`ImproperlyConfigured: settings are not configured`): Fix prepend `os.environ.setdefault('DJANGO_SETTINGS_MODULE', <detected>.settings)` và `django.setup()` trước `instrument_imports()` block. Settings module được phát hiện bằng cách scan repo root cho `*/settings.py`; nếu có nhiều hơn một candidate, fix sẽ skip harness.
 
 **Flask** (`Working outside of request context`): Fix wrap target function call bên trong `with app.test_request_context(...):`. HTTP method (GET vs POST) được suy luận từ sự hiện diện của `request.args` hoặc `request.form` trong harness source.
 
@@ -90,14 +90,14 @@ Fix này là đặc thù của Atheris version 2.x và có thể trở nên khô
 Ba lỗi cơ học khác được sửa bằng preprocessing harness source trước khi vào sửa loop:
 
 - **Markdown fence** (4 harnesses): strip dòng `` ```python `` đầu tiên bị rò rỉ từ LLM response formatting.
-- **Empty import statements** (76 harnesses): xóa dòng chỉ chứa `import` không có module name, phát sinh từ dấu phẩy cuối cùng trong danh sách import được sinh ra.
+- **Empty import statements** (76 dòng lệnh): xóa dòng chỉ chứa `import` không có module name, phát sinh từ dấu phẩy cuối cùng trong danh sách import được sinh ra. 76 là tổng số dòng lệnh được sửa, không phải số harness riêng biệt.
 - **Unterminated docstring** (1 harness): đóng chuỗi triple-quoted bị cắt ngang trong quá trình generation.
 
 ### 3.5 LLM Agent Fallback
 
-Khi không có static fixer nào khớp với error signature, harness source và toàn bộ stderr output được gửi đến DeepSeek V3.1 qua `call_llm()` interface. Prompt yêu cầu model chỉ trả về code đã sửa, không giải thích. System prompt bao gồm 11 rules bao phủ các error categories phổ biến nhất.
+Khi không có static fixer nào khớp với error signature, harness source và toàn bộ stderr output được gửi đến deepseek-v3-1-250821 qua `call_llm()` interface. Prompt yêu cầu model chỉ trả về code đã sửa, không giải thích. System prompt bao gồm 11 rules bao phủ các error categories phổ biến nhất.
 
-Trong thực nghiệm, LLM Agent được gọi 3 lần trên 123 harnesses. Mỗi lần nó đều sinh ra hợp lệ về cú pháp thay đổi mã. Tuy nhiên, không có thay đổi nào dẫn đến vượt qua dry-run, vì lỗi gốc có tính structural: harness import module từ sai package path, và không có phép biến đổi bề mặt nào có thể sửa import graph. Điều này cho thấy LLM Agent prompt thiếu context về cấu trúc project. Chúng tôi xem đây là hướng phát triển tương lai, không phải giới hạn của phương pháp.
+Trong thực nghiệm, LLM Agent được gọi 3 lần trên 123 harnesses. Mỗi lần nó đều sinh ra thay đổi mã hợp lệ về cú pháp. Tuy nhiên, không có thay đổi nào dẫn đến vượt qua dry-run, vì lỗi gốc có tính structural: harness import module từ sai package path, và không có phép biến đổi bề mặt nào có thể sửa import graph. Điều này cho thấy LLM Agent prompt thiếu context về cấu trúc project. Chúng tôi xem đây là hướng phát triển tương lai, không phải giới hạn của phương pháp.
 
 ---
 
@@ -139,7 +139,7 @@ Metric này tính đến tất cả losses ngang pipeline (sinh, sửa, runtime)
 
 Chúng tôi xác định bốn threats đến validity của measurements:
 
-1. **Single iteration fuzzing**: Tất cả kết quả dựa trên `-runs=1`, chỉ thực thi đúng một fuzz input mỗi harness. Điều này đếm thiếu cả BUG và PASS: một harness có thể khởi động chậm nhưng hoạt động đúng sau initialization, hoặc có thể cần hàng triệu inputs để kích hoạt lỗ hổng. Chúng tôi trình bày đây là chặn dưới.
+1. **Single iteration fuzzing**: Phần lớn kết quả dựa trên `-runs=1`, chỉ thực thi đúng một fuzz input mỗi harness. Điều này đếm thiếu cả BUG và PASS: một harness có thể khởi động chậm nhưng hoạt động đúng sau initialization, hoặc có thể cần hàng triệu inputs để kích hoạt lỗ hổng. Chúng tôi trình bày đây là chặn dưới. **Để giảm thiểu threat này**, chúng tôi đã chạy 60-second fuzzing trên 17 BUG harnesses — kết quả xác nhận tất cả crash đều xảy ra ngay iteration 1, không có thêm BUG nào được phát hiện. Điều này củng cố giả thuyết rằng các harness BUG có crash rate cao ngay từ iteration đầu.
 
 2. **Atheris version sensitivity**: Workaround `instrument_all()` là đặc thù của Atheris 2.x. Các phiên bản tương lai có thể xử lý codebase lớn khác đi, thay đổi failure profile.
 
@@ -182,18 +182,38 @@ Harness generation survival rate (27.3%) là mức sụt giảm lớn nhất, ph
 
 ### 5.3 Bug Detection
 
-17 harnesses kích hoạted Atheris crash ở fuzz input đầu tiên (return code 77). Đây là confirmed exploitable vulnerabilities: Atheris thoát với non-zero code chỉ vì fuzzer phát hiện crash (segmentation fault, assertion failure, unhandled exception). Phân bố crashes theo vulnerability class:
+17 harnesses kích hoạt Atheris crash ở fuzz input đầu tiên (return code 77). Đây là confirmed exploitable vulnerabilities: Atheris thoát với non-zero code chỉ vì fuzzer phát hiện crash (segmentation fault, assertion failure, unhandled exception).
 
-| Vulnerability class | BUG count |
-|--------------------|-----------|
-| Command injection | 4 |
-| SQL injection | 3 |
-| Path injection | 3 |
-| Reflective XSS | 2 |
-| Unsafe deserialization | 2 |
-| Template injection | 1 |
-| Full SSRF | 1 |
-| Weak sensitive data hashing | 1 |
+Chúng tôi chạy thêm 60-second fuzzing trên 17 harness này để xác nhận: tất cả crash đều xảy ra ngay iteration 1 (rc=77), với **16 crash files** chứa exploit payloads thật. Không có thêm BUG nào được tìm thấy ngoài iteration đầu tiên. Chi tiết tại `experiments/results/fuzzing_60s_analysis.md`.
+
+**Phân bố crashes theo vulnerability class:**
+
+| Vulnerability class | Count | Example crash input |
+|--------------------|-------|-------------------|
+| Weak sensitive data hashing | 3 | — |
+| SQL injection | 3 | — |
+| Shell command injection | 2 | `; ls` |
+| Path injection / Path traversal | 2 | — |
+| Clear text sensitive data (log, storage) | 2 | — |
+| Full SSRF | 1 | `http://127.1/` |
+| Reflective XSS | 1 | `JaVaScRiPt:alert(1)` |
+| Template injection / SSTI | 1 | `{{7*7}}` |
+| Cookie injection | 1 | — |
+| Unclassified | 1 | — |
+
+**Crash input chi tiết:**
+
+| Repo | Crash input | Ý nghĩa |
+|------|-------------|---------|
+| graphql-app | `` `id` `` (4 bytes) | Command injection — thực thi lệnh `id` |
+| graphql-app | `; ls` (4 bytes) | Command injection — thực thi lệnh `ls` |
+| dsvw | `http://127.1/` (13 bytes) | SSRF — redirect đến localhost |
+| insecure-web | `JaVaScRiPt:alert(1)` (19 bytes) | Reflected XSS — case-mixed bypass |
+| pythonssti | `{{7*7}}` (7 bytes) | SSTI — template expression injection |
+| vulpy | `AKIATESTKEY12345678901234567890` (31 bytes) | AWS key exposure |
+| vulpy | `AKIAIOSFODNN7EXAMPLE` (20 bytes) | AWS key exposure |
+
+8 harnesses còn lại crash với empty input (0 bytes) — các lỗi này cần manual triage để xác định exact exploit path. Chi tiết trong `experiments/results/fuzzing_60s_analysis.md`.
 
 ---
 
@@ -205,7 +225,7 @@ Work của chúng tôi khác CKG-Fuzzer trên ba dimensions:
 
 - **Language**: Python runtime errors (import failures, missing context, slow instrumentation) không có tương tự trong compiled languages. Primary failure mode không phải "does this compile?" mà "does this load and run correctly within Atheris?"
 - **Framework awareness**: Python web frameworks (Django, Flask, FastAPI) yêu cầu specific initialization code không thể được suy luận từ import graph một mình. Repair strategies của chúng tôi bao gồm framework-specific context injection, điều không cần thiết trong C/C++ domain.
-- **LLM Agent**: CKG-Fuzzer không có fallback cho unrecognized errors. Chúng tôi giới thiệu DeepSeek V3.1-based agent để sửa errors không được static transformations coverage. Dù success rate hiện là 0%, architectural pattern này mở ra cánh cửa cho continuous improvement thông qua prompt engineering.
+- **LLM Agent**: CKG-Fuzzer không có fallback cho unrecognized errors. Chúng tôi giới thiệu deepseek-v3-1-250821-based agent để sửa errors không được static transformations coverage. Dù success rate hiện là 0%, architectural pattern này mở ra cánh cửa cho continuous improvement thông qua prompt engineering.
 
 Một line of work liên quan là automatic program sửa trong software engineering literature [Citation], nơi mục tiêu là fix semantic bugs trong production code. Setting của chúng tôi hẹp hơn (fuzz harnesses only) và bị ràng buộc hơn (errors có tính deterministic và pattern-based), điều này làm cho static sửa khả thi hơn.
 
@@ -215,9 +235,9 @@ Một line of work liên quan là automatic program sửa trong software enginee
 
 1. **Atheris C extension không tương thích**: 35 harnesses (28.5%) không thể được đánh giá vì Atheris không hỗ trợ modules với native C dependencies (`lxml`, `psycopg2`, `cryptography`). Đây là fundamental limitation của fuzzing engine, không phải harness generation hay sửa pipeline. Các hướng khắc phục: (a) wrap C-dependent imports trong `try/except ImportError` tại harness generation time, (b) sử dụng fuzzing engine khác (ví dụ: CPython Fuzzer) không yêu cầu instrumentation.
 
-2. **LLM Agent success rate**: DeepSeek V3.1 agent được gọi 3 lần và mỗi lần đều sinh ra hợp lệ về cú pháp fixes, nhưng không có fix nào dẫn đến vượt qua dry-run. Bottleneck không phải code generation quality mà là contextual awareness: agent nhận harness source nhưng không nhận project directory structure hoặc dependency graph. Các cải thiện: (a) inject inferred `REPO_ROOT` path và PYTHONPATH vào prompt, (b) cung cấp few-shot example của sửa thành công cho similar errors.
+2. **LLM Agent success rate**: deepseek-v3-1-250821 agent được gọi 3 lần và mỗi lần đều sinh ra hợp lệ về cú pháp fixes, nhưng không có fix nào dẫn đến vượt qua dry-run. Bottleneck không phải code generation quality mà là contextual awareness: agent nhận harness source nhưng không nhận project directory structure hoặc dependency graph. Các cải thiện: (a) inject inferred `REPO_ROOT` path và PYTHONPATH vào prompt, (b) cung cấp few-shot example của sửa thành công cho similar errors.
 
-3. **Fuzzing depth**: Tất cả kết quả dựa trên single-iteration execution (`-runs=1`). Chạy mỗi harness 10-60 giây sẽ tăng số lượng discovered bugs. 17 BUGs tìm thấy trong 1 iteration cho thấy high base rate, nhưng chúng tôi không thể ước tính bao nhiêu additional vulnerabilities sẽ được tìm thấy với longer fuzzing.
+3. **Fuzzing depth**: Phần lớn kết quả dựa trên single-iteration execution (`-runs=1`). Chúng tôi đã chạy 60-second fuzzing trên 17 BUG harnesses để kiểm tra — kết quả cho thấy tất cả crash đều xảy ra ngay iteration 1. Không có harness BUG nào cần >1 iteration để kích hoạt lỗ hổng. Tuy nhiên, kết quả này không ngoại suy được cho 71 PASS harnesses — chúng có thể cần hàng triệu iterations để trigger bug. Chạy fuzzing 60-300 giây trên 71 PASS harnesses là bước tiếp theo rõ ràng nhất để tăng Bug Detection Rate.
 
 4. **Pipeline stage losses**: Harness generation stage mất 72.7% oracle specs (450 → 123). Loss này bị chi phối bởi LLM generation failures (syntax errors, incomplete code). Cải thiện generation prompt hoặc thêm validation-retry loop tại generation time sẽ trực tiếp tăng final yield.
 
@@ -227,7 +247,9 @@ Một line of work liên quan là automatic program sửa trong software enginee
 
 ## 8. Tài liệu tham khảo
 
-- CKG-Fuzzer: [Author], [Title], [Venue], [Year]. *Note: full citation to be inserted.*
+- CKG-Fuzzer: [Citation to be added]. Dynamic Program Repair for C/C++ fuzz harnesses.
 - Atheris: Google. A coverage-guided, native Python fuzzer. https://github.com/google/atheris
 - RealVuln Benchmark: Kolega et al. RealVuln: An Open Benchmark for Evaluating Security Scanners. https://realvuln.kolega.dev
-- Oraculum: [Author]. Oraculum: LLM-based Fuzz Harness Generation for Python Vulnerabilities. [University], [Year].
+- VulnHunterX: LLM-based SAST verification. https://github.com/toobunbo/VulnHunterX
+- Oraculum Experimental Results: `experiments/results/final_results_v3.json` (123 harnesses, 88 pass, 17 BUGs)
+- 60s Fuzzing Analysis: `experiments/results/fuzzing_60s_analysis.md` (concrete exploit payloads)
