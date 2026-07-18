@@ -284,6 +284,6 @@ bash experiments/scripts/run_repair_v7.sh
 - **RealVuln Benchmark**: Kolega et al. RealVuln: An Open Benchmark for Evaluating Security Scanners. https://realvuln.kolega.dev
 - **Atheris**: Google. A coverage-guided, native Python fuzzer. https://github.com/google/atheris
 - **CKG-Fuzzer**: Dynamic Program Repair for C/C++ fuzz harnesses. [Citation to be added]
-- **VulnHunterX**: LLM-based SAST verification. [https://github.com/toobunbo/VulnHunterX](https://github.com/vinsoc-cyber/VulnHunterX/)
+- **VulnHunterX**: LLM-based SAST verification. [https://github.com/vinsoc-cyber/VulnHunterX](https://github.com/vinsoc-cyber/VulnHunterX/)
 - **Oraculum Experimental Results**: 123 harnesses, 71.5% pass rate, 17 BUGs. `experiments/results/final_results_v3.json`
 - **60s Fuzzing Analysis**: Concrete exploit payloads from 17 BUG harnesses. `experiments/results/fuzzing_60s_analysis.md`
