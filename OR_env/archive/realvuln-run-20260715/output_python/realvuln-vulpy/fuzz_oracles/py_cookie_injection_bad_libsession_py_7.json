@@ -1,0 +1,47 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of the create function (response object containing Set-Cookie header with base64-encoded session)",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The returned response object contains base64-encoded fragments of known privileged usernames (e.g. admin, root, sysadmin) in its cookie value, confirming that unsanitized user input survived JSON serialization and base64 encoding to reach the Set-Cookie header",
+    "trigger_patterns": [
+      "ImFkbWluIg",
+      "InJvb3Qi",
+      "InN5c2FkbWluIg"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_COOKIE_INJECTION: unsanitized username survived into cookie value — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "admin",
+      "root",
+      "sysadmin"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "create",
+    "file": "bad/libsession.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def create(response, username)",
+    "tainted_params": [
+      {
+        "name": "username",
+        "index": 1,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_cookie_injection_bad_libsession_py_7",
+    "finding_id": "0",
+    "rule_id": "py/cookie-injection",
+    "rule_slug": "py_cookie-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-vulpy/verification_results/findings/finding_0_py_cookie-injection.json"
+  }
+}

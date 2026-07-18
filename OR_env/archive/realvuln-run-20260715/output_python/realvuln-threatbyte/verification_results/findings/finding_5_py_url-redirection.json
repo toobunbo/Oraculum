@@ -1,0 +1,80 @@
+{
+  "id": "5",
+  "rule_slug": "py_url-redirection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-threatbyte",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte/verification_results/summary_realvuln-threatbyte_20260714_150915.json"
+  },
+  "finding": {
+    "rule_id": "py/url-redirection",
+    "message": "Untrusted URL redirection depends on a [user-provided value](1).",
+    "file": "server/routes.py",
+    "start_line": 256,
+    "end_line": 256,
+    "repo_name": "realvuln-threatbyte",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte/realvuln-threatbyte.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 253: ControlFlowNode for request",
+      "line 256: ControlFlowNode for Attribute",
+      "--- Flow 2 ---",
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 254: ControlFlowNode for request",
+      "line 256: ControlFlowNode for Attribute",
+      "--- Flow 3 ---",
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 256: ControlFlowNode for request",
+      "line 256: ControlFlowNode for Attribute"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-601"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "The code redirects to `request.url` without any validation, which is directly controlled by the user and can lead to open redirect vulnerabilities. There are no defenses or sanitizations applied to the URL before redirection. The missing caller context does not change the fact that `request.url` is user-controllable.",
+    "input_tokens": 16190,
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:08:47.889240",
+    "data_flow": "request (line 1) → request.url (line 256) → redirect(request.url) (line 256)",
+    "confidence_score": 0.95,
+    "answers": [
+      "The EXACT flagged line is: `return redirect(request.url)` on line 256. This line lives in the `upload_file` function.",
+      "The URL value passed to the redirect is `request.url`. There are no assignments to this value; it is directly accessed from the request object.",
+      "`request.url` derives from user input as it represents the full URL of the current request, which includes the path and query parameters provided by the user. The data-flow chain is: request (line 1) → request.url (line 256).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense that contains the redirect. The code does not perform any validation or sanitization on `request.url` before using it in the redirect.",
+      "The user-tainted value `request.url` reaches the sink directly without any validation or sanitization, making it vulnerable to open redirect."
+    ],
+    "cost_usd": 0.0,
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "confidence": "High",
+    "output_tokens": 1019,
+    "elapsed_seconds": 10.227328777313232,
+    "tokens_used": 17209
+  },
+  "function": {
+    "name": "upload_file",
+    "file": "server/routes.py",
+    "start_line": 249,
+    "end_line": 280,
+    "scope": ""
+  },
+  "web_params": []
+}

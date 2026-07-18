@@ -1,0 +1,35 @@
+{
+  "stage": "harness",
+  "repo": "realvuln-dvpwa",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/harness.yaml",
+  "source": {
+    "oracle_status_path": "output/python/realvuln-dvpwa/fuzz_oracles/status.json"
+  },
+  "counts": {
+    "selected": 1,
+    "generated": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "harnesses": [
+    {
+      "id": "0",
+      "target_id": "py_weak_sensitive_data_hashing_sqli_dao_user_py_41",
+      "rule_id": "py/weak-sensitive-data-hashing",
+      "file": "sqli/dao/user.py",
+      "start_line": "41",
+      "function_name": "check_password",
+      "harness": "output/python/realvuln-dvpwa/fuzz_targets/py_weak_sensitive_data_hashing_sqli_dao_user_py_41.py",
+      "oracle": "output/python/realvuln-dvpwa/fuzz_oracles/py_weak_sensitive_data_hashing_sqli_dao_user_py_41.json",
+      "finding_artifact": "output/python/realvuln-dvpwa/verification_results/findings/finding_0_py_weak-sensitive-data-hashing.json",
+      "corpus": "output/python/realvuln-dvpwa/fuzz_corpus/py_weak_sensitive_data_hashing_sqli_dao_user_py_41",
+      "strategy": "recorded_call",
+      "status": "generated",
+      "seed_count": 5,
+      "errors": ""
+    }
+  ],
+  "errors": []
+}

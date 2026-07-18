@@ -1,0 +1,107 @@
+{
+  "stage": "ingest",
+  "repo": "vc-claude-code-seeded-v2-hr-payroll-django",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/summary_vc-claude-code-seeded-v2-hr-payroll-django_20260714_152802.json"
+  },
+  "counts": {
+    "total_verdicts": 12,
+    "selected": 12,
+    "enriched": 12,
+    "skipped": 0,
+    "failed": 0
+  },
+  "findings": [
+    {
+      "id": "0",
+      "rule_id": "py/code-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_0_py_code-injection.json",
+      "function_name": "payroll_formula_cast_252"
+    },
+    {
+      "id": "1",
+      "rule_id": "py/cookie-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_1_py_cookie-injection.json",
+      "function_name": "payroll_crumb_lane_290"
+    },
+    {
+      "id": "2",
+      "rule_id": "py/full-ssrf",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_2_py_full-ssrf.json",
+      "function_name": "payroll_broker_tile_015"
+    },
+    {
+      "id": "3",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_3_py_path-injection.json",
+      "function_name": "payroll_fold_drop_014"
+    },
+    {
+      "id": "4",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_4_py_path-injection.json",
+      "function_name": "payroll_dock_shelf_391"
+    },
+    {
+      "id": "5",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_5_py_path-injection.json",
+      "function_name": "payroll_dock_shelf_391"
+    },
+    {
+      "id": "6",
+      "rule_id": "py/xxe",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_6_py_xxe.json",
+      "function_name": "payroll_xml_fold_454"
+    },
+    {
+      "id": "7",
+      "rule_id": "py/unsafe-deserialization",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_7_py_unsafe-deserialization.json",
+      "function_name": "payroll_bundle_thaw_170"
+    },
+    {
+      "id": "8",
+      "rule_id": "py/nosql-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_8_py_nosql-injection.json",
+      "function_name": "payroll_mongo_lane_413"
+    },
+    {
+      "id": "9",
+      "rule_id": "py/command-line-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_9_py_command-line-injection.json",
+      "function_name": "payroll_shell_probe_402"
+    },
+    {
+      "id": "10",
+      "rule_id": "py/template-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_10_py_template-injection.json",
+      "function_name": "payroll_jinja_cast_384"
+    },
+    {
+      "id": "11",
+      "rule_id": "py/jinja2/autoescape-false",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_11_py_jinja2_autoescape-false.json",
+      "function_name": "payroll_jinja_cast_384"
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,51 @@
+{
+  "stage": "harness",
+  "repo": "realvuln-flask-xss",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/harness.yaml",
+  "source": {
+    "oracle_status_path": "output/python/realvuln-flask-xss/fuzz_oracles/status.json"
+  },
+  "counts": {
+    "selected": 2,
+    "generated": 2,
+    "skipped": 0,
+    "failed": 0
+  },
+  "harnesses": [
+    {
+      "id": "0",
+      "target_id": "py_clear_text_logging_sensitive_data_manage_py_21",
+      "rule_id": "py/clear-text-logging-sensitive-data",
+      "file": "manage.py",
+      "start_line": "21",
+      "function_name": "add_admin",
+      "harness": "output/python/realvuln-flask-xss/fuzz_targets/py_clear_text_logging_sensitive_data_manage_py_21.py",
+      "oracle": "output/python/realvuln-flask-xss/fuzz_oracles/py_clear_text_logging_sensitive_data_manage_py_21.json",
+      "finding_artifact": "output/python/realvuln-flask-xss/verification_results/findings/finding_0_py_clear-text-logging-sensitive-data.json",
+      "corpus": "output/python/realvuln-flask-xss/fuzz_corpus/py_clear_text_logging_sensitive_data_manage_py_21",
+      "strategy": "recorded_call",
+      "status": "generated",
+      "seed_count": 5,
+      "errors": ""
+    },
+    {
+      "id": "1",
+      "target_id": "py_url_redirection_app_blueprints_xss_protection_views_py_12",
+      "rule_id": "py/url-redirection",
+      "file": "app/blueprints/xss_protection/views.py",
+      "start_line": "12",
+      "function_name": "index",
+      "harness": "output/python/realvuln-flask-xss/fuzz_targets/py_url_redirection_app_blueprints_xss_protection_views_py_12.py",
+      "oracle": "output/python/realvuln-flask-xss/fuzz_oracles/py_url_redirection_app_blueprints_xss_protection_views_py_12.json",
+      "finding_artifact": "output/python/realvuln-flask-xss/verification_results/findings/finding_1_py_url-redirection.json",
+      "corpus": "output/python/realvuln-flask-xss/fuzz_corpus/py_url_redirection_app_blueprints_xss_protection_views_py_12",
+      "strategy": "return_value",
+      "status": "generated",
+      "seed_count": 4,
+      "errors": ""
+    }
+  ],
+  "errors": []
+}

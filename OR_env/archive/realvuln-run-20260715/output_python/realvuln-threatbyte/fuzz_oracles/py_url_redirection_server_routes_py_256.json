@@ -1,0 +1,43 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of the upload_file function (Flask Response object)",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The returned Flask Response object has a Location header containing an external HTTP/HTTPS URL or protocol-relative URL, confirming an open redirect via request.url",
+    "trigger_patterns": [
+      "https?://evil\\.com",
+      "https?://attacker\\.com",
+      "//evil\\.com",
+      "//attacker\\.com"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_URL_REDIRECTION: open redirect detected in response Location header — captured={captured} pattern={matched_pattern}>"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "http://evil.com",
+      "https://attacker.com",
+      "//evil.com/path",
+      "https://evil.com/steal?token=123"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "upload_file",
+    "file": "server/routes.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def upload_file()",
+    "tainted_params": [],
+    "target_id": "py_url_redirection_server_routes_py_256",
+    "finding_id": "5",
+    "rule_id": "py/url-redirection",
+    "rule_slug": "py_url-redirection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-threatbyte/verification_results/findings/finding_5_py_url-redirection.json"
+  }
+}

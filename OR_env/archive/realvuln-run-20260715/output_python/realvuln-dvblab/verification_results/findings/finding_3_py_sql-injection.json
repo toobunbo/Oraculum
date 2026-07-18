@@ -1,0 +1,78 @@
+{
+  "id": "3",
+  "rule_slug": "py_sql-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-dvblab",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab/verification_results/summary_realvuln-dvblab_20260714_145756.json"
+  },
+  "finding": {
+    "rule_id": "py/sql-injection",
+    "message": "This SQL query depends on a [user-provided value](1).",
+    "file": "backend/routes/transaction_routes.py",
+    "start_line": 50,
+    "end_line": 50,
+    "repo_name": "realvuln-dvblab",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab/realvuln-dvblab.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 47: ControlFlowNode for request",
+      "line 47: ControlFlowNode for Attribute",
+      "line 47: ControlFlowNode for Attribute()",
+      "line 47: ControlFlowNode for user_id",
+      "line 49: ControlFlowNode for query",
+      "line 50: ControlFlowNode for query"
+    ],
+    "severity": "8.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-89"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "User-controlled input from request.args is directly interpolated into a SQL query string using f-string formatting on line 49, which is then executed by db.session.execute() on line 50 without any parameterization or sanitization, creating a clear SQL injection vulnerability.",
+    "elapsed_seconds": 10.289184331893921,
+    "answers": [
+      "The EXACT sink statement is: `result = db.session.execute(query)` on line 50. The variable passed to it is `query`.",
+      "The assignment to `query` is on line 49: `query = f'SELECT * FROM \"Transaction\" WHERE sender_id = {user_id} OR receiver_id = {user_id} ORDER BY created_at DESC'`.",
+      "The value of `user_id` on line 47 derives from user input: `user_id = request.args.get('user_id', current_user.id)`. The data flow is: `request.args` (line 47) → `user_id` (line 47) → `query` (line 49). When the 'user_id' parameter is not provided in the request, it defaults to `current_user.id` which is safe, but when provided it can be malicious input.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path. The code directly uses the user-provided `user_id` value in the query construction.",
+      "There is no specific defense sanitizing the value before the sink. The query is constructed using direct string formatting without parameterization. The `db.session.execute()` method is called with a raw SQL string that contains user input.",
+      "The user-tainted value (`user_id` from `request.args`) reaches the sink (`db.session.execute(query)`) directly through the `query` variable when a user provides the 'user_id' parameter. There is no sanitization or parameterization."
+    ],
+    "cached_input_tokens": 0,
+    "tokens_used": 16568,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence_score": 0.95,
+    "timestamp": "2026-07-14T14:57:27.711177",
+    "context_needed": [],
+    "data_flow": "request.args.get('user_id', current_user.id) (line 47) → query construction with f-string (line 49) → db.session.execute(query) (line 50)",
+    "output_tokens": 1151,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "iterations": 3,
+    "verdict": "True Positive",
+    "input_tokens": 15417
+  },
+  "function": {
+    "name": "get_transactions",
+    "file": "backend/routes/transaction_routes.py",
+    "start_line": 46,
+    "end_line": 62,
+    "scope": ""
+  },
+  "web_params": [
+    {
+      "name": "user_id",
+      "source": "args"
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "id": "2",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-education-lms-django/verification_results/summary_vc-claude-code-seeded-v2-education-lms-django_20260714_152145.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "lms/course_operations.py",
+    "start_line": 132,
+    "end_line": 132,
+    "repo_name": "vc-claude-code-seeded-v2-education-lms-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-education-lms-django/vc-claude-code-seeded-v2-education-lms-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 127: ControlFlowNode for request",
+      "line 130: ControlFlowNode for Attribute",
+      "line 130: ControlFlowNode for Attribute()",
+      "line 130: ControlFlowNode for name",
+      "line 131: ControlFlowNode for target",
+      "line 132: ControlFlowNode for Attribute"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:21:14.227034",
+    "cost_usd": 0.0,
+    "verdict": "True Positive",
+    "context_needed": [],
+    "data_flow": "request.GET['name'] (line 130) → target = BASE_EXPORT_DIR / name (line 131) → target.parent.mkdir(...) (line 132)",
+    "answers": [
+      "The EXACT flagged line is: `target.parent.mkdir(parents=True, exist_ok=True)` on line 132. This line resides within the function `course_dock_shelf_389` in the file `lms/course_operations.py`.",
+      "The assignments to the path value are: line 130 assigns `name = request.GET.get(\"name\", \"packet.bin\")`, and line 131 assigns `target = BASE_EXPORT_DIR / name`. The last assignment on the path to the sink is line 131: `target = BASE_EXPORT_DIR / name`.",
+      "The value of `target` derives from user input. Specifically: `name` is assigned from `request.GET.get(\"name\", \"packet.bin\")` on line 130, which retrieves the `name` parameter from the HTTP GET request. Then, on line 131, `target` is constructed as `BASE_EXPORT_DIR / name`, making it user-controlled.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. No defensive logic such as path validation, sanitization, or allow-list checks is present in the provided code.",
+      "There is no specific defense applied to contain the path. No use of `secure_filename`, `Path.resolve()`, `is_relative_to()`, or any other path sanitization or validation mechanism is visible.",
+      "The user-tainted value `name` flows directly into the construction of `target`, which is then used in the `mkdir` call on line 132. No sanitization or validation is applied, and no defense mechanisms are visible in the code. The additional context shows no callers or callees, indicating this function is likely a standalone handler, confirming the data flow is complete within this snippet."
+    ],
+    "output_tokens": 1264,
+    "tokens_used": 13718,
+    "confidence": "High",
+    "iterations": 3,
+    "reasoning": "User-controlled input (`name` from `request.GET`) is used to construct a file path (`target`), which is then used in a directory creation operation (`mkdir`) without any sanitization or validation. This allows directory traversal and path injection. The additional context confirms no external callers or callees affect this flow.",
+    "cached_input_tokens": 0,
+    "confidence_score": 0.95,
+    "input_tokens": 12454,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 11.505967617034912
+  },
+  "function": {
+    "name": "course_dock_shelf_389",
+    "file": "lms/course_operations.py",
+    "start_line": 127,
+    "end_line": 134,
+    "scope": ""
+  },
+  "web_params": []
+}

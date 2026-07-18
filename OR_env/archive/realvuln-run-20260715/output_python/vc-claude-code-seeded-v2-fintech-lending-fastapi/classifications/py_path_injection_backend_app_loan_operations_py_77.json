@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is target.parent.mkdir(parents=True, exist_ok=True), a filesystem write operation that creates directories, which is an irreversible side effect."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; Q1 was true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; Q1 was true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock pathlib.Path.mkdir or the specific target.parent.mkdir call on line 77.",
+    "capture": "Capture the path string of target.parent to verify whether user-controlled input (ref) containing traversal sequences like '../' would cause directory creation outside BASE_EXPORT_DIR.",
+    "fake_behavior": "No-op: allow execution to continue without creating any directories on the filesystem.",
+    "notes": [
+      "Ensure the mock does not raise FileNotFoundError or similar, since mkdir is called on a path that may not yet exist.",
+      "The function returns {'path': str(target)}, so after mocking mkdir, the return value can also be inspected to see the full constructed path."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

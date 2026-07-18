@@ -1,0 +1,50 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of payroll_fold_drop_014, which is the content read from the traversed file path",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The returned file content contains known patterns from sensitive system files (e.g., /etc/passwd root entry or /etc/hosts loopback entry), confirming that directory traversal via ../ in packet_ref successfully read an out-of-bounds file",
+    "trigger_patterns": [
+      "root:x:0:0:",
+      "127\\.0\\.0\\.1\\s+localhost",
+      "root:.*:0:0:.*:/root"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_PATH_INJECTION: directory traversal confirmed — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "../../etc/passwd",
+      "../../../etc/passwd",
+      "../../etc/hosts",
+      "../../../../etc/hostname",
+      "..%2f..%2fetc%2fpasswd",
+      "....//....//etc//passwd"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "payroll_fold_drop_014",
+    "file": "hr_portal/payroll_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def payroll_fold_drop_014(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_path_injection_hr_portal_payroll_operations_py_42",
+    "finding_id": "3",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_3_py_path-injection.json"
+  }
+}

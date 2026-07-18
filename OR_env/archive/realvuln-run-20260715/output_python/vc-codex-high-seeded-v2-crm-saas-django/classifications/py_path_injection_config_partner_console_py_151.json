@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is target.write_bytes(request.body) on line 151, a filesystem write operation with potential directory traversal, which is an irreversible side effect."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the pathlib.Path.write_bytes method (or the specific target object's write_bytes) to prevent actual filesystem writes.",
+    "capture": "Capture the resolved path of the target object and the bytes passed to write_bytes (request.body) so the oracle can verify path traversal via directory traversal sequences in the path.",
+    "fake_behavior": "Allow the call to proceed without writing to disk; optionally simulate a successful write by returning the number of bytes written (len(request.body)).",
+    "notes": [
+      "The taint flows from request.GET['name'] into the path, so the captured target path must be checked for traversal characters like '..' or absolute paths.",
+      "The function returns a JsonResponse containing str(target), so the mock must not alter the target object's string representation."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

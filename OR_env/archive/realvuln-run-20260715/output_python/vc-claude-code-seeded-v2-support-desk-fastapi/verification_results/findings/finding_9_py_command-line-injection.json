@@ -1,0 +1,69 @@
+{
+  "id": "9",
+  "rule_slug": "py_command-line-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/summary_vc-claude-code-seeded-v2-support-desk-fastapi_20260714_153638.json"
+  },
+  "finding": {
+    "rule_id": "py/command-line-injection",
+    "message": "This command line depends on a [user-provided value](1).",
+    "file": "backend/app/support_operations.py",
+    "start_line": 104,
+    "end_line": 104,
+    "repo_name": "vc-claude-code-seeded-v2-support-desk-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/vc-claude-code-seeded-v2-support-desk-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 102: ControlFlowNode for host",
+      "line 104: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-78",
+      "CWE-88"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 16316,
+    "cached_input_tokens": 0,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "reasoning": "User-controlled input `host` is directly concatenated into a shell command via `os.system()` without sanitization, creating a clear command injection vulnerability. The additional context confirms there are no callers or callees that would affect this data flow.",
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 1033,
+    "tokens_used": 17349,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "answers": [
+      "The EXACT flagged line is `_os.system(\"ping -c 1 \" + host)` on line 104. This line is located within the function `ticket_shell_probe_398`.",
+      "The only assignment to `host` is the function parameter on line 102. The value flows directly from the parameter to the sink without intermediate assignments.",
+      "The value of `host` originates from user input via the HTTP request parameter. The data flow is: [SOURCE] line 102 (host parameter) → line 104 (used in `_os.system()`).",
+      "There are no conditions or reassignments that override the user-tainted value.",
+      "No specific defense sanitizes the value. The code directly concatenates user input into a shell command.",
+      "The user-tainted value clearly reaches the sink without sanitization."
+    ],
+    "elapsed_seconds": 8.637569904327393,
+    "timestamp": "2026-07-14T15:36:27.849545",
+    "context_needed": [],
+    "iterations": 3,
+    "data_flow": "host parameter (line 102) → string concatenation (line 104) → os.system() call (line 104)"
+  },
+  "function": {
+    "name": "ticket_shell_probe_398",
+    "file": "backend/app/support_operations.py",
+    "start_line": 102,
+    "end_line": 105,
+    "scope": ""
+  },
+  "web_params": []
+}

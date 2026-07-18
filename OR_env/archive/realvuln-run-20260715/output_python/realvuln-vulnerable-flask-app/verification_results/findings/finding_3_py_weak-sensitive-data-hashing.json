@@ -1,0 +1,71 @@
+{
+  "id": "3",
+  "rule_slug": "py_weak-sensitive-data-hashing",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulnerable-flask-app",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-flask-app",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-flask-app/verification_results/summary_realvuln-vulnerable-flask-app_20260714_151300.json"
+  },
+  "finding": {
+    "rule_id": "py/weak-sensitive-data-hashing",
+    "message": "[Sensitive data (password)](1) is used in a hashing algorithm (MD5) that is insecure for password hashing, since it is not a computationally expensive hash function.",
+    "file": "app/app.py",
+    "start_line": 141,
+    "end_line": 141,
+    "repo_name": "realvuln-vulnerable-flask-app",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-flask-app/realvuln-vulnerable-flask-app.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 140: ControlFlowNode for Subscript",
+      "line 140: ControlFlowNode for password",
+      "line 141: ControlFlowNode for password"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-327",
+      "CWE-328",
+      "CWE-916"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "cost_usd": 0.0,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "input_tokens": 13332,
+    "confidence": "High",
+    "cached_input_tokens": 0,
+    "reasoning": "The code uses MD5 for password hashing without any salt or computational hardness, which is insecure. The data flows directly from user input to an insecure hash function used for security purposes (password storage). No additional context changes this assessment.",
+    "context_needed": [],
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 1191,
+    "tokens_used": 14523,
+    "data_flow": "source (line 140) → transform (line 141) → sink (line 141)",
+    "answers": [
+      "The exact crypto call is `hashlib.md5(password).hexdigest()` on line 141. The algorithm used is MD5.",
+      "The algorithm name is specified via a hardcoded literal through the method call `hashlib.md5`, which directly references the MD5 hashing algorithm. This is visible on line 141.",
+      "The output of the MD5 hash is used for password storage in the `User` object instantiation on line 142 (`new_user = User(username, hash_pass)`), and subsequently committed to the database on line 143. This is a security-sensitive use-case (password storage).",
+      "Yes, collision resistance is required for password hashing. MD5 is broken for collision resistance and is unsuitable for securely hashing passwords.",
+      "There is no defense or safe alternative present. The code should use a strong password hashing algorithm such as `bcrypt`, `argon2`, `scrypt`, or `pbkdf2_hmac` with sufficient iterations. The current implementation uses plain MD5 without salt or computational cost.",
+      "Not visible in provided context.",
+      "The use-case is security-sensitive (password storage), and no adequate defense mechanism is present. MD5 is explicitly unsuitable for password hashing."
+    ],
+    "timestamp": "2026-07-14T15:12:56.982524",
+    "elapsed_seconds": 10.536269664764404,
+    "iterations": 3
+  },
+  "function": {
+    "name": "reg_customer",
+    "file": "app/app.py",
+    "start_line": 135,
+    "end_line": 148,
+    "scope": ""
+  },
+  "web_params": []
+}

@@ -1,0 +1,51 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "helpers.run_cmd",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "shell command string passed to helpers.run_cmd",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured command string contains shell metacharacters (;, &&, |, $(), backticks) after 'ps', indicating command injection via the tainted arg parameter",
+    "trigger_patterns": [
+      "ps\\s+\\S+;\\s*\\S+",
+      "ps\\s+\\S+&&\\s*\\S+",
+      "ps\\s+\\S+\\|\\s*\\S+",
+      "ps\\s+.*\\$\\(",
+      "ps\\s+.*\\x60[^\\x60]+\\x60"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_SHELL_COMMAND_CONSTRUCTED_FROM_INPUT: command injection detected — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "aux; id",
+      "aux&& cat /etc/passwd",
+      "aux| whoami",
+      "aux$(id)",
+      "aux`id`"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "resolve_system_debug",
+    "file": "core/views.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def resolve_system_debug(info, arg)",
+    "tainted_params": [
+      {
+        "name": "arg",
+        "index": 1,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_shell_command_constructed_from_input_core_views_py_352",
+    "finding_id": "1",
+    "rule_id": "py/shell-command-constructed-from-input",
+    "rule_slug": "py_shell-command-constructed-from-input",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-damn-vulnerable-graphql-application/verification_results/findings/finding_1_py_shell-command-constructed-from-input.json"
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "id": "5",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/summary_vc-claude-code-seeded-v2-crm-saas-django_20260714_152015.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "crm_project/partner_console.py",
+    "start_line": 143,
+    "end_line": 143,
+    "repo_name": "vc-claude-code-seeded-v2-crm-saas-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/vc-claude-code-seeded-v2-crm-saas-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 137: ControlFlowNode for request",
+      "line 140: ControlFlowNode for Attribute",
+      "line 140: ControlFlowNode for Attribute()",
+      "line 140: ControlFlowNode for name",
+      "line 141: ControlFlowNode for target",
+      "line 143: ControlFlowNode for target"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 12268,
+    "confidence": "High",
+    "iterations": 3,
+    "output_tokens": 1145,
+    "context_needed": [],
+    "reasoning": "User-controlled input `name` is used to construct a file path which is then written to using `write_bytes`. There is no sanitization or validation to prevent directory traversal, and the additional context confirms that `write_bytes` is a standard Pathlib method without built-in protections. This constitutes a path injection vulnerability.",
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:20:02.156215",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request.GET['name'] (line 140) → target = BASE_EXPORT_DIR / name (line 141) → target.write_bytes(...) (line 143)",
+    "cost_usd": 0.0,
+    "cached_input_tokens": 0,
+    "tokens_used": 13413,
+    "elapsed_seconds": 9.336351156234741,
+    "confidence_score": 0.95,
+    "answers": [
+      "The EXACT file-operation sink is `target.write_bytes(request.body)` on line 143. The path value passed to it is `target`, which is derived from `BASE_EXPORT_DIR / name`.",
+      "The assignments to the path value `target` are: line 141: `target = BASE_EXPORT_DIR / name`.",
+      "The value of `target` derives from user input. Specifically: - Line 140: `name = request.GET.get(\"name\", \"packet.bin\")` retrieves the `name` parameter from the GET request. - Line 141: `target = BASE_EXPORT_DIR / name` constructs the path using the user-provided `name`. This means `target` is directly influenced by user input.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The path `target` is constructed directly from the user input without any sanitization or validation.",
+      "There is no specific defense applied to contain the path. No use of `secure_filename`, `resolve()`, `is_relative_to()`, or any other mechanism to prevent directory traversal is visible. The `write_bytes` method is a standard Pathlib method that writes bytes to a file without additional protections.",
+      "The user-tainted value `name` reaches the sink `target.write_bytes(...)` directly. There is no evidence of sanitization or defense mechanisms in the provided code, and the additional context does not change this assessment."
+    ]
+  },
+  "function": {
+    "name": "acct_dock_shelf_388",
+    "file": "crm_project/partner_console.py",
+    "start_line": 137,
+    "end_line": 144,
+    "scope": ""
+  },
+  "web_params": []
+}

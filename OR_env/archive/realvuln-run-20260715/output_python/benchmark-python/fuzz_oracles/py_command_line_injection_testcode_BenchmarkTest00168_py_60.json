@@ -1,0 +1,79 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "target": "subprocess.run",
+    "signature": "subprocess.run(args, *, stdin=None, input=None, stdout=None, stderr=None, capture_output=False, shell=False, cwd=None, timeout=None, check=False, encoding=None, errors=None, text=None, env=None, universal_newlines=None, **other_popen_kwargs)",
+    "capture": {
+      "args_index": 0,
+      "sink_arg_name": "args"
+    },
+    "patch_target": "subprocess.run",
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "captured value",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "predicate": {
+      "type": "regex",
+      "pattern": "echo\\s+[^\\s]+",
+      "test_value": "echo malicious_input",
+      "expected_match": true
+    },
+    "condition_description": "{'type': 'regex', 'pattern': 'echo\\\\s+[^\\\\s]+', 'test_value': 'echo malicious_input', 'expected_match': True}",
+    "trigger_patterns": [
+      "[\\s\\S]+"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "ORACULUM_VIOLATION: captured={captured}"
+  },
+  "fuzz_guidance": {
+    "input_type": "flask_view",
+    "sink_function": "subprocess.run",
+    "sink_module": "subprocess",
+    "payload_injection_point": "request.form.get(\"BenchmarkTest00168\")",
+    "mock_action": "Patch subprocess.run to record the command string and prevent actual execution",
+    "validation": "Verify the command string contains unsanitized user input via regex pattern matching",
+    "seed_corpus": [],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "aliasing_risks": [
+      "subprocess.call, subprocess.check_output, subprocess.check_call may also be used and need patching if present"
+    ],
+    "import_risks": [
+      "subprocess may be imported as alias (e.g., import subprocess as sp), patching must use the actual module name used in the target"
+    ],
+    "async_risks": [],
+    "sink_context": "The subprocess.run call is invoked with shell=True using a command string constructed from user input via f-string interpolation, creating a command injection vector.",
+    "classification_strategy": "recorded_call",
+    "classification_confidence": "high",
+    "mock_guidance": {
+      "required": true,
+      "target": "subprocess call with shell=True",
+      "capture": "the constructed shell command string (argStr) and its arguments",
+      "fake_behavior": "stub the subprocess execution to prevent actual command execution, return a safe mock response",
+      "notes": [
+        "Ensure the subprocess call is mocked to avoid actual shell command execution during testing.",
+        "Capture the command string to verify it does not contain unsanitized user input."
+      ]
+    },
+    "target_id": "py_command_line_injection_testcode_BenchmarkTest00168_py_60",
+    "finding_id": "8",
+    "rule_id": "py/command-line-injection",
+    "rule_slug": "py_command-line-injection",
+    "file": "testcode/BenchmarkTest00168.py",
+    "function": "BenchmarkTest00168_post",
+    "input_strategy": "flask_view",
+    "function_signature": "def BenchmarkTest00168_post()",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": -1,
+        "type": "flask_request"
+      }
+    ],
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "output/python/benchmark-python/verification_results/findings/finding_8_py_command-line-injection.json"
+  }
+}

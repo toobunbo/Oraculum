@@ -1,0 +1,80 @@
+{
+  "id": "18",
+  "rule_slug": "py_reflective-xss",
+  "source": {
+    "vhx_root": "/home/tuonglnc/repo/VulnHunterX",
+    "vhx_repo_root": "/home/tuonglnc/repo/VulnHunterX/repos/python/benchmark-python",
+    "vhx_output_root": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python",
+    "summary_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/verification_results/summary_benchmark-python_filtered_20260610_105228.json"
+  },
+  "finding": {
+    "rule_id": "py/reflective-xss",
+    "message": "Cross-site scripting vulnerability due to a [user-provided value](1).",
+    "file": "testcode/BenchmarkTest00591.py",
+    "start_line": 48,
+    "end_line": 48,
+    "repo_name": "benchmark-python",
+    "lang": "python",
+    "sarif_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/benchmark-python.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 32: ControlFlowNode for request",
+      "line 32: ControlFlowNode for headers",
+      "line 35: ControlFlowNode for param",
+      "line 39: ControlFlowNode for param",
+      "line 39: [post] ControlFlowNode for map31207 [Dictionary element at key keyB-31207]",
+      "line 40: ControlFlowNode for map31207 [Dictionary element at key keyB-31207]",
+      "line 41: ControlFlowNode for map31207 [Dictionary element at key keyB-31207]",
+      "line 41: ControlFlowNode for Subscript",
+      "line 41: ControlFlowNode for bar",
+      "line 48: ControlFlowNode for Tuple"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [],
+    "tags": [
+      "security",
+      "external/cwe/cwe-079",
+      "external/cwe/cwe-116"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-06-10T10:44:56.212019",
+    "context_needed": [],
+    "data_flow": "request.headers.getlist('Referer') (line 6) → headers[0] (line 9) → param (line 9) → map31207[key] (lines 39-41) → bar (line 41) → Tuple (line 48)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "answers": [
+      "The potentially dangerous data originates from the HTTP request headers, specifically the 'Referer' header (line 6).",
+      "Data flows through: headers (line 6) → param (line 9) → map31207[key] (lines 39-41) → bar (line 41).",
+      "No validation, sanitization, or encoding is applied to the data at any step.",
+      "The sink is at line 48 where the data ends up in a Tuple, presumably used for rendering HTML without escaping.",
+      "There are no intermediate transformations that would prevent or bypass sanitization.",
+      "Not visible in provided context - no framework auto-escaping protections are evident from the code shown.",
+      "The code appears to process HTTP request headers, which can be controlled by unauthenticated attackers.",
+      "This appears to be a test file based on the function name BenchmarkTest00591_post, but could still execute with untrusted input.",
+      "The concrete security impact would be Cross-Site Scripting (XSS) allowing script execution in victim's browser.",
+      "The weakest link is the complete absence of any sanitization or escaping before data reaches the sink at line 48."
+    ],
+    "confidence_score": 0.95,
+    "iterations": 1,
+    "input_tokens": 2252,
+    "elapsed_seconds": 11.666108846664429,
+    "confidence": "High",
+    "cached_input_tokens": 0,
+    "tokens_used": 2657,
+    "reasoning": "User-controlled Referer header flows directly to a sink without any sanitization or escaping, with high-confidence data flow from source to sink through multiple assignments.",
+    "verdict": "True Positive",
+    "output_tokens": 405
+  },
+  "function": {
+    "name": "BenchmarkTest00591_post",
+    "file": "testcode/BenchmarkTest00591.py",
+    "start_line": 28,
+    "end_line": 51,
+    "scope": "Function init"
+  }
+}

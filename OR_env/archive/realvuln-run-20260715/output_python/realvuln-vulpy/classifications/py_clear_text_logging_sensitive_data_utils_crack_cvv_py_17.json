@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "Sink is print() to stdout, which is not network I/O, shell execution, DB write, or irreversible"
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Ambiguous: stdout capture allows post-return inspection, but the violation mechanism is the call itself, not persistent state or a return value"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "returns.kind is 'none' with empty exprs, so no return value exists to inspect"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock or capture the print() call on line 17 that outputs cvv.decode()",
+    "capture": "Capture the exact string argument passed to print(), specifically the decoded CVV value",
+    "fake_behavior": "Allow execution to continue; either suppress actual stdout output or let it pass through while recording the argument",
+    "notes": [
+      "The violation is that sensitive CVV data reaches print() in cleartext without encryption or hashing",
+      "Verify the captured argument contains the raw CVV string to confirm the clear-text logging violation"
+    ]
+  },
+  "confidence": "low",
+  "warnings": [
+    "Q2 is ambiguous: stdout capture is technically post-return observable but the violation is inherently tied to the call site, making recorded_call the safer choice per ambiguity rules"
+  ]
+}

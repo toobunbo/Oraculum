@@ -1,0 +1,95 @@
+{
+  "id": "10",
+  "rule_slug": "py_weak-sensitive-data-hashing",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/summary_vc-claude-code-seeded-v2-support-desk-fastapi_20260714_153638.json"
+  },
+  "finding": {
+    "rule_id": "py/weak-sensitive-data-hashing",
+    "message": "[Sensitive data (password)](1) is used in a hashing algorithm (SHA256) that is insecure for password hashing, since it is not a computationally expensive hash function.\n[Sensitive data (password)](2) is used in a hashing algorithm (SHA256) that is insecure for password hashing, since it is not a computationally expensive hash function.\n[Sensitive data (password)](3) is used in a hashing algorithm (SHA256) that is insecure for password hashing, since it is not a computationally expensive hash function.\n[Sensitive data (password)](4) is used in a hashing algorithm (SHA256) that is insecure for password hashing, since it is not a computationally expensive hash function.\n[Sensitive data (password)](5) is used in a hashing algorithm (SHA256) that is insecure for password hashing, since it is not a computationally expensive hash function.\n[Sensitive data (password)](6) is used in a hashing algorithm (SHA256) that is insecure for password hashing, since it is not a computationally expensive hash function.",
+    "file": "backend/app/security.py",
+    "start_line": 72,
+    "end_line": 72,
+    "repo_name": "vc-claude-code-seeded-v2-support-desk-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/vc-claude-code-seeded-v2-support-desk-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 32: ControlFlowNode for api_key_header",
+      "line 38: ControlFlowNode for api_key_header",
+      "line 71: ControlFlowNode for token",
+      "line 72: ControlFlowNode for Attribute()",
+      "--- Flow 2 ---",
+      "line 67: ControlFlowNode for x_api_key",
+      "line 76: ControlFlowNode for x_api_key",
+      "line 32: ControlFlowNode for api_key_header",
+      "line 38: ControlFlowNode for api_key_header",
+      "line 71: ControlFlowNode for token",
+      "line 72: ControlFlowNode for Attribute()",
+      "--- Flow 3 ---",
+      "line 135: ControlFlowNode for x_api_key",
+      "line 141: ControlFlowNode for x_api_key",
+      "line 32: ControlFlowNode for api_key_header",
+      "line 38: ControlFlowNode for api_key_header",
+      "line 71: ControlFlowNode for token",
+      "line 72: ControlFlowNode for Attribute()",
+      "--- Flow 4 ---",
+      "line 67: ControlFlowNode for Header()",
+      "line 67: ControlFlowNode for x_api_key",
+      "line 76: ControlFlowNode for x_api_key",
+      "line 32: ControlFlowNode for api_key_header",
+      "line 38: ControlFlowNode for api_key_header",
+      "line 71: ControlFlowNode for token",
+      "line 72: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-327",
+      "CWE-328",
+      "CWE-916"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 14792,
+    "cached_input_tokens": 0,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "reasoning": "The function hashes sensitive data (API keys/tokens) using SHA256 without proper key stretching, which is insecure for password/token hashing. The dataflow shows this is used in security contexts (authentication), and no additional context changed this assessment.",
+    "verdict": "True Positive",
+    "confidence_score": 0.9,
+    "output_tokens": 1358,
+    "tokens_used": 16150,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "answers": [
+      "The EXACT crypto call is `hashlib.sha256(token.encode(\"utf-8\")).hexdigest()` on line 72. The algorithm is SHA256.",
+      "The algorithm is specified via a hardcoded method call `hashlib.sha256` on line 72.",
+      "The output of the hash is returned by the function `hash_token`. Based on the dataflow paths shown in the original analysis, this function is used with API key headers and x-api-key values, suggesting it's used for authentication token handling, which falls under SECURITY use-case (a). The consumers are at lines 38, 76, and 141.",
+      "SHA256 provides good collision resistance, but the issue is that it's not computationally expensive, making it unsuitable for password/token hashing where brute-force attacks are a concern.",
+      "There is no defense or safe alternative present. The code should use a computationally expensive hash function like `bcrypt`, `argon2`, `scrypt`, or `pbkdf2_hmac` for sensitive data hashing. The current implementation uses plain SHA256 without any key stretching mechanism.",
+      "Not visible in provided context.",
+      "The use-case appears to be SECURITY (authentication tokens), and there is no adequate defense present."
+    ],
+    "elapsed_seconds": 10.31636905670166,
+    "timestamp": "2026-07-14T15:36:34.703700",
+    "context_needed": [],
+    "iterations": 3,
+    "data_flow": "Multiple sources (api_key_header line 32, x_api_key lines 67, 135) → token (line 71) → hashlib.sha256(token.encode(\"utf-8\")).hexdigest() (line 72) → consumers at lines 38, 76, 141"
+  },
+  "function": {
+    "name": "hash_token",
+    "file": "backend/app/security.py",
+    "start_line": 71,
+    "end_line": 72,
+    "scope": ""
+  },
+  "web_params": []
+}

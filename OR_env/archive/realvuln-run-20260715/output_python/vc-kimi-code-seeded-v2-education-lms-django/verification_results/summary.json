@@ -1,0 +1,22 @@
+{
+  "stage": "ingest",
+  "repo": "vc-kimi-code-seeded-v2-education-lms-django",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-kimi-code-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-kimi-code-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-kimi-code-seeded-v2-education-lms-django/verification_results/summary_vc-kimi-code-seeded-v2-education-lms-django_20260714_160734.json"
+  },
+  "counts": {
+    "total_verdicts": 11,
+    "selected": 0,
+    "enriched": 0,
+    "skipped": 11,
+    "failed": 0
+  },
+  "findings": [],
+  "errors": []
+}

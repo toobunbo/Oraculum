@@ -1,0 +1,70 @@
+{
+  "id": "9",
+  "rule_slug": "py_weak-sensitive-data-hashing",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-dvblab",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab/verification_results/summary_realvuln-dvblab_20260714_145756.json"
+  },
+  "finding": {
+    "rule_id": "py/weak-sensitive-data-hashing",
+    "message": "[Sensitive data (password)](1) is used in a hashing algorithm (MD5) that is insecure for password hashing, since it is not a computationally expensive hash function.",
+    "file": "backend/models.py",
+    "start_line": 27,
+    "end_line": 27,
+    "repo_name": "realvuln-dvblab",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab/realvuln-dvblab.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 26: ControlFlowNode for password",
+      "line 27: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-327",
+      "CWE-328",
+      "CWE-916"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "The code uses MD5 for password hashing in a security-sensitive authentication context without any visible defense or secure alternative. MD5 is cryptographically broken for password storage due to its speed and vulnerability to collision attacks.",
+    "elapsed_seconds": 10.822067975997925,
+    "answers": [
+      "The EXACT crypto call is `hashlib.md5(password.encode()).hexdigest()` on line 27. The algorithm used is MD5.",
+      "The algorithm name is specified via direct call to `hashlib.md5` which is a constant import. Quote from line 27: `hashlib.md5(password.encode()).hexdigest()`.",
+      "The output is used in a password comparison for authentication. Quote from line 27: `self.password_hash == hashlib.md5(password.encode()).hexdigest()`. This is a SECURITY use-case as it's used for password verification.",
+      "Yes, collision resistance is required for password hashing to prevent authentication bypass, though MD5's main weakness here is its speed making brute force attacks feasible.",
+      "No secure alternative is present. MD5 should not be used for password hashing. Secure alternatives include bcrypt, argon2, scrypt, or pbkdf2_hmac.",
+      "Not visible in provided context.",
+      "The use-case is SECURITY-related (password authentication) and no defense or secure alternative is visible."
+    ],
+    "cached_input_tokens": 0,
+    "tokens_used": 13927,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence_score": 0.95,
+    "timestamp": "2026-07-14T14:57:49.072986",
+    "context_needed": [],
+    "data_flow": "password parameter (line 26) → hashlib.md5(password.encode()).hexdigest() (line 27) → comparison with self.password_hash (line 27)",
+    "output_tokens": 1034,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "iterations": 3,
+    "verdict": "True Positive",
+    "input_tokens": 12893
+  },
+  "function": {
+    "name": "check_password",
+    "file": "backend/models.py",
+    "start_line": 26,
+    "end_line": 27,
+    "scope": "User"
+  },
+  "web_params": []
+}

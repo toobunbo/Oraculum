@@ -1,0 +1,76 @@
+{
+  "id": "0",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-education-lms-django/verification_results/summary_vc-claude-code-seeded-v2-education-lms-django_20260714_152145.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "lms/course_operations.py",
+    "start_line": 81,
+    "end_line": 81,
+    "repo_name": "vc-claude-code-seeded-v2-education-lms-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-education-lms-django/vc-claude-code-seeded-v2-education-lms-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 76: ControlFlowNode for request",
+      "line 79: ControlFlowNode for Attribute",
+      "line 79: ControlFlowNode for Attribute()",
+      "line 79: ControlFlowNode for ref",
+      "line 80: ControlFlowNode for target",
+      "line 81: ControlFlowNode for Attribute"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:21:12.858393",
+    "cost_usd": 0.0,
+    "verdict": "True Positive",
+    "context_needed": [],
+    "data_flow": "request (line 76) → ref = request.GET.get(\"ref\", \"daily\") (line 79) → target = BASE_EXPORT_DIR / f\"{ref}.json\" (line 80) → target.parent.mkdir(...) (line 81)",
+    "answers": [
+      "The EXACT file-operation sink is `target.parent.mkdir(parents=True, exist_ok=True)` on line 81. The path value passed to it is `target.parent`, where `target` is derived from `BASE_EXPORT_DIR / f\"{ref}.json\"` (line 80).",
+      "The assignments to the path value are: Line 79: `ref = request.GET.get(\"ref\", \"daily\")`, Line 80: `target = BASE_EXPORT_DIR / f\"{ref}.json\"`.",
+      "The LAST assignment is on line 80: `target = BASE_EXPORT_DIR / f\"{ref}.json\"`. The value of `ref` derives from user input via `request.GET.get(\"ref\", \"daily\")` on line 79. Data flow: `request` (line 76) → `ref` (line 79) → `target` (line 80).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path. No defensive code is present to neutralize the user input before it is used in the path construction.",
+      "There is no specific defense visible in the code. No sanitization, validation, or path restriction mechanism (e.g., `secure_filename`, `is_relative_to`, allow-list) is applied to `ref` or the resulting `target` path. The definition of `BASE_EXPORT_DIR` is not available, but even if it were, the user-controlled `ref` could still introduce traversal segments like `../` into the path.",
+      "The user-tainted value `ref` flows directly into the path construction and then to `mkdir`. There is no visible defense to prevent directory traversal. The missing definition of `BASE_EXPORT_DIR` does not change the fact that `ref` is user-controlled and directly embedded into the path."
+    ],
+    "output_tokens": 1440,
+    "tokens_used": 18472,
+    "confidence": "High",
+    "iterations": 3,
+    "reasoning": "User-controlled input `ref` is used directly in a file path construction that leads to a directory creation operation (`mkdir`) without any sanitization or path traversal defense. This allows an attacker to potentially create directories in unintended locations. The unavailability of `BASE_EXPORT_DIR`'s definition does not mitigate this, as the user input can still introduce traversal sequences.",
+    "cached_input_tokens": 0,
+    "confidence_score": 0.9,
+    "input_tokens": 17032,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 12.521698713302612
+  },
+  "function": {
+    "name": "course_vault_stash_234",
+    "file": "lms/course_operations.py",
+    "start_line": 76,
+    "end_line": 83,
+    "scope": ""
+  },
+  "web_params": []
+}

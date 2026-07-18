@@ -1,0 +1,52 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "os.system",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "The full command string passed to os.system, constructed as 'echo ' + str(user_input)",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured command string starts with 'echo ' and contains shell metacharacters (;, &&, ||, |, $()) that indicate command injection",
+    "trigger_patterns": [
+      "echo .+; .+",
+      "echo .+&& .+",
+      "echo .+\\|\\| .+",
+      "echo .+\\| .+",
+      "echo .+\\$\\(.+\\)"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY/SHELL-COMMAND-CONSTRUCTED-FROM-INPUT: shell injection detected in os.system arg — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "; id",
+      "&& cat /etc/passwd",
+      "|| whoami",
+      "| ls -la",
+      "$(id)",
+      "; rm -rf /"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "thread_function",
+    "file": "apps/falcon_app.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def thread_function(user_input)",
+    "tainted_params": [
+      {
+        "name": "user_input",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_shell_command_constructed_from_input_apps_falcon_app_py_63",
+    "finding_id": "7",
+    "rule_id": "py/shell-command-constructed-from-input",
+    "rule_slug": "py_shell-command-constructed-from-input",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-vulnpy/verification_results/findings/finding_7_py_shell-command-constructed-from-input.json"
+  }
+}

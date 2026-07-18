@@ -1,0 +1,45 @@
+{
+  "stage": "classification",
+  "repo": "realvuln-python-insecure-app",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/classification.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/realvuln-python-insecure-app/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 2,
+    "generated": 2,
+    "skipped": 0,
+    "failed": 0
+  },
+  "classifications": [
+    {
+      "id": "0",
+      "target_id": "py_template_injection_app_main_py_41",
+      "rule_id": "py/template-injection",
+      "file": "app/main.py",
+      "start_line": "41",
+      "function_name": "try_hack_me",
+      "finding_artifact": "output/python/realvuln-python-insecure-app/verification_results/findings/finding_0_py_template-injection.json",
+      "classification": "output/python/realvuln-python-insecure-app/classifications/py_template_injection_app_main_py_41.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "high"
+    },
+    {
+      "id": "1",
+      "target_id": "py_jinja2_autoescape_false_app_main_py_41",
+      "rule_id": "py/jinja2/autoescape-false",
+      "file": "app/main.py",
+      "start_line": "41",
+      "function_name": "try_hack_me",
+      "finding_artifact": "output/python/realvuln-python-insecure-app/verification_results/findings/finding_1_py_jinja2_autoescape-false.json",
+      "classification": "output/python/realvuln-python-insecure-app/classifications/py_jinja2_autoescape_false_app_main_py_41.json",
+      "status": "generated",
+      "strategy": "return_value",
+      "confidence": "high"
+    }
+  ],
+  "errors": []
+}

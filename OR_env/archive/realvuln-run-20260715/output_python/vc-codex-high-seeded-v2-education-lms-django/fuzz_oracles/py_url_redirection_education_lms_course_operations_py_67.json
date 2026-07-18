@@ -1,0 +1,48 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "redirect URL extracted from HttpResponseRedirect return value (response.url or response['Location'])",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The returned redirect response contains an external URL scheme (http://, https://, or protocol-relative //) in its Location header, confirming the user-provided URL passed through without sanitization",
+    "trigger_patterns": [
+      "https?://[a-zA-Z0-9]",
+      "//[a-zA-Z0-9]"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_URL_REDIRECTION: open redirect bypass — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "https://evil.com",
+      "http://attacker.com/steal-credentials",
+      "//malicious.site/phish",
+      "https://evil.com/path?token=stolen",
+      "http://127.0.0.1:8080/admin"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "course_return_lane_162",
+    "file": "education_lms/course_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def course_return_lane_162(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "HttpRequest"
+      }
+    ],
+    "target_id": "py_url_redirection_education_lms_course_operations_py_67",
+    "finding_id": "7",
+    "rule_id": "py/url-redirection",
+    "rule_slug": "py_url-redirection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/findings/finding_7_py_url-redirection.json"
+  }
+}

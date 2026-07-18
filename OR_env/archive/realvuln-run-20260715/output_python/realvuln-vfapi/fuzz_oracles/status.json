@@ -1,0 +1,43 @@
+{
+  "stage": "oracle",
+  "repo": "realvuln-vfapi",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/oracle.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/realvuln-vfapi/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 2,
+    "generated": 2,
+    "skipped": 0,
+    "failed": 0
+  },
+  "oracles": [
+    {
+      "id": "0",
+      "target_id": "py_weak_sensitive_data_hashing_main_py_113",
+      "rule_id": "py/weak-sensitive-data-hashing",
+      "file": "main.py",
+      "start_line": "113",
+      "function_name": "init_sql_db",
+      "finding_artifact": "output/python/realvuln-vfapi/verification_results/findings/finding_0_py_weak-sensitive-data-hashing.json",
+      "oracle": "output/python/realvuln-vfapi/fuzz_oracles/py_weak_sensitive_data_hashing_main_py_113.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "1",
+      "target_id": "py_weak_sensitive_data_hashing_main_py_187",
+      "rule_id": "py/weak-sensitive-data-hashing",
+      "file": "main.py",
+      "start_line": "187",
+      "function_name": "put_user",
+      "finding_artifact": "output/python/realvuln-vfapi/verification_results/findings/finding_1_py_weak-sensitive-data-hashing.json",
+      "oracle": "output/python/realvuln-vfapi/fuzz_oracles/py_weak_sensitive_data_hashing_main_py_187.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    }
+  ],
+  "errors": []
+}

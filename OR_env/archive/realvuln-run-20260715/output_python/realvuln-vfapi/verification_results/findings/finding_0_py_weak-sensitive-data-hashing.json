@@ -1,0 +1,71 @@
+{
+  "id": "0",
+  "rule_slug": "py_weak-sensitive-data-hashing",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vfapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vfapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vfapi/verification_results/summary_realvuln-vfapi_20260714_151157.json"
+  },
+  "finding": {
+    "rule_id": "py/weak-sensitive-data-hashing",
+    "message": "[Sensitive data (password)](1) is used in a hashing algorithm (MD5) that is insecure for password hashing, since it is not a computationally expensive hash function.",
+    "file": "main.py",
+    "start_line": 113,
+    "end_line": 113,
+    "repo_name": "realvuln-vfapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vfapi/realvuln-vfapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 113: ControlFlowNode for Attribute",
+      "line 113: ControlFlowNode for Attribute()",
+      "line 113: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-327",
+      "CWE-328",
+      "CWE-916"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "cost_usd": 0.0,
+    "context_needed": [],
+    "answers": [
+      "The EXACT crypto call is `md5(fake.password().encode()).hexdigest()` on line 113. The algorithm used is MD5.",
+      "The algorithm is specified via the `md5` function from the `hashlib` module, which is imported implicitly (not shown in the snippet). This is a standard library import, not a hardcoded string or config-driven value. Line 113 uses `md5(...)` directly.",
+      "The output of the MD5 hash is used as the `password` field value in an SQL INSERT statement into the `users` table (lines 102–119). This is clearly a SECURITY use-case: password storage in a database.",
+      "Yes, collision resistance is required for password hashing. MD5 is cryptographically broken for collision resistance and is unsuitable for password hashing due to its speed and vulnerability to rainbow table attacks.",
+      "There is NO defense or safe alternative present. The code uses plain MD5 without salt or key stretching (e.g., bcrypt, scrypt, Argon2, PBKDF2). This is insecure for password hashing.",
+      "Not visible in provided context. There is no indication this is for backward compatibility with an external system.",
+      "The use-case is SECURITY (password storage), and there is no visible defense or safe alternative such as bcrypt, scrypt, Argon2, or PBKDF2. Therefore, this is a real vulnerability."
+    ],
+    "confidence": "High",
+    "timestamp": "2026-07-14T15:11:57.145649",
+    "tokens_used": 18176,
+    "elapsed_seconds": 15.192961692810059,
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "cached_input_tokens": 0,
+    "output_tokens": 1328,
+    "input_tokens": 16848,
+    "reasoning": "The code hashes passwords using MD5 without salt or key stretching, which is insecure for password storage. The data flow from the password source to the insecure hash sink is direct and exploitable. No additional context changes this assessment.",
+    "data_flow": "fake.password() (line 113) → md5(...).hexdigest() (line 113) → SQL INSERT INTO users.password (line 102–119)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "iterations": 3
+  },
+  "function": {
+    "name": "init_sql_db",
+    "file": "main.py",
+    "start_line": 87,
+    "end_line": 122,
+    "scope": ""
+  },
+  "web_params": []
+}

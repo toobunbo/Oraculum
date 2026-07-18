@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is target.parent.mkdir(parents=True, exist_ok=True), a filesystem write/irreversible side effect"
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Decision terminated at Q1"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Decision terminated at Q1"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock pathlib.Path.parent.mkdir to prevent actual directory creation",
+    "capture": "Capture the path argument (target.parent) passed to mkdir, specifically the full resolved path string to verify directory traversal payloads like '../' are present",
+    "fake_behavior": "No-op or return None, allowing execution to continue without modifying the filesystem",
+    "notes": [
+      "Ensure the mock applies to the specific Path object's parent.mkdir call on line 56",
+      "The tainted value flows from user input 'ref' through f-string interpolation into the Path, so the captured path should reflect the unsanitized traversal sequence"
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

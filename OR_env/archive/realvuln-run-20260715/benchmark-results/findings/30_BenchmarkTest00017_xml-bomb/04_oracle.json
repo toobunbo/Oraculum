@@ -1,0 +1,83 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "target": "xml.dom.minidom.parseString",
+    "capture_args": [
+      {
+        "index": 0,
+        "name": "xmlString",
+        "tainted": true
+      }
+    ],
+    "patch_target": "xml.dom.minidom.parseString",
+    "target_arg_index": 0,
+    "target_arg_name": "xmlString",
+    "capture_what": "xmlString",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "predicate": "lambda xmlString: isinstance(xmlString, str) and ('<!ENTITY' in xmlString or 'DTD' in xmlString or '<!ELEMENT' in xmlString)",
+    "condition_description": "lambda xmlString: isinstance(xmlString, str) and ('<!ENTITY' in xmlString or 'DTD' in xmlString or '<!ELEMENT' in xmlString)",
+    "trigger_patterns": [
+      "[\\s\\S]+"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "ORACULUM_VIOLATION: captured={captured}"
+  },
+  "fuzz_guidance": {
+    "sink_inputs": [
+      {
+        "arg_index": 0,
+        "fuzz_type": "xml_bomb_templates"
+      }
+    ],
+    "payload_refinement": [
+      "Ensure payload includes entity expansion patterns",
+      "Include external DTD declarations",
+      "Test quadratic blowup scenarios"
+    ],
+    "seed_corpus": [],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "aliasing_risks": [
+      "Variable `bar` aliases the tainted input `param`",
+      "Sink argument name is `xmlString` but source variable is `bar`"
+    ],
+    "import_risks": [
+      "xml.dom.minidom may be imported as minidom or via `from xml.dom import minidom`",
+      "Need to patch `xml.dom.minidom.parseString` in the actual module namespace"
+    ],
+    "async_risks": [],
+    "classification_strategy": "recorded_call",
+    "classification_confidence": "high",
+    "mock_guidance": {
+      "required": true,
+      "target": "xml.dom.minidom.parseString(bar, parser)",
+      "capture": "The value of `bar` (user-controlled input from cookie via `param`)",
+      "fake_behavior": "Stub the parseString call to avoid actual XML parsing; return a safe mock DOM object or raise an exception to simulate failure.",
+      "notes": [
+        "Ensure the mock prevents actual XML parsing to avoid risk of XML bomb attacks during testing.",
+        "Capture the input `bar` to verify it originates from the cookie-based user input.",
+        "Mocking should preserve control flow while avoiding side effects from the real XML parser."
+      ]
+    },
+    "target_id": "py_xml_bomb_testcode_BenchmarkTest00017_py_52",
+    "finding_id": "30",
+    "rule_id": "py/xml-bomb",
+    "rule_slug": "py_xml-bomb",
+    "file": "testcode/BenchmarkTest00017.py",
+    "function": "BenchmarkTest00017_post",
+    "input_strategy": "flask_view",
+    "function_signature": "def BenchmarkTest00017_post()",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": -1,
+        "type": "flask_request"
+      }
+    ],
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "output/python/benchmark-python/verification_results/findings/finding_30_py_xml-bomb.json"
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "id": "26",
+  "rule_slug": "py_url-redirection",
+  "source": {
+    "vhx_root": "/home/trieudai/",
+    "vhx_repo_root": "/home/trieudai/bench-src",
+    "vhx_output_root": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python",
+    "summary_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/verification_results/summary_benchmark-python_filtered_20260610_105228.json"
+  },
+  "finding": {
+    "rule_id": "py/url-redirection",
+    "message": "Untrusted URL redirection depends on a [user-provided value](1).",
+    "file": "testcode/BenchmarkTest00068.py",
+    "start_line": 49,
+    "end_line": 49,
+    "repo_name": "benchmark-python",
+    "lang": "python",
+    "sarif_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/benchmark-python.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 39: ControlFlowNode for request",
+      "line 39: ControlFlowNode for Attribute",
+      "line 39: ControlFlowNode for Attribute()",
+      "line 39: ControlFlowNode for Attribute()",
+      "line 39: ControlFlowNode for param",
+      "line 43: ControlFlowNode for param",
+      "line 43: [post] ControlFlowNode for map43804 [Dictionary element at key keyB-43804]",
+      "line 44: ControlFlowNode for map43804 [Dictionary element at key keyB-43804]",
+      "line 45: ControlFlowNode for map43804 [Dictionary element at key keyB-43804]",
+      "line 45: ControlFlowNode for Subscript",
+      "line 45: ControlFlowNode for bar",
+      "line 49: ControlFlowNode for bar"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [],
+    "tags": [
+      "security",
+      "external/cwe/cwe-601"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-06-10T10:47:08.357914",
+    "context_needed": [],
+    "data_flow": "request.cookies.get (line 18) → urllib.parse.unquote_plus (line 18) → map43804[key] (lines 43-44) → bar (line 45) → redirect call (line 49 - flagged by CodeQL)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "answers": [
+      "The redirect sink is not visible in the provided code context. The function snippet appears to be incomplete, ending mid-function without showing any redirect call.",
+      "The last assignment to the value that would reach the sink is `bar = map43804[keyB-43804]` (line 45). Prior assignments include `param = urllib.parse.unquote_plus(request.cookies.get(\"BenchmarkTest00068\", \"noCookieValueSupplied\"))` (line 18) and assignments into `map43804` (lines 43-44).",
+      "The value derives from user input via `request.cookies.get(\"BenchmarkTest00068\", ...)`, which is then unquoted (line 18). This user-controlled value flows into `map43804` and is retrieved as `bar` (line 45).",
+      "No constant-time conditions or reassignments that override the user-tainted value are visible in the provided snippet.",
+      "No specific defense mechanism (e.g., domain allowlist, path restriction, or safe-host check) is visible in the provided code.",
+      "Since the redirect sink is not visible in the provided code snippet, we cannot confirm whether the user-tainted value reaches it or whether any defense is applied. However, based on the CodeQL finding indicating line 49 as the sink, and the data flow clearly showing user-controlled input reaching the `bar` variable that would likely be used in a redirect, this appears to be a true positive."
+    ],
+    "confidence_score": 0.85,
+    "iterations": 7,
+    "input_tokens": 28284,
+    "elapsed_seconds": 79.02833032608032,
+    "confidence": "High",
+    "cached_input_tokens": 0,
+    "tokens_used": 31508,
+    "reasoning": "User-controlled input from cookies flows through unquote_plus and dictionary assignment to `bar` variable, which CodeQL flags as reaching a redirect sink at line 49. No sanitization or domain validation is visible in the code path.",
+    "verdict": "True Positive",
+    "output_tokens": 3224
+  },
+  "function": {
+    "name": "BenchmarkTest00068_post",
+    "file": "testcode/BenchmarkTest00068.py",
+    "start_line": 35,
+    "end_line": 51,
+    "scope": "Function init"
+  }
+}

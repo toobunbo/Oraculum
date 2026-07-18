@@ -1,0 +1,85 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "target": "xml.etree.ElementTree.fromstring",
+    "argument_index": 0,
+    "capture_type": "regex",
+    "capture_predicate": "(?i)([\\\"\\'].*?(xpath|document|root).*?[\\\"\\'])|(\\b(or|and)\\b\\s*\\d+=\\d+)",
+    "patch_target": "xml.etree.ElementTree.fromstring",
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "captured value",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "check_type": "regex_match",
+    "pattern": "(?i)([\\\"\\'].*?(xpath|document|root).*?[\\\"\\'])|(\\b(or|and)\\b\\s*\\d+=\\d+)",
+    "match_required": true,
+    "condition_description": "oracle condition",
+    "trigger_patterns": [
+      "[\\s\\S]+"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "ORACULUM_VIOLATION: captured={captured}"
+  },
+  "fuzz_guidance": {
+    "sink_inputs": [
+      {
+        "name": "xpath_query",
+        "source_type": "cookie",
+        "taint_strategy": "full_taint"
+      }
+    ],
+    "avoid_early_return_conditions": [
+      "apostrophe_filter"
+    ],
+    "payload_injection_points": [
+      "xpath_meta_chars",
+      "boolean_injection"
+    ],
+    "seed_corpus": [],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "aliasing_risks": [
+      "ElementTree may be imported as ET or xml.etree.cElementTree",
+      "fromstring may be aliased via method assignment"
+    ],
+    "import_risks": [
+      "xml.etree.ElementTree may be imported in different forms",
+      "lxml.etree may be used instead of xml.etree"
+    ],
+    "async_risks": null,
+    "sink_approximation": "XPath sink not visible in source - monitoring ET.fromstring as proxy for XPath execution context",
+    "classification_strategy": "recorded_call",
+    "classification_confidence": "high",
+    "mock_guidance": {
+      "required": true,
+      "target": "XPath expression execution or XML parsing functionality that uses the user-provided query",
+      "capture": "The final XPath query string or expression that is constructed using the user input after sanitization",
+      "fake_behavior": "Stub the XPath execution to prevent actual XML document access while capturing the query for verification",
+      "notes": [
+        "The actual XPath sink is not visible in the provided code but CodeQL has flagged it as high precision",
+        "Need to mock/record the XML processing library calls that would execute the XPath expression",
+        "User input flows through urllib.parse.unquote_plus and minimal apostrophe filtering before reaching the sink"
+      ]
+    },
+    "target_id": "py_xpath_injection_testcode_BenchmarkTest00021_py_58",
+    "finding_id": "37",
+    "rule_id": "py/xpath-injection",
+    "rule_slug": "py_xpath-injection",
+    "file": "testcode/BenchmarkTest00021.py",
+    "function": "BenchmarkTest00021_post",
+    "input_strategy": "flask_view",
+    "function_signature": "def BenchmarkTest00021_post()",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": -1,
+        "type": "flask_request"
+      }
+    ],
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "output/python/benchmark-python/verification_results/findings/finding_37_py_xpath-injection.json"
+  }
+}

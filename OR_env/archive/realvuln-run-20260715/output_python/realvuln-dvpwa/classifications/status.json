@@ -1,0 +1,32 @@
+{
+  "stage": "classification",
+  "repo": "realvuln-dvpwa",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/classification.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/realvuln-dvpwa/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 1,
+    "generated": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "classifications": [
+    {
+      "id": "0",
+      "target_id": "py_weak_sensitive_data_hashing_sqli_dao_user_py_41",
+      "rule_id": "py/weak-sensitive-data-hashing",
+      "file": "sqli/dao/user.py",
+      "start_line": "41",
+      "function_name": "check_password",
+      "finding_artifact": "output/python/realvuln-dvpwa/verification_results/findings/finding_0_py_weak-sensitive-data-hashing.json",
+      "classification": "output/python/realvuln-dvpwa/classifications/py_weak_sensitive_data_hashing_sqli_dao_user_py_41.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "high"
+    }
+  ],
+  "errors": []
+}

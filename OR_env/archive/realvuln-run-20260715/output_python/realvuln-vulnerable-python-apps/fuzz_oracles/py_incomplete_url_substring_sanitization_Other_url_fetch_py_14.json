@@ -1,0 +1,51 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "urllib.request.urlopen",
+    "target_arg_index": 0,
+    "target_arg_name": "url",
+    "capture_what": "full URL string passed to urlopen that bypassed the startswith sanitization",
+    "additional_imports": [
+      "urllib.request"
+    ]
+  },
+  "oracle_check": {
+    "condition_description": "The URL passed to urlopen starts with the allowed prefix 'https://insecurewebapp.com' but contains an '@' authority override or a subdomain suffix, indicating the prefix-only check was bypassed for SSRF",
+    "trigger_patterns": [
+      "^https://insecurewebapp\\.com@[a-zA-Z0-9]",
+      "^https://insecurewebapp\\.com\\.[a-zA-Z0-9]",
+      "https://insecurewebapp\\.com@.*?(?:127\\.0\\.0\\.1|192\\.168\\.|10\\.|172\\.(?:1[6-9]|2[0-9]|3[01])\\.)"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_INCOMPLETE_URL_SUBSTRING_SANITIZATION: SSRF via prefix-bypass URL — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "https://insecurewebapp.com@127.0.0.1/admin",
+      "https://insecurewebapp.com@192.168.1.1/secret",
+      "https://insecurewebapp.com.evil.com/",
+      "https://insecurewebapp.com@10.0.0.1/metadata",
+      "https://insecurewebapp.com.attacker.net/api"
+    ],
+    "skip_condition": "not url.startswith('https://insecurewebapp.com')"
+  },
+  "_meta": {
+    "function": "fetch",
+    "file": "Other/url_fetch.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def fetch()",
+    "tainted_params": [
+      {
+        "name": "url",
+        "index": -1,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_incomplete_url_substring_sanitization_Other_url_fetch_py_14",
+    "finding_id": "0",
+    "rule_id": "py/incomplete-url-substring-sanitization",
+    "rule_slug": "py_incomplete-url-substring-sanitization",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-vulnerable-python-apps/verification_results/findings/finding_0_py_incomplete-url-substring-sanitization.json"
+  }
+}

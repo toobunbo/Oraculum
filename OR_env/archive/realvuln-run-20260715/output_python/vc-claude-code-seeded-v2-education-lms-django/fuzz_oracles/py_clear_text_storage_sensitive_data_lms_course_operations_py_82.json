@@ -1,0 +1,48 @@
+{
+  "monitor": {
+    "strategy": "filesystem_state",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "files created or modified that contain cleartext sensitive data patterns (SSN formats like XXX-XX-XXXX or credit card number sequences) written via target.write_text()",
+    "additional_imports": [
+      "re"
+    ]
+  },
+  "oracle_check": {
+    "condition_description": "Any file written to disk during the function execution contains unencrypted sensitive data matching SSN pattern (\\d{3}-\\d{2}-\\d{4}) or credit card number pattern (13-19 consecutive digits) in its file contents",
+    "trigger_patterns": [],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_CLEAR-TEXT-STORAGE-SENSITIVE-DATA: cleartext sensitive data written to filesystem — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "123-45-6789",
+      "4111111111111111",
+      "000-00-0000",
+      "5500000000000004",
+      "999-99-9999",
+      "340000000000009"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "course_vault_stash_234",
+    "file": "lms/course_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def course_vault_stash_234(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "django.http.HttpRequest"
+      }
+    ],
+    "target_id": "py_clear_text_storage_sensitive_data_lms_course_operations_py_82",
+    "finding_id": "5",
+    "rule_id": "py/clear-text-storage-sensitive-data",
+    "rule_slug": "py_clear-text-storage-sensitive-data",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-education-lms-django/verification_results/findings/finding_5_py_clear-text-storage-sensitive-data.json"
+  }
+}

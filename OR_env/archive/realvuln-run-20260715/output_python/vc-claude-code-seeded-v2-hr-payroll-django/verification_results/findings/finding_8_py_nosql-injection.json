@@ -1,0 +1,73 @@
+{
+  "id": "8",
+  "rule_slug": "py_nosql-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/summary_vc-claude-code-seeded-v2-hr-payroll-django_20260714_152802.json"
+  },
+  "finding": {
+    "rule_id": "py/nosql-injection",
+    "message": "This NoSQL query contains an unsanitized [user-provided value](1).",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 165,
+    "end_line": 165,
+    "repo_name": "vc-claude-code-seeded-v2-hr-payroll-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/vc-claude-code-seeded-v2-hr-payroll-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 159: ControlFlowNode for request",
+      "line 163: ControlFlowNode for BoolExpr",
+      "line 163: ControlFlowNode for Attribute()",
+      "line 163: ControlFlowNode for payload",
+      "line 164: ControlFlowNode for payload",
+      "line 164: ControlFlowNode for Attribute()",
+      "line 164: ControlFlowNode for query",
+      "line 165: ControlFlowNode for query"
+    ],
+    "severity": "8.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-943"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "data_flow": "request.body (line 163) → json.loads (line 163) → payload (line 163) → query (line 164) → find_one (line 165)",
+    "iterations": 1,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "tokens_used": 5036,
+    "timestamp": "2026-07-14T15:27:42.166858",
+    "input_tokens": 4549,
+    "output_tokens": 487,
+    "confidence_score": 0.95,
+    "elapsed_seconds": 3.724825620651245,
+    "reasoning": "User-controlled input from `request.body` is parsed as JSON and used directly as a MongoDB query filter without sanitization or validation, allowing injection of MongoDB operators such as `$where` or `$gt`. This constitutes a NoSQL injection vulnerability.",
+    "cost_usd": 0.0,
+    "answers": [
+      "The INPUT originates from `request.body` which is user-controlled. Specifically, line 163 decodes and parses `request.body` into a JSON object: `payload = json.loads(request.body.decode(\"utf-8\") or \"{}\")`.",
+      "Yes, user input is used directly as a MongoDB query object. Line 164 retrieves a 'filter' key from the payload (or defaults to the whole payload): `query = payload.get(\"filter\", payload)`. This `query` is then passed directly into `find_one()` on line 165.",
+      "Yes, an attacker could supply JSON operators like `{'$gt': ''}` or `{'$where': 'sleep(1000)'}` because the parsed JSON from `request.body` is used directly without sanitization. The `query` variable (line 164) is passed to `find_one()` (line 165) with no validation or escaping.",
+      "No, the input is NOT validated to ensure it is a scalar value. The code accepts a full dictionary from the request body and uses it as a MongoDB query filter. There is no type checking or scalar enforcement on the `query` object.",
+      "Yes, `pymongo` is used (imported on line 162), but there is NO input sanitization middleware or escaping shown in the code. The query is passed raw to `find_one()`.",
+      "The impact could include authentication bypass, data exfiltration, or DoS via `$where` expressions, as MongoDB query operators allow manipulation of query logic and execution behavior."
+    ],
+    "cached_input_tokens": 0,
+    "context_needed": []
+  },
+  "function": {
+    "name": "payroll_mongo_lane_413",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 159,
+    "end_line": 166,
+    "scope": ""
+  },
+  "web_params": []
+}

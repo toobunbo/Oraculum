@@ -1,0 +1,70 @@
+{
+  "id": "0",
+  "rule_slug": "py_weak-sensitive-data-hashing",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-dvpwa",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-dvpwa",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvpwa/verification_results/summary_realvuln-dvpwa_20260714_145900.json"
+  },
+  "finding": {
+    "rule_id": "py/weak-sensitive-data-hashing",
+    "message": "[Sensitive data (password)](1) is used in a hashing algorithm (MD5) that is insecure for password hashing, since it is not a computationally expensive hash function.",
+    "file": "sqli/dao/user.py",
+    "start_line": 41,
+    "end_line": 41,
+    "repo_name": "realvuln-dvpwa",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvpwa/realvuln-dvpwa.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 40: ControlFlowNode for password",
+      "line 41: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-327",
+      "CWE-328",
+      "CWE-916"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "context_needed": [],
+    "reasoning": "The code uses MD5 for password hashing which is cryptographically weak and insecure for this purpose. Even though the caller context is not visible, the method is clearly designed for password verification (check_password) and uses MD5 directly without salting or a secure hashing algorithm.",
+    "cached_input_tokens": 0,
+    "cost_usd": 0.0,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "output_tokens": 1021,
+    "data_flow": "password (line 40) → md5(password.encode('utf-8')).hexdigest() (line 41) → comparison with self.pwd_hash (line 41)",
+    "input_tokens": 12809,
+    "elapsed_seconds": 9.953626871109009,
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "timestamp": "2026-07-14T14:59:00.977657",
+    "tokens_used": 13830,
+    "answers": [
+      "The EXACT crypto call is `md5(password.encode('utf-8')).hexdigest()` on line 41, and the algorithm is MD5.",
+      "The algorithm is specified via direct invocation of `md5()` which is a standard library function from hashlib. This is a hardcoded reference, not driven by configuration or user input.",
+      "The output is used for password verification in a security context: `self.pwd_hash == md5(...)` on line 41. This is clearly a SECURITY use-case involving authentication.",
+      "Yes, collision resistance is required for password hashing to prevent attackers from finding equivalent passwords that would authenticate successfully.",
+      "No secure alternative is present. The code should use bcrypt, argon2, scrypt, or PBKDF2 with proper iteration counts and salting.",
+      "Not visible in provided context.",
+      "This is a security use-case (password verification) without proper cryptographic defenses."
+    ],
+    "verdict": "True Positive",
+    "iterations": 3
+  },
+  "function": {
+    "name": "check_password",
+    "file": "sqli/dao/user.py",
+    "start_line": 40,
+    "end_line": 41,
+    "scope": "User"
+  },
+  "web_params": []
+}

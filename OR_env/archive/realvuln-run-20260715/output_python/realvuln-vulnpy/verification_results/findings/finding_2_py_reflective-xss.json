@@ -1,0 +1,70 @@
+{
+  "id": "2",
+  "rule_slug": "py_reflective-xss",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulnpy",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnpy",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnpy/verification_results/summary_realvuln-vulnpy_20260714_151715.json"
+  },
+  "finding": {
+    "rule_id": "py/reflective-xss",
+    "message": "Cross-site scripting vulnerability due to a [user-provided value](1).",
+    "file": "src/vulnpy/fastapi/vulnerable.py",
+    "start_line": 44,
+    "end_line": 44,
+    "repo_name": "realvuln-vulnpy",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnpy/realvuln-vulnpy.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 33: ControlFlowNode for user_input",
+      "line 42: ControlFlowNode for template",
+      "line 44: ControlFlowNode for template"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "elapsed_seconds": 12.598026752471924,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "timestamp": "2026-07-14T15:17:02.087248",
+    "output_tokens": 1361,
+    "confidence": "High",
+    "confidence_score": 0.9,
+    "iterations": 3,
+    "tokens_used": 14868,
+    "cost_usd": 0.0,
+    "data_flow": "user_input (line 33) → string concatenation into template (line 42) → template (line 44)",
+    "answers": [
+      "The EXACT sink is line 44: `return HTMLResponse(template)`. The value being rendered is `template`.",
+      "Assignments to `template` on the path to the sink: line 39: `template = get_template(\"{}.html\".format(name))`, line 42: `template += \"<p>XSS: \" + user_input + \"</p>\"`. The LAST assignment is line 42.",
+      "The last assignment on line 42 is `template += \"<p>XSS: \" + user_input + \"</p>\"`. This derives directly from `user_input` (line 33), which is user-provided. Data flow: user_input (line 33) → string concatenation (line 42) → template (line 42). The `get_template` function is not found, so we cannot assume it provides any escaping.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on this path. The value of `template` is built up and then returned directly.",
+      "No specific escaping defense is applied to `user_input` before it is embedded in the HTML string. There is no call to `html.escape()`, `markupsafe.escape()`, or any equivalent sanitization function visible in the code. The `get_template` function is not found, so we cannot assume it provides any escaping.",
+      "No explicit escaping-disabling construct like `|safe`, `{% autoescape false %}`, `Markup(...)`, or `mark_safe(...)` is used. However, the vulnerability arises from the lack of escaping, not from disabling it.",
+      "The user-tainted value (`user_input`) reaches the sink (`template` in `HTMLResponse`) via line 42 and is embedded directly into HTML without escaping. No defense is visible. The unavailability of `get_template`'s implementation means we cannot assume any escaping occurs there."
+    ],
+    "context_needed": [],
+    "input_tokens": 13507,
+    "verdict": "True Positive",
+    "reasoning": "User-provided input (`user_input`) is directly embedded into an HTML string via concatenation on line 42 and returned as an `HTMLResponse` on line 44 without escaping. The unavailability of `get_template`'s implementation prevents assuming any escaping occurs, confirming the vulnerability.",
+    "cached_input_tokens": 0
+  },
+  "function": {
+    "name": "get_trigger_view",
+    "file": "src/vulnpy/fastapi/vulnerable.py",
+    "start_line": 29,
+    "end_line": 44,
+    "scope": ""
+  },
+  "web_params": []
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "strategy": "filesystem_state",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "Sink is target.write_text(), a local filesystem write, not network I/O, shell execution, DB write, RCE, or unsafe parser."
+    },
+    "q2_observable_after_return": {
+      "answer": true,
+      "evidence": "The cleartext sensitive data persists in the JSON file on disk after the function returns, readable via filesystem inspection."
+    },
+    "q3_result_in_memory": {
+      "answer": false,
+      "evidence": "returns.exprs is JsonResponse({'path': str(target)}), which only exposes the file path string, not the file contents or the cleartext data."
+    }
+  },
+  "mock_guidance": null,
+  "confidence": "high",
+  "warnings": []
+}

@@ -1,0 +1,68 @@
+{
+  "id": "14",
+  "rule_slug": "py_log-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-legal-case-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/verification_results/summary_vc-claude-code-seeded-v2-legal-case-django_20260714_152949.json"
+  },
+  "finding": {
+    "rule_id": "py/log-injection",
+    "message": "This log entry depends on a [user-provided value](1).",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 80,
+    "end_line": 80,
+    "repo_name": "vc-claude-code-seeded-v2-legal-case-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/vc-claude-code-seeded-v2-legal-case-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 76: ControlFlowNode for request",
+      "line 80: ControlFlowNode for Attribute",
+      "line 80: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.8",
+    "precision": "medium",
+    "cwe_ids": [
+      "CWE-117"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "answers": [
+      "The log data originates from the request body (line 79: `body = request.body.decode(\"utf-8\", errors=\"replace\")`) and the Authorization header (line 80: `request.headers.get(\"authorization\")`), both of which are user-provided values.",
+      "Yes, the data is written to a log using `logger.warning` without any sanitization (line 80).",
+      "Yes, an attacker could embed newline characters (\\n, \\r) in the request body or authorization header, which are directly logged, enabling log injection.",
+      "Yes, injected entries could mask real security events or mislead incident responders by forging log entries that appear legitimate.",
+      "It is likely that the log is consumed by a log aggregation system, as this is a common practice, making it vulnerable to confusion by crafted entries.",
+      "Yes, stripping or encoding newlines and control characters from user data before logging would prevent this vulnerability."
+    ],
+    "reasoning": "User-provided data from the request body and headers flows directly into a log entry without sanitization, allowing potential log injection via newline characters. This satisfies all criteria for CWE-117 (Improper Output Neutralization for Logs).",
+    "cost_usd": 0.0,
+    "iterations": 1,
+    "input_tokens": 3235,
+    "cached_input_tokens": 0,
+    "output_tokens": 328,
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request.body (line 79) → body variable (line 79) → logger.warning (line 80)",
+    "elapsed_seconds": 3.0612964630126953,
+    "tokens_used": 3563,
+    "verdict": "True Positive",
+    "confidence": "High",
+    "timestamp": "2026-07-14T15:29:48.551985"
+  },
+  "function": {
+    "name": "case_wire_tally_212",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 76,
+    "end_line": 81,
+    "scope": ""
+  },
+  "web_params": []
+}

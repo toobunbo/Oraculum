@@ -1,0 +1,79 @@
+{
+  "id": "2",
+  "rule_slug": "py_reflective-xss",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-insecure-web",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-insecure-web",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-insecure-web/verification_results/summary_realvuln-insecure-web_20260714_144146.json"
+  },
+  "finding": {
+    "rule_id": "py/reflective-xss",
+    "message": "Cross-site scripting vulnerability due to a [user-provided value](1).",
+    "file": "app/app.py",
+    "start_line": 53,
+    "end_line": 53,
+    "repo_name": "realvuln-insecure-web",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-insecure-web/realvuln-insecure-web.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 52: ControlFlowNode for request",
+      "line 52: ControlFlowNode for Attribute",
+      "line 52: ControlFlowNode for Attribute()",
+      "line 52: ControlFlowNode for query",
+      "line 53: ControlFlowNode for Fstring"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "User-controlled input `query` is directly embedded into an HTML response via an f-string on line 53 with no escaping or sanitization, constituting a reflective XSS vulnerability. The lack of caller context doesn't change the fact that this code path is vulnerable as written.",
+    "context_needed": [],
+    "confidence": "High",
+    "data_flow": "request.args.get(\"q\", \"\") (line 52) → query (line 52) → f-string HTML response (line 53)",
+    "output_tokens": 1282,
+    "elapsed_seconds": 10.882693529129028,
+    "timestamp": "2026-07-14T14:41:44.251859",
+    "iterations": 3,
+    "answers": [
+      "The EXACT sink is: `return f\"<h1>Search Results for {query}</h1>\"` on line 53. The value being rendered is `query`.",
+      "The only assignment to `query` is on line 52: `query = request.args.get(\"q\", \"\")`.",
+      "The value of `query` derives from user input via `request.args.get(\"q\", \"\")` on line 52. The data-flow chain is: request.args (line 52) → query (line 52) → f-string sink (line 53).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the path from line 52 to line 53.",
+      "No specific defense is present. There is no call to `html.escape()`, `markupsafe.escape()`, or any framework-specific escaping helper. The f-string directly interpolates the user-provided value into HTML.",
+      "No escaping-disabling construct like `|safe`, `{% autoescape false %}`, `Markup(...)`, or `mark_safe(...)` is used. However, their absence is not the issue — the issue is the lack of escaping.",
+      "The user-tainted value `query` reaches the sink on line 53 without any escaping or sanitization. No defense is visible in the code."
+    ],
+    "cached_input_tokens": 0,
+    "cost_usd": 0.0,
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "input_tokens": 11898,
+    "confidence_score": 0.95,
+    "tokens_used": 13180
+  },
+  "function": {
+    "name": "search",
+    "file": "app/app.py",
+    "start_line": 50,
+    "end_line": 53,
+    "scope": ""
+  },
+  "web_params": [
+    {
+      "name": "q",
+      "source": "args"
+    }
+  ]
+}

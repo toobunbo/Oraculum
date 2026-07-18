@@ -1,0 +1,68 @@
+{
+  "id": "0",
+  "rule_slug": "py_template-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-pythonssti",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-pythonssti",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-pythonssti/verification_results/summary_realvuln-pythonssti_20260714_150718.json"
+  },
+  "finding": {
+    "rule_id": "py/template-injection",
+    "message": "This template construction depends on a [user-provided value](1).",
+    "file": "main.py",
+    "start_line": 14,
+    "end_line": 14,
+    "repo_name": "realvuln-pythonssti",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-pythonssti/realvuln-pythonssti.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 8: ControlFlowNode for username",
+      "line 10: ControlFlowNode for username",
+      "line 14: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "9.3",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-74"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "answers": [
+      "The EXACT template-render sink is `Jinja2.from_string(\"Welcome \" + username + \"!\").render()` on line 14. The template-source string passed to it is `\"Welcome \" + username + \"!\"`.",
+      "The template-source string is assigned on line 14 as `\"Welcome \" + username + \"!\"`. This is the LAST and ONLY assignment to the template source on this path.",
+      "The value of the template-source string on line 14 derives from user input `username`, which is a parameter of the function `read_root` (line 8) and is used directly in the string concatenation. The data-flow path is: username (line 8) → username (line 10) → template string (line 14).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense preventing SSTI. The user input is directly embedded into the template source string, and no sandboxing or safe rendering mechanism (e.g., SandboxedEnvironment or passing user input as template variables) is used.",
+      "The user-controlled data (`username`) reaches the template SOURCE (`\"Welcome \" + username + \"!\"`) with concrete line numbers (line 14), and there is no defense such as sandboxing or passing user input as template variables."
+    ],
+    "confidence_score": 0.95,
+    "input_tokens": 11748,
+    "timestamp": "2026-07-14T15:06:49.094567",
+    "data_flow": "username parameter (line 8) → template string construction (line 14) → Jinja2.from_string(...).render() (line 14)",
+    "cached_input_tokens": 0,
+    "cost_usd": 0.0,
+    "output_tokens": 1119,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "verdict": "True Positive",
+    "reasoning": "User-controlled input (`username`) is directly embedded into the template source string on line 14, which is then rendered without any sanitization or sandboxing, making it vulnerable to Server-Side Template Injection (SSTI). The additional context confirms that the function is not called from within the analysis scope, but the vulnerability exists within the function itself.",
+    "tokens_used": 12867,
+    "iterations": 3,
+    "elapsed_seconds": 10.910175085067749,
+    "confidence": "High",
+    "context_needed": []
+  },
+  "function": {
+    "name": "read_root",
+    "file": "main.py",
+    "start_line": 8,
+    "end_line": 19,
+    "scope": ""
+  },
+  "web_params": []
+}

@@ -1,0 +1,107 @@
+{
+  "stage": "oracle",
+  "repo": "realvuln-vulnpy",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/oracle.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/realvuln-vulnpy/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 7,
+    "generated": 6,
+    "skipped": 0,
+    "failed": 1
+  },
+  "oracles": [
+    {
+      "id": "0",
+      "target_id": "py_reflective_xss_src_vulnpy_flask_blueprint_py_57",
+      "rule_id": "py/reflective-xss",
+      "file": "src/vulnpy/flask/blueprint.py",
+      "start_line": "57",
+      "function_name": "get_trigger_view",
+      "finding_artifact": "output/python/realvuln-vulnpy/verification_results/findings/finding_0_py_reflective-xss.json",
+      "oracle": "output/python/realvuln-vulnpy/fuzz_oracles/py_reflective_xss_src_vulnpy_flask_blueprint_py_57.json",
+      "status": "generated",
+      "strategy": "return_value"
+    },
+    {
+      "id": "1",
+      "target_id": "py_reflective_xss_src_vulnpy_django_vulnerable_py_38",
+      "rule_id": "py/reflective-xss",
+      "file": "src/vulnpy/django/vulnerable.py",
+      "start_line": "38",
+      "function_name": "get_trigger_view",
+      "finding_artifact": "output/python/realvuln-vulnpy/verification_results/findings/finding_1_py_reflective-xss.json",
+      "oracle": "output/python/realvuln-vulnpy/fuzz_oracles/py_reflective_xss_src_vulnpy_django_vulnerable_py_38.json",
+      "status": "failed"
+    },
+    {
+      "id": "2",
+      "target_id": "py_reflective_xss_src_vulnpy_fastapi_vulnerable_py_44",
+      "rule_id": "py/reflective-xss",
+      "file": "src/vulnpy/fastapi/vulnerable.py",
+      "start_line": "44",
+      "function_name": "get_trigger_view",
+      "finding_artifact": "output/python/realvuln-vulnpy/verification_results/findings/finding_2_py_reflective-xss.json",
+      "oracle": "output/python/realvuln-vulnpy/fuzz_oracles/py_reflective_xss_src_vulnpy_fastapi_vulnerable_py_44.json",
+      "status": "generated",
+      "strategy": "filesystem_state"
+    },
+    {
+      "id": "3",
+      "target_id": "py_reflective_xss_src_vulnpy_django_vulnerable_asgi_py_57",
+      "rule_id": "py/reflective-xss",
+      "file": "src/vulnpy/django/vulnerable_asgi.py",
+      "start_line": "57",
+      "function_name": "get_trigger_view",
+      "finding_artifact": "output/python/realvuln-vulnpy/verification_results/findings/finding_3_py_reflective-xss.json",
+      "oracle": "output/python/realvuln-vulnpy/fuzz_oracles/py_reflective_xss_src_vulnpy_django_vulnerable_asgi_py_57.json",
+      "status": "generated",
+      "strategy": "return_value"
+    },
+    {
+      "id": "4",
+      "target_id": "py_reflective_xss_src_vulnpy_aiohttp_vulnerable_routes_py_31",
+      "rule_id": "py/reflective-xss",
+      "file": "src/vulnpy/aiohttp/vulnerable_routes.py",
+      "start_line": "31",
+      "function_name": "get_trigger_view",
+      "finding_artifact": "output/python/realvuln-vulnpy/verification_results/findings/finding_4_py_reflective-xss.json",
+      "oracle": "output/python/realvuln-vulnpy/fuzz_oracles/py_reflective_xss_src_vulnpy_aiohttp_vulnerable_routes_py_31.json",
+      "status": "generated",
+      "strategy": "return_value"
+    },
+    {
+      "id": "5",
+      "target_id": "py_command_line_injection_apps_fastapi_app_py_43",
+      "rule_id": "py/command-line-injection",
+      "file": "apps/fastapi_app.py",
+      "start_line": "43",
+      "function_name": "cmdi",
+      "finding_artifact": "output/python/realvuln-vulnpy/verification_results/findings/finding_5_py_command-line-injection.json",
+      "oracle": "output/python/realvuln-vulnpy/fuzz_oracles/py_command_line_injection_apps_fastapi_app_py_43.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "7",
+      "target_id": "py_shell_command_constructed_from_input_apps_falcon_app_py_63",
+      "rule_id": "py/shell-command-constructed-from-input",
+      "file": "apps/falcon_app.py",
+      "start_line": "63",
+      "function_name": "thread_function",
+      "finding_artifact": "output/python/realvuln-vulnpy/verification_results/findings/finding_7_py_shell-command-constructed-from-input.json",
+      "oracle": "output/python/realvuln-vulnpy/fuzz_oracles/py_shell_command_constructed_from_input_apps_falcon_app_py_63.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    }
+  ],
+  "errors": [
+    {
+      "finding_artifact": "output/python/realvuln-vulnpy/verification_results/findings/finding_1_py_reflective-xss.json",
+      "error": "_meta missing field: 'tainted_params'"
+    }
+  ]
+}

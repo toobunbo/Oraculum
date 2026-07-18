@@ -1,0 +1,53 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of get_trigger_view, specifically response.text",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The response.text contains raw HTML/JS injection payloads (e.g., <script>, <img onerror, <svg onload) that were never escaped, confirming reflective XSS via direct string concatenation into the HTML response.",
+    "trigger_patterns": [
+      "<script",
+      "<img[^>]+onerror\\s*=",
+      "<svg[^>]+onload\\s*=",
+      "<body[^>]+onload\\s*=",
+      "javascript\\s*:",
+      "<iframe[^>]+src\\s*="
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_REFLECTIVE_XSS: unescaped XSS payload in HTML response — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "<script>alert(1)</script>",
+      "<img src=x onerror=alert(1)>",
+      "<svg onload=alert(1)>",
+      "<body onload=alert(1)>",
+      "javascript:alert(1)",
+      "<iframe src=\"javascript:alert(1)\">"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "get_trigger_view",
+    "file": "src/vulnpy/aiohttp/vulnerable_routes.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def get_trigger_view(name, trigger)",
+    "tainted_params": [
+      {
+        "name": "trigger",
+        "index": 1,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_reflective_xss_src_vulnpy_aiohttp_vulnerable_routes_py_31",
+    "finding_id": "4",
+    "rule_id": "py/reflective-xss",
+    "rule_slug": "py_reflective-xss",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-vulnpy/verification_results/findings/finding_4_py_reflective-xss.json"
+  }
+}

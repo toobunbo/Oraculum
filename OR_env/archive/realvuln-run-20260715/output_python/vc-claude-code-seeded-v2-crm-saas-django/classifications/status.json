@@ -1,0 +1,182 @@
+{
+  "stage": "classification",
+  "repo": "vc-claude-code-seeded-v2-crm-saas-django",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/classification.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 12,
+    "generated": 10,
+    "skipped": 0,
+    "failed": 2
+  },
+  "classifications": [
+    {
+      "id": "0",
+      "target_id": "py_full_ssrf_crm_project_partner_console_py_52",
+      "rule_id": "py/full-ssrf",
+      "file": "crm_project/partner_console.py",
+      "start_line": "52",
+      "function_name": "acct_vendor_ping_003",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/findings/finding_0_py_full-ssrf.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-crm-saas-django/classifications/py_full_ssrf_crm_project_partner_console_py_52.json",
+      "status": "failed",
+      "errors": "classification.decision.q2_observable_after_return.evidence must be a string"
+    },
+    {
+      "id": "1",
+      "target_id": "py_path_injection_crm_project_partner_console_py_42",
+      "rule_id": "py/path-injection",
+      "file": "crm_project/partner_console.py",
+      "start_line": "42",
+      "function_name": "acct_packet_pull_002",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/findings/finding_1_py_path-injection.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-crm-saas-django/classifications/py_path_injection_crm_project_partner_console_py_42.json",
+      "status": "generated",
+      "strategy": "return_value",
+      "confidence": "high"
+    },
+    {
+      "id": "2",
+      "target_id": "py_path_injection_crm_project_partner_console_py_91",
+      "rule_id": "py/path-injection",
+      "file": "crm_project/partner_console.py",
+      "start_line": "91",
+      "function_name": "acct_vault_stash_233",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/findings/finding_2_py_path-injection.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-crm-saas-django/classifications/py_path_injection_crm_project_partner_console_py_91.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "high"
+    },
+    {
+      "id": "3",
+      "target_id": "py_path_injection_crm_project_partner_console_py_92",
+      "rule_id": "py/path-injection",
+      "file": "crm_project/partner_console.py",
+      "start_line": "92",
+      "function_name": "acct_vault_stash_233",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/findings/finding_3_py_path-injection.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-crm-saas-django/classifications/py_path_injection_crm_project_partner_console_py_92.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "high"
+    },
+    {
+      "id": "4",
+      "target_id": "py_path_injection_crm_project_partner_console_py_142",
+      "rule_id": "py/path-injection",
+      "file": "crm_project/partner_console.py",
+      "start_line": "142",
+      "function_name": "acct_dock_shelf_388",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/findings/finding_4_py_path-injection.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-crm-saas-django/classifications/py_path_injection_crm_project_partner_console_py_142.json",
+      "status": "failed",
+      "errors": "classification.decision.q2_observable_after_return.evidence must be a string"
+    },
+    {
+      "id": "5",
+      "target_id": "py_path_injection_crm_project_partner_console_py_143",
+      "rule_id": "py/path-injection",
+      "file": "crm_project/partner_console.py",
+      "start_line": "143",
+      "function_name": "acct_dock_shelf_388",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/findings/finding_5_py_path-injection.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-crm-saas-django/classifications/py_path_injection_crm_project_partner_console_py_143.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "high"
+    },
+    {
+      "id": "6",
+      "target_id": "py_clear_text_storage_sensitive_data_crm_project_partner_console_py_92",
+      "rule_id": "py/clear-text-storage-sensitive-data",
+      "file": "crm_project/partner_console.py",
+      "start_line": "92",
+      "function_name": "acct_vault_stash_233",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/findings/finding_6_py_clear-text-storage-sensitive-data.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-crm-saas-django/classifications/py_clear_text_storage_sensitive_data_crm_project_partner_console_py_92.json",
+      "status": "generated",
+      "strategy": "filesystem_state",
+      "confidence": "high"
+    },
+    {
+      "id": "7",
+      "target_id": "py_xxe_crm_project_partner_console_py_193",
+      "rule_id": "py/xxe",
+      "file": "crm_project/partner_console.py",
+      "start_line": "193",
+      "function_name": "acct_xml_fold_451",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/findings/finding_7_py_xxe.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-crm-saas-django/classifications/py_xxe_crm_project_partner_console_py_193.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "high"
+    },
+    {
+      "id": "8",
+      "target_id": "py_url_redirection_crm_project_partner_console_py_73",
+      "rule_id": "py/url-redirection",
+      "file": "crm_project/partner_console.py",
+      "start_line": "73",
+      "function_name": "acct_return_lane_149",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/findings/finding_8_py_url-redirection.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-crm-saas-django/classifications/py_url_redirection_crm_project_partner_console_py_73.json",
+      "status": "generated",
+      "strategy": "return_value",
+      "confidence": "high"
+    },
+    {
+      "id": "9",
+      "target_id": "py_command_line_injection_crm_project_partner_console_py_151",
+      "rule_id": "py/command-line-injection",
+      "file": "crm_project/partner_console.py",
+      "start_line": "151",
+      "function_name": "acct_shell_probe_399",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/findings/finding_9_py_command-line-injection.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-crm-saas-django/classifications/py_command_line_injection_crm_project_partner_console_py_151.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "high"
+    },
+    {
+      "id": "10",
+      "target_id": "py_template_injection_crm_project_partner_console_py_134",
+      "rule_id": "py/template-injection",
+      "file": "crm_project/partner_console.py",
+      "start_line": "134",
+      "function_name": "acct_jinja_cast_381",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/findings/finding_10_py_template-injection.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-crm-saas-django/classifications/py_template_injection_crm_project_partner_console_py_134.json",
+      "status": "generated",
+      "strategy": "return_value",
+      "confidence": "high"
+    },
+    {
+      "id": "11",
+      "target_id": "py_jinja2_autoescape_false_crm_project_partner_console_py_134",
+      "rule_id": "py/jinja2/autoescape-false",
+      "file": "crm_project/partner_console.py",
+      "start_line": "134",
+      "function_name": "acct_jinja_cast_381",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/findings/finding_11_py_jinja2_autoescape-false.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-crm-saas-django/classifications/py_jinja2_autoescape_false_crm_project_partner_console_py_134.json",
+      "status": "generated",
+      "strategy": "return_value",
+      "confidence": "high"
+    }
+  ],
+  "errors": [
+    {
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/findings/finding_0_py_full-ssrf.json",
+      "error": "classification.decision.q2_observable_after_return.evidence must be a string"
+    },
+    {
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/findings/finding_4_py_path-injection.json",
+      "error": "classification.decision.q2_observable_after_return.evidence must be a string"
+    }
+  ]
+}

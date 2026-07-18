@@ -1,0 +1,38 @@
+{
+  "stage": "ingest",
+  "repo": "realvuln-vulnerable-python-apps",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulnerable-python-apps",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-python-apps",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-python-apps/verification_results/summary_realvuln-vulnerable-python-apps_20260714_151422.json"
+  },
+  "counts": {
+    "total_verdicts": 5,
+    "selected": 2,
+    "enriched": 1,
+    "skipped": 3,
+    "failed": 1
+  },
+  "findings": [
+    {
+      "id": "0",
+      "rule_id": "py/incomplete-url-substring-sanitization",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-vulnerable-python-apps/verification_results/findings/finding_0_py_incomplete-url-substring-sanitization.json",
+      "function_name": "fetch"
+    }
+  ],
+  "errors": [
+    {
+      "id": "4",
+      "rule_id": "py/insecure-protocol",
+      "file": "Other/host_header_injection.py",
+      "start_line": 9,
+      "error": "No enclosing function found for finding 4: py/insecure-protocol @ Other/host_header_injection.py:9"
+    }
+  ]
+}

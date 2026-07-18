@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink is a MongoDB find_one query (line 165), which involves network I/O to the database and could trigger DoS or code execution via injected $where operators."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Skipped: Q1 answered YES."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Skipped: Q1 answered YES."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the MongoDB collection's find_one method that is called on line 165.",
+    "capture": "Capture the `query` argument passed to find_one to verify it contains unsanitized user input and potentially malicious MongoDB operators like $where or $gt.",
+    "fake_behavior": "Return a safe dummy dictionary (e.g., {'_id': 'mock_id', 'user': 'test'}) to allow execution to continue through the JsonResponse return path.",
+    "notes": [
+      "Mocking at the collection level avoids needing to set up a real MongoDB connection.",
+      "Ensure the mock records the exact query dict for assertion."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

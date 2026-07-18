@@ -1,0 +1,83 @@
+{
+  "stage": "harness",
+  "repo": "realvuln-lets-be-bad-guys",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/harness.yaml",
+  "source": {
+    "oracle_status_path": "output/python/realvuln-lets-be-bad-guys/fuzz_oracles/status.json"
+  },
+  "counts": {
+    "selected": 4,
+    "generated": 4,
+    "skipped": 0,
+    "failed": 0
+  },
+  "harnesses": [
+    {
+      "id": "0",
+      "target_id": "py_code_injection_badguys_vulnerable_views_py_72",
+      "rule_id": "py/code-injection",
+      "file": "badguys/vulnerable/views.py",
+      "start_line": "72",
+      "function_name": "code_execution",
+      "harness": "output/python/realvuln-lets-be-bad-guys/fuzz_targets/py_code_injection_badguys_vulnerable_views_py_72.py",
+      "oracle": "output/python/realvuln-lets-be-bad-guys/fuzz_oracles/py_code_injection_badguys_vulnerable_views_py_72.json",
+      "finding_artifact": "output/python/realvuln-lets-be-bad-guys/verification_results/findings/finding_0_py_code-injection.json",
+      "corpus": "output/python/realvuln-lets-be-bad-guys/fuzz_corpus/py_code_injection_badguys_vulnerable_views_py_72",
+      "strategy": "recorded_call",
+      "status": "generated",
+      "seed_count": 5,
+      "errors": ""
+    },
+    {
+      "id": "1",
+      "target_id": "py_code_injection_badguys_vulnerable_views_py_76",
+      "rule_id": "py/code-injection",
+      "file": "badguys/vulnerable/views.py",
+      "start_line": "76",
+      "function_name": "code_execution",
+      "harness": "output/python/realvuln-lets-be-bad-guys/fuzz_targets/py_code_injection_badguys_vulnerable_views_py_76.py",
+      "oracle": "output/python/realvuln-lets-be-bad-guys/fuzz_oracles/py_code_injection_badguys_vulnerable_views_py_76.json",
+      "finding_artifact": "output/python/realvuln-lets-be-bad-guys/verification_results/findings/finding_1_py_code-injection.json",
+      "corpus": "output/python/realvuln-lets-be-bad-guys/fuzz_corpus/py_code_injection_badguys_vulnerable_views_py_76",
+      "strategy": "recorded_call",
+      "status": "generated",
+      "seed_count": 5,
+      "errors": ""
+    },
+    {
+      "id": "2",
+      "target_id": "py_path_injection_badguys_vulnerable_views_py_42",
+      "rule_id": "py/path-injection",
+      "file": "badguys/vulnerable/views.py",
+      "start_line": "42",
+      "function_name": "user_pic",
+      "harness": "output/python/realvuln-lets-be-bad-guys/fuzz_targets/py_path_injection_badguys_vulnerable_views_py_42.py",
+      "oracle": "output/python/realvuln-lets-be-bad-guys/fuzz_oracles/py_path_injection_badguys_vulnerable_views_py_42.json",
+      "finding_artifact": "output/python/realvuln-lets-be-bad-guys/verification_results/findings/finding_2_py_path-injection.json",
+      "corpus": "output/python/realvuln-lets-be-bad-guys/fuzz_corpus/py_path_injection_badguys_vulnerable_views_py_42",
+      "strategy": "return_value",
+      "status": "generated",
+      "seed_count": 5,
+      "errors": ""
+    },
+    {
+      "id": "3",
+      "target_id": "py_url_redirection_badguys_vulnerable_views_py_178",
+      "rule_id": "py/url-redirection",
+      "file": "badguys/vulnerable/views.py",
+      "start_line": "178",
+      "function_name": "unvalidated_redirect",
+      "harness": "output/python/realvuln-lets-be-bad-guys/fuzz_targets/py_url_redirection_badguys_vulnerable_views_py_178.py",
+      "oracle": "output/python/realvuln-lets-be-bad-guys/fuzz_oracles/py_url_redirection_badguys_vulnerable_views_py_178.json",
+      "finding_artifact": "output/python/realvuln-lets-be-bad-guys/verification_results/findings/finding_3_py_url-redirection.json",
+      "corpus": "output/python/realvuln-lets-be-bad-guys/fuzz_corpus/py_url_redirection_badguys_vulnerable_views_py_178",
+      "strategy": "return_value",
+      "status": "generated",
+      "seed_count": 3,
+      "errors": ""
+    }
+  ],
+  "errors": []
+}

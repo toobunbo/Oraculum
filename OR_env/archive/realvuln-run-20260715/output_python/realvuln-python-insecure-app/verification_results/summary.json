@@ -1,0 +1,37 @@
+{
+  "stage": "ingest",
+  "repo": "realvuln-python-insecure-app",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-python-insecure-app",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-python-insecure-app",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-python-insecure-app/verification_results/summary_realvuln-python-insecure-app_20260714_150522.json"
+  },
+  "counts": {
+    "total_verdicts": 2,
+    "selected": 2,
+    "enriched": 2,
+    "skipped": 0,
+    "failed": 0
+  },
+  "findings": [
+    {
+      "id": "0",
+      "rule_id": "py/template-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-python-insecure-app/verification_results/findings/finding_0_py_template-injection.json",
+      "function_name": "try_hack_me"
+    },
+    {
+      "id": "1",
+      "rule_id": "py/jinja2/autoescape-false",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-python-insecure-app/verification_results/findings/finding_1_py_jinja2_autoescape-false.json",
+      "function_name": "try_hack_me"
+    }
+  ],
+  "errors": []
+}

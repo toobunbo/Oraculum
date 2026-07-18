@@ -1,0 +1,67 @@
+{
+  "id": "0",
+  "rule_slug": "py_full-ssrf",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/summary_vc-claude-code-seeded-v2-support-desk-fastapi_20260714_153638.json"
+  },
+  "finding": {
+    "rule_id": "py/full-ssrf",
+    "message": "The full URL of this request depends on a [user-provided value](1).",
+    "file": "backend/app/support_operations.py",
+    "start_line": 75,
+    "end_line": 75,
+    "repo_name": "vc-claude-code-seeded-v2-support-desk-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/vc-claude-code-seeded-v2-support-desk-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 74: ControlFlowNode for endpoint",
+      "line 75: ControlFlowNode for endpoint"
+    ],
+    "severity": "9.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-918"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 17082,
+    "cached_input_tokens": 0,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "reasoning": "The endpoint parameter is user-controlled via query parameters in the FastAPI route, and flows directly to urllib.request.urlopen() without any validation or restrictions, constituting a Server-Side Request Forgery (SSRF) vulnerability.",
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 1212,
+    "tokens_used": 18294,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "answers": [
+      "The exact HTTP/network sink is `urllib.request.urlopen(endpoint, timeout=3)` on line 75. The URL value passed to it is `endpoint`.",
+      "The only assignment to `endpoint` is on line 74: `endpoint: str = \"http://127.0.0.1/status\"`. This is the LAST and ONLY assignment on the path to the sink.",
+      "The value of `endpoint` on line 74 is a constant string `\"http://127.0.0.1/status\"` by default, but the parameter is defined as a FastAPI endpoint parameter which means it can be overridden by user input via query parameters. The data-flow shows the parameter `endpoint` (line 74) flows directly to the sink (line 75).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The default value is only used if no user input is provided.",
+      "There is no specific defense restricting the URL. The code directly uses the user-provided endpoint parameter without any validation, allow-listing, or sanitization.",
+      "The endpoint parameter can be controlled by user input through the query parameter `endpoint`, and it flows directly to `urllib.request.urlopen()` without any validation or restrictions."
+    ],
+    "elapsed_seconds": 11.818876028060913,
+    "timestamp": "2026-07-14T15:36:13.209801",
+    "context_needed": [],
+    "iterations": 3,
+    "data_flow": "endpoint parameter (line 74, user-controlled via query param) → urllib.request.urlopen(endpoint, ...) (line 75)"
+  },
+  "function": {
+    "name": "ticket_relay_probe_354",
+    "file": "backend/app/support_operations.py",
+    "start_line": 74,
+    "end_line": 77,
+    "scope": ""
+  },
+  "web_params": []
+}

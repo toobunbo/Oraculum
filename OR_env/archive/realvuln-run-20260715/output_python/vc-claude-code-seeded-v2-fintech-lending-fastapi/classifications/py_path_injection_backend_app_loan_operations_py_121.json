@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is target.write_bytes(body) on line 121, which is an irreversible filesystem write operation."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated due to Q1 being true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated due to Q1 being true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the write_bytes method on the pathlib.Path object target.",
+    "capture": "Capture the resolved file path (target) to detect directory traversal sequences like '../', and optionally capture the body argument.",
+    "fake_behavior": "Prevent actual filesystem writes by no-oping the method or raising an assertion if traversal is detected, while allowing normal control flow to continue.",
+    "notes": [
+      "Since returns.kind is 'value' and includes str(target), mocking write_bytes safely lets the function return its dict so you could also assert on the return value if needed."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

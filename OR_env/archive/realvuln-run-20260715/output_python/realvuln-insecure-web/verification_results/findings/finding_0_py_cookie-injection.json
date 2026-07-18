@@ -1,0 +1,85 @@
+{
+  "id": "0",
+  "rule_slug": "py_cookie-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-insecure-web",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-insecure-web",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-insecure-web/verification_results/summary_realvuln-insecure-web_20260714_144146.json"
+  },
+  "finding": {
+    "rule_id": "py/cookie-injection",
+    "message": "Cookie is constructed from a [user-supplied input](1).",
+    "file": "app/app.py",
+    "start_line": 38,
+    "end_line": 38,
+    "repo_name": "realvuln-insecure-web",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-insecure-web/realvuln-insecure-web.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 27: ControlFlowNode for request",
+      "line 27: ControlFlowNode for Attribute",
+      "line 27: ControlFlowNode for Attribute()",
+      "line 27: ControlFlowNode for username",
+      "line 38: ControlFlowNode for username"
+    ],
+    "severity": "5.0",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-20"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "The code directly uses unsanitized user input (username from form data) as a cookie value without any validation or sanitization. This allows for potential cookie injection attacks, particularly session fixation. The data flow is clear from line 27 to line 38, with no protective measures in place.",
+    "context_needed": [],
+    "confidence": "High",
+    "data_flow": "request.form.get('username') (line 27) → username variable → response.set_cookie('session', username) (line 38)",
+    "output_tokens": 595,
+    "elapsed_seconds": 5.007749795913696,
+    "timestamp": "2026-07-14T14:41:36.986219",
+    "iterations": 1,
+    "answers": [
+      "The potentially dangerous data originates from user input via an HTTP POST request. Specifically, it comes from the 'username' field in the form data submitted to the /login route (line 27).",
+      "The data flows through the following variables and lines: username = request.form.get(\"username\") (line 27) → username (line 38) where it is used in response.set_cookie(\"session\", username).",
+      "No validation, sanitization, or encoding is applied to the username variable between its retrieval from the request and its use in setting the cookie. There are no checks or transformations on the data.",
+      "The sink is the response.set_cookie(\"session\", username) call on line 38. The data ends up being used as the value for a cookie. This is dangerous because it allows an attacker to inject malicious cookie values, potentially leading to session fixation or other cookie-based attacks.",
+      "There are no intermediate transformations applied to the username data between its retrieval from the request and its use in setting the cookie. The raw user input is directly used.",
+      "The Flask framework does not provide automatic protection against cookie injection. While Flask has some security features, it does not automatically sanitize or validate data used in cookie values.",
+      "An attacker does not need any specific privilege level or authentication state to trigger this code path. The vulnerable code is in the /login route which is accessible to unauthenticated users.",
+      "This code is not in a test file, debug path, or dead code. It appears to be part of the main application logic that would execute in production.",
+      "If an attacker controls this data, they could inject malicious cookie values. This could lead to session fixation attacks where an attacker sets a known session ID, potentially leading to account compromise. The impact is primarily related to session management vulnerabilities and potential privilege escalation if the attacker can force a victim to use a known session ID.",
+      "The weakest link in the defense chain is the complete lack of validation or sanitization of the username before using it as a cookie value. There are no checks to ensure the username is safe for use in a cookie context, and the raw user input is directly used."
+    ],
+    "cached_input_tokens": 0,
+    "cost_usd": 0.0,
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "input_tokens": 4136,
+    "confidence_score": 0.95,
+    "tokens_used": 4731
+  },
+  "function": {
+    "name": "login",
+    "file": "app/app.py",
+    "start_line": 26,
+    "end_line": 41,
+    "scope": ""
+  },
+  "web_params": [
+    {
+      "name": "username",
+      "source": "form"
+    },
+    {
+      "name": "password",
+      "source": "form"
+    }
+  ]
+}

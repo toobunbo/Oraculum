@@ -1,0 +1,72 @@
+{
+  "stage": "ingest",
+  "repo": "realvuln-threatbyte",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-threatbyte",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte/verification_results/summary_realvuln-threatbyte_20260714_150915.json"
+  },
+  "counts": {
+    "total_verdicts": 10,
+    "selected": 7,
+    "enriched": 7,
+    "skipped": 3,
+    "failed": 0
+  },
+  "findings": [
+    {
+      "id": "0",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-threatbyte/verification_results/findings/finding_0_py_path-injection.json",
+      "function_name": "upload_file"
+    },
+    {
+      "id": "1",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-threatbyte/verification_results/findings/finding_1_py_path-injection.json",
+      "function_name": "delete_file"
+    },
+    {
+      "id": "2",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-threatbyte/verification_results/findings/finding_2_py_path-injection.json",
+      "function_name": "delete_file"
+    },
+    {
+      "id": "4",
+      "rule_id": "py/sql-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-threatbyte/verification_results/findings/finding_4_py_sql-injection.json",
+      "function_name": "dashboard"
+    },
+    {
+      "id": "5",
+      "rule_id": "py/url-redirection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-threatbyte/verification_results/findings/finding_5_py_url-redirection.json",
+      "function_name": "upload_file"
+    },
+    {
+      "id": "6",
+      "rule_id": "py/url-redirection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-threatbyte/verification_results/findings/finding_6_py_url-redirection.json",
+      "function_name": "upload_file"
+    },
+    {
+      "id": "8",
+      "rule_id": "py/weak-sensitive-data-hashing",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-threatbyte/verification_results/findings/finding_8_py_weak-sensitive-data-hashing.json",
+      "function_name": "hash_password"
+    }
+  ],
+  "errors": []
+}

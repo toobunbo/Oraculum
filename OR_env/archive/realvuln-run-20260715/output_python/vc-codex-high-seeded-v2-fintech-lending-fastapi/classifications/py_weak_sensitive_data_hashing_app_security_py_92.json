@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "The sink is hashlib.sha256().hexdigest(), a local CPU-bound cryptographic operation with no network, shell, DB, or external side effects."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "The violation is the use of a fast hashing algorithm (SHA256) instead of a computationally expensive one. This algorithm choice cannot be determined by inspecting the returned hex string."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated because Q2 was answered false."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock or record the call to hashlib.sha256 within the hash_token function.",
+    "capture": "Capture the invocation of hashlib.sha256 to verify the weak algorithm is used, and optionally capture the encoded raw token argument.",
+    "fake_behavior": "Return a dummy 64-character hex string to allow execution to continue safely.",
+    "notes": [
+      "The violation is the algorithm choice, not the output state, so the call itself must be intercepted to confirm the use of SHA256 over a secure alternative like argon2 or bcrypt."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

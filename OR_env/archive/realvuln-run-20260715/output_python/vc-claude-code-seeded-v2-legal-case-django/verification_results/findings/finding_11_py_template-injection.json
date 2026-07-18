@@ -1,0 +1,70 @@
+{
+  "id": "11",
+  "rule_slug": "py_template-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-legal-case-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/verification_results/summary_vc-claude-code-seeded-v2-legal-case-django_20260714_152949.json"
+  },
+  "finding": {
+    "rule_id": "py/template-injection",
+    "message": "This template construction depends on a [user-provided value](1).",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 133,
+    "end_line": 133,
+    "repo_name": "vc-claude-code-seeded-v2-legal-case-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/vc-claude-code-seeded-v2-legal-case-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 128: ControlFlowNode for request",
+      "line 132: ControlFlowNode for Attribute",
+      "line 132: ControlFlowNode for Attribute()",
+      "line 132: ControlFlowNode for fragment",
+      "line 133: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "9.3",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-74"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "answers": [
+      "The EXACT template-render sink is: `Template(\"Result: \" + fragment).render()` on line 133. The template-source string passed to it is: `\"Result: \" + fragment`.",
+      "The template-source string is assigned on line 133 as: `\"Result: \" + fragment`. The variable `fragment` is assigned on line 132: `fragment = request.GET.get(\"fragment\", \"{{ 7 * 7 }}\")`. The LAST assignment to the template SOURCE is on line 133, which directly uses the value of `fragment`.",
+      "The value of `fragment` derives from user input via `request.GET.get(\"fragment\", \"{{ 7 * 7 }}\")` on line 132. The data-flow chain is: `request` (line 128) → `request.GET.get(...)` (line 132) → `fragment` (line 132) → `\"Result: \" + fragment` (line 133).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path. The value of `fragment` is directly used in the template construction.",
+      "There is no specific defense preventing SSTI. The user input is directly embedded into the template source string without any sanitization, sandboxing, or use of `jinja2.sandbox.SandboxedEnvironment`. The input is not passed as a template variable via `render(**ctx)`, which would be safe with auto-escape.",
+      "User-controlled data (`fragment`) reaches the template SOURCE (`\"Result: \" + fragment`) with concrete line numbers (132 → 133), and there is no defense such as sandboxing, auto-escape, or allow-listing. The additional context shows no caller was found, which means we cannot determine if there are framework-level protections, but the vulnerability is clearly present in the code as shown."
+    ],
+    "reasoning": "User input (`fragment`) is directly embedded into a Jinja2 template source string without sanitization or sandboxing, creating a Server-Side Template Injection (SSTI) vulnerability. The data flow is clear and unmitigated. The absence of caller information does not change the fact that the vulnerability exists in the shown code path.",
+    "cost_usd": 0.0,
+    "iterations": 3,
+    "input_tokens": 16712,
+    "cached_input_tokens": 0,
+    "output_tokens": 1708,
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request (line 128) → request.GET.get(\"fragment\", ...) (line 132) → fragment (line 132) → \"Result: \" + fragment (line 133) → Template(...).render() (line 133)",
+    "elapsed_seconds": 12.273863315582275,
+    "tokens_used": 18420,
+    "verdict": "True Positive",
+    "confidence": "High",
+    "timestamp": "2026-07-14T15:29:47.430399"
+  },
+  "function": {
+    "name": "case_jinja_cast_385",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 128,
+    "end_line": 134,
+    "scope": ""
+  },
+  "web_params": []
+}

@@ -1,0 +1,73 @@
+{
+  "id": "4",
+  "rule_slug": "py_reflective-xss",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/summary_vc-codex-high-seeded-v2-education-lms-django_20260714_154006.json"
+  },
+  "finding": {
+    "rule_id": "py/reflective-xss",
+    "message": "Cross-site scripting vulnerability due to a [user-provided value](1).",
+    "file": "education_lms/course_operations.py",
+    "start_line": 33,
+    "end_line": 33,
+    "repo_name": "vc-codex-high-seeded-v2-education-lms-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/vc-codex-high-seeded-v2-education-lms-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 28: ControlFlowNode for request",
+      "line 31: ControlFlowNode for Attribute",
+      "line 31: ControlFlowNode for Attribute()",
+      "line 31: ControlFlowNode for copyline",
+      "line 32: ControlFlowNode for body",
+      "line 33: ControlFlowNode for body"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:39:47.371871",
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "iterations": 3,
+    "tokens_used": 13935,
+    "cost_usd": 0.0,
+    "answers": [
+      "The exact sink is `return HttpResponse(body, content_type=\"text/html\")` on line 33 in function `course_memo_badge_064`. The value being rendered is `body`.",
+      "The value `body` is assigned on line 32: `body = \"<section><h2>\" + copyline + \"</h2><p>Preview generated for operations.</p></section>\"`.",
+      "The value `copyline` on line 31 derives from user input: `copyline = request.GET.get(\"copyline\", \"gradebook update\")`. The data flow is: `request` (line 28) → `request.GET.get(...)` (line 31) → `copyline` (line 31) → `body` (line 32).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the path from `request` to `body`.",
+      "No specific defense is present. There is no call to `html.escape()`, `markupsafe.escape()`, `bleach.clean()`, or any framework-specific escaping mechanism visible in the code.",
+      "No escaping-disabling mechanism like `|safe`, `{% autoescape false %}`, `Markup(...)`, or `mark_safe(...)` is used.",
+      "The user-tainted value `copyline` flows directly into `body`, which is rendered as raw HTML without escaping. No defenses are visible."
+    ],
+    "context_needed": [],
+    "verdict": "True Positive",
+    "data_flow": "request (line 28) → copyline = request.GET.get(...) (line 31) → body = \"<section><h2>\" + copyline + \"</h2>...\" (line 32) → HttpResponse(body, ...) (line 33)",
+    "elapsed_seconds": 10.743967294692993,
+    "reasoning": "User-controlled input (`copyline` from `request.GET`) is embedded directly into an HTML string (`body`) and returned via `HttpResponse` with `content_type=\"text/html\"`, without any escaping or sanitization. This allows an attacker to inject arbitrary HTML or JavaScript. The lack of caller information does not change the fact that the data flow is clearly exploitable.",
+    "cached_input_tokens": 0,
+    "output_tokens": 1459,
+    "input_tokens": 12476,
+    "model": "ollama_chat/qwen3-coder:480b-cloud"
+  },
+  "function": {
+    "name": "course_memo_badge_064",
+    "file": "education_lms/course_operations.py",
+    "start_line": 28,
+    "end_line": 33,
+    "scope": ""
+  },
+  "web_params": []
+}

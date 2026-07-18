@@ -1,0 +1,69 @@
+{
+  "id": "7",
+  "rule_slug": "py_clear-text-storage-sensitive-data",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/summary_vc-claude-code-seeded-v2-support-desk-fastapi_20260714_153638.json"
+  },
+  "finding": {
+    "rule_id": "py/clear-text-storage-sensitive-data",
+    "message": "This expression stores [sensitive data (private)](1) as clear text.",
+    "file": "backend/app/support_operations.py",
+    "start_line": 57,
+    "end_line": 57,
+    "repo_name": "vc-claude-code-seeded-v2-support-desk-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/vc-claude-code-seeded-v2-support-desk-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 57: ControlFlowNode for Attribute()",
+      "line 57: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-312",
+      "CWE-315",
+      "CWE-359"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 4989,
+    "cached_input_tokens": 0,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "reasoning": "SSN and credit card data from line 57 are stored in cleartext in a file without encryption, making them accessible to anyone with file system access. The data flow is direct with no sanitization, and the endpoint is production-reachable.",
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 409,
+    "tokens_used": 5398,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "answers": [
+      "The sensitive data being stored includes SSN and credit card number, as seen on line 57: \"ssn\": payload.get(\"ssn\", \"111-22-3333\"), \"card\": payload.get(\"card\", \"4111111111111111\").",
+      "The data is stored in a file on the filesystem. Line 55 constructs the target path using BASE_EXPORT_DIR and line 57 writes the data to this file using target.write_text().",
+      "No, the data is not encrypted or hashed before storage. Line 57 directly writes the sensitive data in cleartext using json.dumps() without any encryption or hashing.",
+      "Yes, an attacker with access to the file system or backups could read the sensitive data since it's stored in cleartext in a JSON file.",
+      "This storage is reachable in production as the endpoint /vault/ticket-stash-232 is a production API route protected only by an internal token check (lines 16-19), which doesn't prevent access if the token is known.",
+      "The blast radius is high as exposure of SSNs and credit card numbers could lead to identity theft, financial fraud, and regulatory violations (e.g., GDPR, PCI-DSS)."
+    ],
+    "elapsed_seconds": 3.874133348464966,
+    "timestamp": "2026-07-14T15:36:18.658054",
+    "context_needed": [],
+    "iterations": 1,
+    "data_flow": "source (line 57) → transform (json.dumps) → sink (line 57, target.write_text)"
+  },
+  "function": {
+    "name": "ticket_vault_stash_232",
+    "file": "backend/app/support_operations.py",
+    "start_line": 51,
+    "end_line": 58,
+    "scope": ""
+  },
+  "web_params": []
+}

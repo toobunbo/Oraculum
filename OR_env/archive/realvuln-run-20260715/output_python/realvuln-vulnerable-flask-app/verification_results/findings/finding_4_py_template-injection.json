@@ -1,0 +1,70 @@
+{
+  "id": "4",
+  "rule_slug": "py_template-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulnerable-flask-app",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-flask-app",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-flask-app/verification_results/summary_realvuln-vulnerable-flask-app_20260714_151300.json"
+  },
+  "finding": {
+    "rule_id": "py/template-injection",
+    "message": "This template construction depends on a [user-provided value](1).",
+    "file": "app/app.py",
+    "start_line": 114,
+    "end_line": 114,
+    "repo_name": "realvuln-vulnerable-flask-app",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-flask-app/realvuln-vulnerable-flask-app.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 112: ControlFlowNode for request",
+      "line 103: ControlFlowNode for template",
+      "line 114: ControlFlowNode for template"
+    ],
+    "severity": "9.3",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-74"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "cost_usd": 0.0,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "input_tokens": 12716,
+    "confidence": "High",
+    "cached_input_tokens": 0,
+    "reasoning": "User input (`request.url`) is directly embedded into the template string (`template`) on line 112, which is then passed to `render_template_string` on line 114 without any sanitization or sandboxing, making it vulnerable to Server-Side Template Injection (SSTI). The lack of callers does not change the fact that the function is vulnerable as written.",
+    "context_needed": [],
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 1208,
+    "tokens_used": 13924,
+    "data_flow": "request.url (line 112) → template (line 112) → render_template_string(template, ...) (line 114)",
+    "answers": [
+      "The EXACT template-render sink is `render_template_string(template, dir = dir, help = help, locals = locals)` on line 114. The template-source string passed to it is the variable `template`.",
+      "The template-source string `template` is assigned on line 103 as a multi-line string, and then formatted on line 112 using `request.url`. The LAST assignment to the template SOURCE is on line 112: `template = '''<html>...''' % request.url`.",
+      "The value of `template` on line 112 derives from user input via `request.url`. The data-flow chain is: `request.url` (line 112) → `template` (line 112) → `render_template_string(template, ...)` (line 114).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path. The value of `template` remains tainted by `request.url` until it reaches the sink.",
+      "There is no specific defense preventing SSTI. The user-controlled data (`request.url`) is directly embedded into the template string, which is then passed as the template source to `render_template_string`. No sandboxing, escaping, or context isolation is applied.",
+      "User-controlled data (`request.url`) reaches the template SOURCE (`template`) with concrete line numbers (line 112), and there is no defense such as sandboxing, escaping, or safe rendering context. Therefore, this is a real issue."
+    ],
+    "timestamp": "2026-07-14T15:13:00.191699",
+    "elapsed_seconds": 10.297305822372437,
+    "iterations": 3
+  },
+  "function": {
+    "name": "pnf",
+    "file": "app/app.py",
+    "start_line": 102,
+    "end_line": 114,
+    "scope": ""
+  },
+  "web_params": []
+}

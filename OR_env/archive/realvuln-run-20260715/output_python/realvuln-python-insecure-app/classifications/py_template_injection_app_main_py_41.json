@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "jinja2.Template(content).render() on line 41 is an SSTI sink that can lead to Remote Code Execution (RCE) based on the tainted user input."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock jinja2.Template or its render method to prevent actual template parsing and execution of potentially injected expressions.",
+    "capture": "Capture the `content` argument passed to jinja2.Template to verify it contains user-controlled payload without executing it.",
+    "fake_behavior": "Return a safe placeholder string (e.g., 'MOCKED_TEMPLATE_OUTPUT') instead of evaluating the template.",
+    "notes": [
+      "Because SSTI can easily result in RCE, the Template constructor or render method must be intercepted.",
+      "Avoid using jinja2.sandbox.SandboxedEnvironment unless the test specifically validates sandbox escaping, as the goal is to detect the tainted sink argument safely."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

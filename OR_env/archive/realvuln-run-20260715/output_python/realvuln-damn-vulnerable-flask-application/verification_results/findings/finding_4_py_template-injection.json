@@ -1,0 +1,84 @@
+{
+  "id": "4",
+  "rule_slug": "py_template-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-damn-vulnerable-flask-application",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-flask-application",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-flask-application/verification_results/summary_realvuln-damn-vulnerable-flask-application_20260714_145037.json"
+  },
+  "finding": {
+    "rule_id": "py/template-injection",
+    "message": "This template construction depends on a [user-provided value](1).",
+    "file": "app.py",
+    "start_line": 205,
+    "end_line": 205,
+    "repo_name": "realvuln-damn-vulnerable-flask-application",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-flask-application/realvuln-damn-vulnerable-flask-application.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 11: ControlFlowNode for ImportMember",
+      "line 11: ControlFlowNode for request",
+      "line 188: ControlFlowNode for request",
+      "line 189: ControlFlowNode for name",
+      "line 191: ControlFlowNode for template",
+      "line 205: ControlFlowNode for template",
+      "--- Flow 2 ---",
+      "line 11: ControlFlowNode for ImportMember",
+      "line 11: ControlFlowNode for request",
+      "line 189: ControlFlowNode for request",
+      "line 189: ControlFlowNode for name",
+      "line 191: ControlFlowNode for template",
+      "line 205: ControlFlowNode for template"
+    ],
+    "severity": "9.3",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-74"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "timestamp": "2026-07-14T14:50:37.976697",
+    "reasoning": "User input from `request.form['name']` is embedded directly into a template string via string formatting (line 191), which is then passed to `render_template_string` (line 205) without sanitization or sandboxing, enabling server-side template injection (SSTI). The lack of a visible caller does not change the fact that the data flow is clearly exploitable within the provided context.",
+    "data_flow": "request.form['name'] (line 189) → name (line 189) → template (line 191) → render_template_string(template) (line 205)",
+    "verdict": "True Positive",
+    "tokens_used": 14017,
+    "output_tokens": 1192,
+    "cached_input_tokens": 0,
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "answers": [
+      "The EXACT template-render sink is `render_template_string(template)` on line 205.",
+      "The template-source string is assigned on line 191: `template = \"...\" %(name)`. This is the LAST and ONLY assignment to `template` on the path reaching the sink.",
+      "The value of `template` derives from user input. Specifically: `request.form['name']` (line 189) → `name` (line 189) → `template` (line 191). The dataflow path is: line 189 (user input via POST) → line 191 (string formatting into template).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The value of `template` is directly derived from user input and passed to the sink without sanitization or filtering.",
+      "There is NO specific defense preventing SSTI. The user-controlled value is embedded directly into the template string, which is then rendered by `render_template_string`. No sandboxing, escaping, or context separation is applied.",
+      "User-controlled data (`request.form['name']`) reaches the template SOURCE (`template`) with concrete line numbers (189 → 191), and there is no defense such as sandboxing, escaping, or context-passing to prevent SSTI."
+    ],
+    "elapsed_seconds": 23.424354076385498,
+    "input_tokens": 12825,
+    "iterations": 3
+  },
+  "function": {
+    "name": "sayhi",
+    "file": "app.py",
+    "start_line": 186,
+    "end_line": 205,
+    "scope": ""
+  },
+  "web_params": [
+    {
+      "name": "name",
+      "source": "form"
+    }
+  ]
+}

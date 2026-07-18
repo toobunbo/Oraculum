@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is _os.system(\"ping -c 1 \" + host), which performs shell execution."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Decision terminated at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Decision terminated at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock _os.system to prevent actual shell execution during testing.",
+    "capture": "Capture the full command string argument passed to _os.system, specifically the concatenated value \"ping -c 1 \" + host, so the injection payload can be inspected.",
+    "fake_behavior": "Return 0 to simulate a successful ping completion, allowing the function to proceed to its return statement and produce {'status': status}.",
+    "notes": [
+      "Use unittest.mock.patch on the _os reference used by the module, not directly on os.system, to match the import alias.",
+      "Assert the captured command string contains the user-supplied host value to confirm the taint reaches the sink."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

@@ -1,0 +1,51 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "pathlib.Path.write_bytes",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "Path object (self) representing the resolved file path that write_bytes is called on",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured Path object's string representation contains directory traversal sequences (../) indicating the user-controlled 'name' parameter escaped BASE_EXPORT_DIR",
+    "trigger_patterns": [
+      "\\.\\./",
+      "\\.\\.\\\\/",
+      "\\.\\.[\\\\/]",
+      "\\.\\.%2[fF]"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_PATH-INJECTION: path traversal detected in write_bytes target — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "../../etc/passwd",
+      "../../../etc/shadow",
+      "..\\..\\..\\windows\\system32\\config\\sam",
+      "foo/../../etc/hosts",
+      "normal.bin",
+      "packet.bin"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "payroll_dock_shelf_391",
+    "file": "hr_portal/payroll_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def payroll_dock_shelf_391(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "django.http.HttpRequest"
+      }
+    ],
+    "target_id": "py_path_injection_hr_portal_payroll_operations_py_148",
+    "finding_id": "5",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_5_py_path-injection.json"
+  }
+}

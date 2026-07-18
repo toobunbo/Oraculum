@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is _os.system(\"ping -c 1 \" + host) on line 151, which is shell execution (explicitly dangerous)."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock _os.system to intercept the shell command execution on line 151.",
+    "capture": "Capture the full command string argument passed to _os.system, specifically the value of \"ping -c 1 \" + host, so the injected payload can be inspected.",
+    "fake_behavior": "Return 0 (success exit code) to simulate a successful ping without executing any real shell command, allowing execution to continue to the JsonResponse return.",
+    "notes": [
+      "Ensure the mock replaces _os.system at the module level where it is imported as '_os'.",
+      "The captured command string should be compared against an expected safe value (e.g., 'ping -c 1 127.0.0.1') or checked for absence of shell metacharacters to assert the vulnerability is triggered or absent."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

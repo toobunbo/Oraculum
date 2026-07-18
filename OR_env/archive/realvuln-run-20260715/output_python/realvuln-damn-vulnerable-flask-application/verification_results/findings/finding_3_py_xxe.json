@@ -1,0 +1,83 @@
+{
+  "id": "3",
+  "rule_slug": "py_xxe",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-damn-vulnerable-flask-application",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-flask-application",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-flask-application/verification_results/summary_realvuln-damn-vulnerable-flask-application_20260714_145037.json"
+  },
+  "finding": {
+    "rule_id": "py/xxe",
+    "message": "XML parsing depends on a [user-provided value](1) without guarding against external entity expansion.",
+    "file": "app.py",
+    "start_line": 159,
+    "end_line": 159,
+    "repo_name": "realvuln-damn-vulnerable-flask-application",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-flask-application/realvuln-damn-vulnerable-flask-application.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 11: ControlFlowNode for ImportMember",
+      "line 11: ControlFlowNode for request",
+      "line 155: ControlFlowNode for request",
+      "line 156: ControlFlowNode for xml",
+      "line 159: ControlFlowNode for str()",
+      "--- Flow 2 ---",
+      "line 11: ControlFlowNode for ImportMember",
+      "line 11: ControlFlowNode for request",
+      "line 156: ControlFlowNode for request",
+      "line 156: ControlFlowNode for xml",
+      "line 159: ControlFlowNode for str()"
+    ],
+    "severity": "9.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-611",
+      "CWE-827"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "timestamp": "2026-07-14T14:50:17.848343",
+    "reasoning": "The XML parser is configured to allow DTD validation and network access, enabling external entity resolution. The input is sourced directly from user-controlled POST data (`request.form['xml']`), creating a clear XXE vulnerability. No caller context was found to suggest additional safeguards.",
+    "data_flow": "request.form['xml'] (line 156) → str(xml) (line 159) → etree.fromstring (line 159)",
+    "verdict": "True Positive",
+    "tokens_used": 14753,
+    "output_tokens": 1298,
+    "cached_input_tokens": 0,
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "answers": [
+      "The EXACT XML-parse sink is `etree.fromstring(str(xml), parser)` on line 159. The parser object is `parser` (defined on line 157), and the input bytes/text passed to it is `str(xml)`.",
+      "The XML input `xml` is assigned on line 156: `xml = request.form['xml']`. This is the only assignment on the path to the parse call.",
+      "The LAST assignment on the path is `xml = request.form['xml']` on line 156. The value derives from user input via `request.form`, which is part of the HTTP request body (POST data). The data-flow chain is: `request` (line 155) → `request.form['xml']` (line 156) → `str(xml)` (line 159).",
+      "The parser configuration is defined on line 157: `parser = etree.XMLParser(no_network=False, dtd_validation=True)`. The options set are `no_network=False` and `dtd_validation=True`. By default, `etree.XMLParser` allows external entity resolution unless explicitly disabled.",
+      "The parser is NOT safe-by-default. It ENABLES external entities and DTD loading because `no_network=False` (line 157) allows network access, and `dtd_validation=True` enables DTD processing, which can lead to XXE vulnerabilities. There is no explicit disabling of entity resolution (`resolve_entities=False`) or DTD loading (`load_dtd=False`).",
+      "The parser ENABLES external entities (via DTD validation and network access) AND the input is user-controlled (from `request.form['xml']`). Therefore, this is a real XXE vulnerability."
+    ],
+    "elapsed_seconds": 10.434717655181885,
+    "input_tokens": 13455,
+    "iterations": 3
+  },
+  "function": {
+    "name": "xml",
+    "file": "app.py",
+    "start_line": 153,
+    "end_line": 181,
+    "scope": ""
+  },
+  "web_params": [
+    {
+      "name": "xml",
+      "source": "form"
+    }
+  ]
+}

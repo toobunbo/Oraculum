@@ -1,0 +1,65 @@
+{
+  "id": "1",
+  "rule_slug": "py_jinja2_autoescape-false",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-python-insecure-app",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-python-insecure-app",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-python-insecure-app/verification_results/summary_realvuln-python-insecure-app_20260714_150522.json"
+  },
+  "finding": {
+    "rule_id": "py/jinja2/autoescape-false",
+    "message": "Using jinja2 templates with autoescape=False can potentially allow XSS attacks.",
+    "file": "app/main.py",
+    "start_line": 41,
+    "end_line": 41,
+    "repo_name": "realvuln-python-insecure-app",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-python-insecure-app/realvuln-python-insecure-app.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [],
+    "severity": "6.1",
+    "precision": "medium",
+    "cwe_ids": [
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "context_needed": [],
+    "input_tokens": 12886,
+    "iterations": 3,
+    "confidence": "High",
+    "data_flow": "name parameter (line 19) → name variable (line 37) → content (line 38) → Template(content).render() (line 41)",
+    "elapsed_seconds": 11.138848304748535,
+    "timestamp": "2026-07-14T15:05:22.095635",
+    "confidence_score": 0.95,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "output_tokens": 1226,
+    "cached_input_tokens": 0,
+    "verdict": "True Positive",
+    "answers": [
+      "The sink is `Template(content).render()` on line 41. The value being rendered is `content`.",
+      "The value `content` is assigned on line 38: `content = f\"<h1>Hello, {name}!</h1><h2>Public IP: <code>{public_ip}</code></h2>\"`.",
+      "The `content` variable is derived from `name` (line 38) which comes from the `name` query parameter in the function signature (line 19). The data flow is: `name` parameter (line 19) → `name` variable (line 37) → `content` (line 38).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense that escapes the value at the sink. The Jinja2 `Template` is instantiated with `autoescape=False` by default, and no explicit escaping function like `html.escape()` or `markupsafe.escape()` is used.",
+      "The `Template` class from Jinja2 is used without enabling autoescape, which effectively disables escaping. This is the default behavior of `jinja2.Template` when `autoescape` is not explicitly set to `True`. The instantiation `Template(content)` on line 41 does not enable autoescaping.",
+      "The user-tainted value `name` reaches the sink in `content`, and there is no escaping or sanitization applied. The use of `jinja2.Template` without autoescaping explicitly enabled constitutes a vulnerability."
+    ],
+    "cost_usd": 0.0,
+    "reasoning": "User-controlled input `name` flows into the `content` variable (line 38) which is rendered via `jinja2.Template` without autoescaping (line 41), leading to a potential XSS vulnerability. No escaping or sanitization is applied. The function is a FastAPI endpoint, making it externally reachable.",
+    "tokens_used": 14112
+  },
+  "function": {
+    "name": "try_hack_me",
+    "file": "app/main.py",
+    "start_line": 19,
+    "end_line": 41,
+    "scope": ""
+  },
+  "web_params": []
+}

@@ -1,0 +1,68 @@
+{
+  "id": "13",
+  "rule_slug": "py_xxe",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-claude-code-seeded-v2-fintech-lending-fastapi_20260714_152421.json"
+  },
+  "finding": {
+    "rule_id": "py/xxe",
+    "message": "XML parsing depends on a [user-provided value](1) without guarding against external entity expansion.",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 164,
+    "end_line": 164,
+    "repo_name": "vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/vc-claude-code-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 161: ControlFlowNode for request",
+      "line 164: ControlFlowNode for Await"
+    ],
+    "severity": "9.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-611",
+      "CWE-827"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "confidence": "High",
+    "iterations": 3,
+    "answers": [
+      "The EXACT flagged line is: `doc = etree.fromstring(await request.body(), parser)` on line 164. This line lives in the function `loan_xml_fold_449`.",
+      "The XML parse sink is `etree.fromstring(await request.body(), parser)` on line 164. The parser object is `parser` and the input bytes passed to it are `await request.body()`.",
+      "The only assignment to the XML input on the path reaching the parse call is on line 164 itself: `doc = etree.fromstring(await request.body(), parser)`. The last assignment is this same line.",
+      "The value `await request.body()` on line 164 derives from user input, specifically the request body, as indicated by the dataflow path from line 161 (`request`) to line 164 (`Await`). The caller context is not found, but the function is an API endpoint that receives HTTP requests, confirming the input is user-controlled.",
+      "The parser configuration on line 163 is: `etree.XMLParser(load_dtd=True, resolve_entities=True, no_network=False)`.",
+      "The parser configuration on line 163 ENABLES external entities (`resolve_entities=True`), DTD loading (`load_dtd=True`), and network access (`no_network=False`)."
+    ],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 9.043073892593384,
+    "output_tokens": 1212,
+    "context_needed": [],
+    "reasoning": "The XML parser is explicitly configured to resolve external entities and load DTDs (line 163), and the input is directly from the user-provided request body (line 164). The function is an API endpoint receiving HTTP requests, confirming user control of the input.",
+    "data_flow": "request (line 161) → await request.body() (line 164) → etree.fromstring (line 164)",
+    "confidence_score": 0.95,
+    "timestamp": "2026-07-14T15:23:56.943359",
+    "cost_usd": 0.0,
+    "input_tokens": 14265,
+    "cached_input_tokens": 0,
+    "tokens_used": 15477
+  },
+  "function": {
+    "name": "loan_xml_fold_449",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 161,
+    "end_line": 165,
+    "scope": ""
+  },
+  "web_params": []
+}

@@ -1,0 +1,47 @@
+{
+  "monitor": {
+    "strategy": "filesystem_state",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "files created or modified by the target function, specifically their contents checked for cleartext SSN patterns (e.g., \\d{3}-\\d{2}-\\d{4}) and credit card number patterns (13-19 consecutive digits)",
+    "additional_imports": [
+      "re"
+    ]
+  },
+  "oracle_check": {
+    "condition_description": "A newly created or modified file contains cleartext sensitive data patterns — specifically SSN in NNN-NN-NNNN format or credit card numbers (13-19 digit sequences) stored without encryption or hashing, as written by json.dumps via write_text",
+    "trigger_patterns": [],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_CLEAR-TEXT-STORAGE-SENSITIVE-DATA: cleartext sensitive data written to file — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "{\"ssn\": \"123-45-6789\", \"card\": \"4111111111111111\"}",
+      "{\"ssn\": \"987-65-4321\", \"card\": \"5500000000000004\"}",
+      "{\"ssn\": \"000-12-3456\", \"card\": \"340000000000009\"}",
+      "{\"ssn\": \"999-88-7777\", \"card\": \"6011000000000004\"}",
+      "{\"name\": \"John Doe\", \"ssn\": \"444-33-2222\", \"card\": \"3530111333300000\"}"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "loan_vault_stash_235",
+    "file": "backend/app/loan_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def loan_vault_stash_235(request: Request, gate_ref: None)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "Request"
+      }
+    ],
+    "target_id": "py_clear_text_storage_sensitive_data_backend_app_loan_operations_py_78",
+    "finding_id": "11",
+    "rule_id": "py/clear-text-storage-sensitive-data",
+    "rule_slug": "py_clear-text-storage-sensitive-data",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_11_py_clear-text-storage-sensitive-data.json"
+  }
+}

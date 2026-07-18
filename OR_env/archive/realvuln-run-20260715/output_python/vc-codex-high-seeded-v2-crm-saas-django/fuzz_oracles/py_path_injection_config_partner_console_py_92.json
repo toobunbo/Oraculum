@@ -1,0 +1,51 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "pathlib.Path.write_text",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "Path object (self) whose str() contains the user-controlled ref interpolated into the file path",
+    "additional_imports": [
+      "pathlib"
+    ]
+  },
+  "oracle_check": {
+    "condition_description": "The string representation of the Path object contains directory traversal sequences (../ or ..\\) or targets sensitive system directories via the ref-derived path segment",
+    "trigger_patterns": [
+      "\\.{2}/",
+      "\\.{2}\\\\",
+      "/etc/"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_PATH_INJECTION: path traversal detected in write_text target — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "../../etc/shadow",
+      "../../../tmp/pwned",
+      "../../etc/cron.d/backdoor",
+      "../.ssh/authorized_keys",
+      "..\\..\\windows\\system32\\config"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "acct_vault_stash_244",
+    "file": "config/partner_console.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def acct_vault_stash_244(request)",
+    "tainted_params": [
+      {
+        "name": "ref",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_path_injection_config_partner_console_py_92",
+    "finding_id": "3",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_3_py_path-injection.json"
+  }
+}

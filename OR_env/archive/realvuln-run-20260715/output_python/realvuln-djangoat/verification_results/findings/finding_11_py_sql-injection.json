@@ -1,0 +1,84 @@
+{
+  "id": "11",
+  "rule_slug": "py_sql-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-djangoat",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/verification_results/summary_realvuln-djangoat_20260714_145404.json"
+  },
+  "finding": {
+    "rule_id": "py/sql-injection",
+    "message": "This SQL query depends on a [user-provided value](1).",
+    "file": "app/models/Analytics/analytics.py",
+    "start_line": 60,
+    "end_line": 60,
+    "repo_name": "realvuln-djangoat",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/realvuln-djangoat.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 86: ControlFlowNode for request",
+      "line 98: ControlFlowNode for Subscript",
+      "line 55: ControlFlowNode for ip",
+      "line 57: ControlFlowNode for cmd",
+      "line 60: ControlFlowNode for cmd",
+      "--- Flow 2 ---",
+      "line 86: ControlFlowNode for request",
+      "line 88: ControlFlowNode for Attribute()",
+      "line 88: ControlFlowNode for Attribute()",
+      "line 88: ControlFlowNode for data",
+      "line 90: ControlFlowNode for key",
+      "line 92: ControlFlowNode for key",
+      "line 92: [post] ControlFlowNode for col",
+      "line 93: ControlFlowNode for col",
+      "line 98: ControlFlowNode for col",
+      "line 55: ControlFlowNode for col",
+      "line 57: ControlFlowNode for cmd",
+      "line 60: ControlFlowNode for cmd"
+    ],
+    "severity": "8.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-89"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 12747,
+    "output_tokens": 1192,
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "data_flow": "ip (line 55) and col (line 55) → cmd (line 57) → cursor.execute(cmd) (line 60)",
+    "cost_usd": 0.0,
+    "confidence_score": 0.95,
+    "reasoning": "The SQL query `cmd` is constructed using string formatting with user-controlled inputs `ip` and `col`, and is executed directly via `cursor.execute(cmd)` without parameterization or sanitization, leading to a clear SQL injection vulnerability. The additional context does not change the analysis as no callers or callees provide further protection or constraints.",
+    "confidence": "High",
+    "answers": [
+      "The EXACT sink statement is: `cursor.execute(cmd)` on line 60. The variable passed to it is `cmd`.",
+      "The assignment to `cmd` is on line 57: `cmd = \"SELECT %s FROM %s WHERE ip_address='%s' ORDER BY id DESC\" % (col, table_name, ip)`.",
+      "The value of `cmd` derives from user input: `ip` (line 55) and `col` (line 55). The data flow for `ip` is: line 86 (request) → line 98 (Subscript) → line 55 (`ip`) → line 57 (`cmd`). The data flow for `col` is: line 86 (request) → line 88 (Attribute) → line 90 (key) → line 92 (col) → line 98 (col) → line 55 (`col`) → line 57 (`cmd`).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense sanitising the value before the sink. The query is constructed using string formatting, and `cursor.execute(cmd)` is called directly with the tainted `cmd` string.",
+      "The user-tainted values `ip` and `col` reach the sink at line 60 via `cmd`, and there is no evidence of parameterization or sanitization. The use of string formatting to construct the SQL query makes it vulnerable to SQL injection."
+    ],
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 14.030824661254883,
+    "timestamp": "2026-07-14T14:53:51.726318",
+    "iterations": 3,
+    "tokens_used": 13939
+  },
+  "function": {
+    "name": "hits_by_ip",
+    "file": "app/models/Analytics/analytics.py",
+    "start_line": 55,
+    "end_line": 63,
+    "scope": "Analytics"
+  },
+  "web_params": []
+}

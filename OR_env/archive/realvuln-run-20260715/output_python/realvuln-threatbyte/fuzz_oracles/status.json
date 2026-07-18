@@ -1,0 +1,107 @@
+{
+  "stage": "oracle",
+  "repo": "realvuln-threatbyte",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/oracle.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/realvuln-threatbyte/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 7,
+    "generated": 6,
+    "skipped": 0,
+    "failed": 1
+  },
+  "oracles": [
+    {
+      "id": "0",
+      "target_id": "py_path_injection_server_routes_py_264",
+      "rule_id": "py/path-injection",
+      "file": "server/routes.py",
+      "start_line": "264",
+      "function_name": "upload_file",
+      "finding_artifact": "output/python/realvuln-threatbyte/verification_results/findings/finding_0_py_path-injection.json",
+      "oracle": "output/python/realvuln-threatbyte/fuzz_oracles/py_path_injection_server_routes_py_264.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "1",
+      "target_id": "py_path_injection_server_routes_py_363",
+      "rule_id": "py/path-injection",
+      "file": "server/routes.py",
+      "start_line": "363",
+      "function_name": "delete_file",
+      "finding_artifact": "output/python/realvuln-threatbyte/verification_results/findings/finding_1_py_path-injection.json",
+      "oracle": "output/python/realvuln-threatbyte/fuzz_oracles/py_path_injection_server_routes_py_363.json",
+      "status": "generated",
+      "strategy": "return_value"
+    },
+    {
+      "id": "2",
+      "target_id": "py_path_injection_server_routes_py_364",
+      "rule_id": "py/path-injection",
+      "file": "server/routes.py",
+      "start_line": "364",
+      "function_name": "delete_file",
+      "finding_artifact": "output/python/realvuln-threatbyte/verification_results/findings/finding_2_py_path-injection.json",
+      "oracle": "output/python/realvuln-threatbyte/fuzz_oracles/py_path_injection_server_routes_py_364.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "4",
+      "target_id": "py_sql_injection_server_routes_py_138",
+      "rule_id": "py/sql-injection",
+      "file": "server/routes.py",
+      "start_line": "138",
+      "function_name": "dashboard",
+      "finding_artifact": "output/python/realvuln-threatbyte/verification_results/findings/finding_4_py_sql-injection.json",
+      "oracle": "output/python/realvuln-threatbyte/fuzz_oracles/py_sql_injection_server_routes_py_138.json",
+      "status": "failed"
+    },
+    {
+      "id": "5",
+      "target_id": "py_url_redirection_server_routes_py_256",
+      "rule_id": "py/url-redirection",
+      "file": "server/routes.py",
+      "start_line": "256",
+      "function_name": "upload_file",
+      "finding_artifact": "output/python/realvuln-threatbyte/verification_results/findings/finding_5_py_url-redirection.json",
+      "oracle": "output/python/realvuln-threatbyte/fuzz_oracles/py_url_redirection_server_routes_py_256.json",
+      "status": "generated",
+      "strategy": "return_value"
+    },
+    {
+      "id": "6",
+      "target_id": "py_url_redirection_server_routes_py_260",
+      "rule_id": "py/url-redirection",
+      "file": "server/routes.py",
+      "start_line": "260",
+      "function_name": "upload_file",
+      "finding_artifact": "output/python/realvuln-threatbyte/verification_results/findings/finding_6_py_url-redirection.json",
+      "oracle": "output/python/realvuln-threatbyte/fuzz_oracles/py_url_redirection_server_routes_py_260.json",
+      "status": "generated",
+      "strategy": "return_value"
+    },
+    {
+      "id": "8",
+      "target_id": "py_weak_sensitive_data_hashing_db_create_dummy_data_py_8",
+      "rule_id": "py/weak-sensitive-data-hashing",
+      "file": "db/create_dummy_data.py",
+      "start_line": "8",
+      "function_name": "hash_password",
+      "finding_artifact": "output/python/realvuln-threatbyte/verification_results/findings/finding_8_py_weak-sensitive-data-hashing.json",
+      "oracle": "output/python/realvuln-threatbyte/fuzz_oracles/py_weak_sensitive_data_hashing_db_create_dummy_data_py_8.json",
+      "status": "generated",
+      "strategy": "return_value"
+    }
+  ],
+  "errors": [
+    {
+      "finding_artifact": "output/python/realvuln-threatbyte/verification_results/findings/finding_4_py_sql-injection.json",
+      "error": "monitor.strategy invalid: 'patch_call'. Must be one of {'return_value', 'recorded_call', 'filesystem_state'}"
+    }
+  ]
+}

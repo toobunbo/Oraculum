@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink is `exec(bar)` which is a dangerous operation that can lead to arbitrary code execution."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "Not evaluated because Q1 was true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated because Q1 was true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "exec(bar) call on line 45",
+    "capture": "the value of bar which is user-controlled input",
+    "fake_behavior": "prevent actual code execution by mocking or recording the call without executing the code",
+    "notes": [
+      "The exec() function should be mocked to prevent arbitrary code execution during testing.",
+      "Capture the value of bar to verify it contains user-controlled input.",
+      "Ensure the mock does not allow any side effects from the exec() call."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

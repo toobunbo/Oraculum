@@ -1,0 +1,70 @@
+{
+  "id": "9",
+  "rule_slug": "py_template-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/summary_vc-claude-code-seeded-v2-healthcare-clinic-django_20260714_152609.json"
+  },
+  "finding": {
+    "rule_id": "py/template-injection",
+    "message": "This template construction depends on a [user-provided value](1).",
+    "file": "clinic_portal/patient_operations.py",
+    "start_line": 130,
+    "end_line": 130,
+    "repo_name": "vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/vc-claude-code-seeded-v2-healthcare-clinic-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 125: ControlFlowNode for request",
+      "line 129: ControlFlowNode for Attribute",
+      "line 129: ControlFlowNode for Attribute()",
+      "line 129: ControlFlowNode for fragment",
+      "line 130: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "9.3",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-74"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "User-controlled input (`fragment`) from HTTP request parameters is directly concatenated into a Jinja2 template source string and rendered without any sanitization or sandboxing, creating a clear Server-Side Template Injection vulnerability. The function appears to be a Django view based on the request parameter pattern and JsonResponse returns.",
+    "cost_usd": 0.0,
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 1336,
+    "tokens_used": 17793,
+    "elapsed_seconds": 11.408010005950928,
+    "cached_input_tokens": 0,
+    "timestamp": "2026-07-14T15:26:00.373137",
+    "iterations": 3,
+    "input_tokens": 16457,
+    "context_needed": [],
+    "data_flow": "request (line 125) → request.GET.get() (line 129) → fragment variable (line 129) → template string construction (line 130) → Template.render() (line 130)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "answers": [
+      "The EXACT template-render sink is: `Template(\"Result: \" + fragment).render()` on line 130. The template-source string passed to it is `\"Result: \" + fragment`.",
+      "The template-source string is assigned on line 130 as `\"Result: \" + fragment`. The variable `fragment` is assigned on line 129 from `request.GET.get(\"fragment\", \"{{ 7 * 7 }}\")`.",
+      "The LAST assignment to the template SOURCE is on line 130: `\"Result: \" + fragment`. The value of `fragment` derives from user input via `request.GET.get(\"fragment\", \"{{ 7 * 7 }}\")` on line 129. The data-flow chain is: request (line 125) → request.GET.get (line 129) → fragment (line 129) → template source (line 130).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense preventing SSTI. The user input is directly embedded into the template source string, and no sandboxing, escaping, or allow-listing is applied. The use of `jinja2.Template` with a user-controlled string is inherently unsafe without additional protections.",
+      "User-controlled data (`fragment` from `request.GET`) reaches the template SOURCE (`\"Result: \" + fragment`) with concrete line numbers (129 → 130), and there is no defense such as sandboxing, escaping, or allow-listing."
+    ]
+  },
+  "function": {
+    "name": "patient_jinja_cast_383",
+    "file": "clinic_portal/patient_operations.py",
+    "start_line": 125,
+    "end_line": 131,
+    "scope": ""
+  },
+  "web_params": []
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Jinja2.from_string(...).render() on line 14 is the SSTI sink and can lead to Remote Code Execution when processing user-controlled input."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "N/A - decision stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "N/A - decision stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the Jinja2.from_string method or its resulting Template object's render method to intercept the call on line 14.",
+    "capture": "Capture the template-source string argument passed to Jinja2.from_string (i.e., 'Welcome ' + username + '!') to verify that user-controlled data reaches the sink unsanitized.",
+    "fake_behavior": "Return a benign placeholder string (e.g., 'mocked_render_output') so that the function can continue to return an HTMLResponse without evaluating the potentially malicious template.",
+    "notes": [
+      "Ensure the mock does not evaluate the concatenated string as a Jinja2 template.",
+      "Verify that the captured argument contains the injected payload to confirm the vulnerability."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

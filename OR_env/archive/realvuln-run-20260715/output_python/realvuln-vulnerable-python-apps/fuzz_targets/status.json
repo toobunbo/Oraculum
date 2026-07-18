@@ -1,0 +1,35 @@
+{
+  "stage": "harness",
+  "repo": "realvuln-vulnerable-python-apps",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/harness.yaml",
+  "source": {
+    "oracle_status_path": "output/python/realvuln-vulnerable-python-apps/fuzz_oracles/status.json"
+  },
+  "counts": {
+    "selected": 1,
+    "generated": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "harnesses": [
+    {
+      "id": "0",
+      "target_id": "py_incomplete_url_substring_sanitization_Other_url_fetch_py_14",
+      "rule_id": "py/incomplete-url-substring-sanitization",
+      "file": "Other/url_fetch.py",
+      "start_line": "14",
+      "function_name": "fetch",
+      "harness": "output/python/realvuln-vulnerable-python-apps/fuzz_targets/py_incomplete_url_substring_sanitization_Other_url_fetch_py_14.py",
+      "oracle": "output/python/realvuln-vulnerable-python-apps/fuzz_oracles/py_incomplete_url_substring_sanitization_Other_url_fetch_py_14.json",
+      "finding_artifact": "output/python/realvuln-vulnerable-python-apps/verification_results/findings/finding_0_py_incomplete-url-substring-sanitization.json",
+      "corpus": "output/python/realvuln-vulnerable-python-apps/fuzz_corpus/py_incomplete_url_substring_sanitization_Other_url_fetch_py_14",
+      "strategy": "recorded_call",
+      "status": "generated",
+      "seed_count": 5,
+      "errors": ""
+    }
+  ],
+  "errors": []
+}

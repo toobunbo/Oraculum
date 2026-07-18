@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Template.render() with user-controlled template source enables SSTI, which can achieve RCE via Jinja2 sandbox escapes, making it dangerous in a test environment."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "N/A - decision made at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "N/A - decision made at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock or wrap jinja2.Template (or the specific Template().render() call) on line 113 so the actual template engine does not evaluate user-controlled source strings.",
+    "capture": "Capture the template-source string argument passed to the Template constructor (\"Result: \" + fragment) to assert it contains user-controlled data and to detect the injection pattern.",
+    "fake_behavior": "Return a benign string such as the original template-source literal (e.g., \"Result: \" + fragment) or a fixed placeholder like \"MOCKED_RENDER\", allowing execution to continue into HTMLResponse without triggering the Jinja2 engine.",
+    "notes": [
+      "Do not let the real Jinja2 environment parse the template source, as crafted payloads can escape sandboxes and execute arbitrary code.",
+      "The mock must be applied before the Template constructor or intercept the render method to prevent evaluation."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

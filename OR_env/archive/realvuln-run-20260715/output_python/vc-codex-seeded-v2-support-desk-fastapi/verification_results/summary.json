@@ -1,0 +1,22 @@
+{
+  "stage": "ingest",
+  "repo": "vc-codex-seeded-v2-support-desk-fastapi",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-seeded-v2-support-desk-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-seeded-v2-support-desk-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-seeded-v2-support-desk-fastapi/verification_results/summary_vc-codex-seeded-v2-support-desk-fastapi_20260714_160514.json"
+  },
+  "counts": {
+    "total_verdicts": 10,
+    "selected": 0,
+    "enriched": 0,
+    "skipped": 10,
+    "failed": 0
+  },
+  "findings": [],
+  "errors": []
+}

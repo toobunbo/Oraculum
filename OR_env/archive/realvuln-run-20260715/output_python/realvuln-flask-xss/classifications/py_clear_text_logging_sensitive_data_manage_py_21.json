@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "data_flow includes database storage via db.session.add (line 19) and db.session.commit (line 20); DB writes are explicitly listed as dangerous sinks"
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "not evaluated; decision terminated at Q1"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "returns.kind is none, exprs is empty"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock db.session.add, db.session.commit, and the log/print call on line 21 to prevent real database writes and capture sensitive data exposure",
+    "capture": "Capture the User object passed to db.session.add to inspect whether the password attribute is hashed or cleartext; capture the arguments passed to the logging call on line 21 to verify the password appears in cleartext",
+    "fake_behavior": "Make db.session.add and db.session.commit no-ops; make the logging call silently record its arguments without emitting output",
+    "notes": [
+      "The primary violation is clear-text logging of the password, so the logging sink argument is the most critical capture",
+      "If the logging sink is a print() call, mock builtins.print; if it uses the logging module, mock the specific logger method"
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

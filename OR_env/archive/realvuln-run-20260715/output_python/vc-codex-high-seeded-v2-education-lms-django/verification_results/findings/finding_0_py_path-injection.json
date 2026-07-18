@@ -1,0 +1,76 @@
+{
+  "id": "0",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/summary_vc-codex-high-seeded-v2-education-lms-django_20260714_154006.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "education_lms/course_operations.py",
+    "start_line": 81,
+    "end_line": 81,
+    "repo_name": "vc-codex-high-seeded-v2-education-lms-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/vc-codex-high-seeded-v2-education-lms-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 76: ControlFlowNode for request",
+      "line 79: ControlFlowNode for Attribute",
+      "line 79: ControlFlowNode for Attribute()",
+      "line 79: ControlFlowNode for ref",
+      "line 80: ControlFlowNode for target",
+      "line 81: ControlFlowNode for Attribute"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:39:41.145283",
+    "confidence": "Medium",
+    "confidence_score": 0.75,
+    "iterations": 4,
+    "tokens_used": 25287,
+    "cost_usd": 0.0,
+    "answers": [
+      "1. The EXACT flagged line is: `target.parent.mkdir(parents=True, exist_ok=True)` on line 81. This line is located in the function `course_vault_stash_245`. The path value passed to it is `target.parent`, where `target` is derived from `BASE_EXPORT_DIR / f'{ref}.json'` (line 80).",
+      "2. The only assignment to `target` is on line 80: `target = BASE_EXPORT_DIR / f'{ref}.json'`. The variable `ref` is assigned on line 79: `ref = request.GET.get('ref', 'daily')`.",
+      "3. The value of `target` derives from `ref`, which comes directly from user input via `request.GET.get('ref', 'daily')` (line 79). The `BASE_EXPORT_DIR` global variable is not visible in the provided context, so we cannot determine if it provides any protection.",
+      "4. There are no constant-time conditions or reassignments that override the user-tainted value. The value flows directly from the user input to the path construction without sanitization or validation.",
+      "5. No specific defense is present in the visible code. There is no use of `secure_filename`, `Path.resolve()`, `is_relative_to()`, or any other mechanism to prevent directory traversal. The `mkdir` function implementation is also not visible.",
+      "6. Since we cannot see `BASE_EXPORT_DIR` or the `mkdir` implementation, we cannot definitively confirm or deny the presence of defenses. However, the pattern of using unsanitized user input in path construction is inherently dangerous."
+    ],
+    "context_needed": [],
+    "verdict": "True Positive",
+    "data_flow": "request.GET.get('ref', 'daily') (line 79) → ref → target = BASE_EXPORT_DIR / f'{ref}.json' (line 80) → target.parent.mkdir(...) (line 81)",
+    "elapsed_seconds": 15.821821212768555,
+    "reasoning": "User-provided input (`ref`) is used directly in constructing a file path which then reaches a file system operation (`mkdir`). While we cannot see BASE_EXPORT_DIR or the mkdir implementation, the pattern represents a classic path injection vulnerability without visible sanitization.",
+    "cached_input_tokens": 0,
+    "output_tokens": 1751,
+    "input_tokens": 23536,
+    "model": "ollama_chat/qwen3-coder:480b-cloud"
+  },
+  "function": {
+    "name": "course_vault_stash_245",
+    "file": "education_lms/course_operations.py",
+    "start_line": 76,
+    "end_line": 83,
+    "scope": ""
+  },
+  "web_params": []
+}

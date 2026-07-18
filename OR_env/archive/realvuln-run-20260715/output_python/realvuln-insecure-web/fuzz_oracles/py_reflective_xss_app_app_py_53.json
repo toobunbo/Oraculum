@@ -1,0 +1,54 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of the search function containing the f-string interpolated HTML response",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The return value contains an unescaped HTML tag or XSS payload fragment injected via the query parameter, confirming no sanitization is applied",
+    "trigger_patterns": [
+      "<script",
+      "<img\\s+[^>]*onerror",
+      "<svg\\s+[^>]*onload",
+      "javascript:",
+      "<iframe",
+      "<body\\s+[^>]*onload",
+      "onmouseover\\s*="
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_REFLECTIVE_XSS: unescaped XSS payload in return value — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "<script>alert(1)</script>",
+      "<img src=x onerror=alert(1)>",
+      "<svg onload=alert(1)>",
+      "javascript:alert(1)",
+      "<iframe src=\"javascript:alert(1)\">",
+      "<body onload=alert(1)>"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "search",
+    "file": "app/app.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def search()",
+    "tainted_params": [
+      {
+        "name": "q",
+        "index": -1,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_reflective_xss_app_app_py_53",
+    "finding_id": "2",
+    "rule_id": "py/reflective-xss",
+    "rule_slug": "py_reflective-xss",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-insecure-web/verification_results/findings/finding_2_py_reflective-xss.json"
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "id": "4",
+  "rule_slug": "py_sql-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulpy",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulpy",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulpy/verification_results/summary_realvuln-vulpy_20260714_151852.json"
+  },
+  "finding": {
+    "rule_id": "py/sql-injection",
+    "message": "This SQL query depends on a [user-provided value](1).",
+    "file": "bad/libuser.py",
+    "start_line": 53,
+    "end_line": 53,
+    "repo_name": "realvuln-vulpy",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulpy/realvuln-vulpy.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 67: ControlFlowNode for request",
+      "line 69: ControlFlowNode for Attribute",
+      "line 69: ControlFlowNode for Attribute()",
+      "line 69: ControlFlowNode for password",
+      "line 80: ControlFlowNode for password",
+      "line 46: ControlFlowNode for password",
+      "line 53: ControlFlowNode for Attribute()",
+      "--- Flow 2 ---",
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 69: ControlFlowNode for request",
+      "line 69: ControlFlowNode for Attribute",
+      "line 69: ControlFlowNode for Attribute()",
+      "line 69: ControlFlowNode for password",
+      "line 80: ControlFlowNode for password",
+      "line 46: ControlFlowNode for password",
+      "line 53: ControlFlowNode for Attribute()"
+    ],
+    "severity": "8.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-89"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "confidence_score": 0.95,
+    "reasoning": "User-controlled inputs `password` and `username` are directly interpolated into a SQL query string using `.format()` on line 53, with no sanitization or parameterization. The dataflow analysis confirms these values originate from external request objects, making this a clear SQL injection vulnerability.",
+    "confidence": "High",
+    "context_needed": [],
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:18:37.510071",
+    "iterations": 3,
+    "data_flow": "request (line 1) → password/username (lines 69, 80) → format(password, username) (line 53) → execute (line 53)",
+    "cost_usd": 0.0,
+    "elapsed_seconds": 11.50623369216919,
+    "cached_input_tokens": 0,
+    "answers": [
+      "The EXACT sink statement is: `c.execute(\"UPDATE users SET password = '{}' WHERE username = '{}'\".format(password, username))` on line 53. The variables passed to it are `password` and `username`.",
+      "The variables `password` and `username` are parameters of the function `password_change` defined on line 46. There are no other assignments to these variables within the provided code snippet.",
+      "According to the dataflow path provided in the initial analysis, both `password` and `username` derive from user input via `request` (lines 1, 69, 80). The flow shows that these values originate from a request object and are passed directly into the function without sanitization. The additional context shows no callers were found, but the dataflow analysis already established the taint source.",
+      "There are no constant-time conditions or reassignments that override the user-tainted values `password` and `username` in the provided code snippet. The additional context shows no callees, confirming no internal reassignments.",
+      "There is no specific defense sanitizing the values before the sink. The query is constructed using Python's string `.format()` method, which is vulnerable to SQL injection when user input is directly interpolated into the query string. No parameterized queries or escaping mechanisms are visible.",
+      "The user-tainted values `password` and `username` reach the sink on line 53 without any sanitization or parameterization. The absence of parameterized queries or any form of input validation confirms the vulnerability. The additional context does not change this assessment."
+    ],
+    "tokens_used": 13664,
+    "input_tokens": 12557,
+    "output_tokens": 1107,
+    "model": "ollama_chat/qwen3-coder:480b-cloud"
+  },
+  "function": {
+    "name": "password_change",
+    "file": "bad/libuser.py",
+    "start_line": 46,
+    "end_line": 56,
+    "scope": ""
+  },
+  "web_params": []
+}

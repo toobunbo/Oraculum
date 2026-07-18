@@ -1,0 +1,70 @@
+{
+  "id": "7",
+  "rule_slug": "py_clear-text-logging-sensitive-data",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulpy",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulpy",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulpy/verification_results/summary_realvuln-vulpy_20260714_151852.json"
+  },
+  "finding": {
+    "rule_id": "py/clear-text-logging-sensitive-data",
+    "message": "This expression logs [sensitive data (private)](1) as clear text.",
+    "file": "utils/crack-cvv.py",
+    "start_line": 17,
+    "end_line": 17,
+    "repo_name": "realvuln-vulpy",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulpy/realvuln-vulpy.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 14: ControlFlowNode for Attribute()",
+      "line 14: ControlFlowNode for cvv",
+      "line 17: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-312",
+      "CWE-359",
+      "CWE-532"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "confidence_score": 0.95,
+    "reasoning": "The code directly prints sensitive CVV data in cleartext to stdout on line 17 without any encryption or protection, matching the rule's description of clear text logging of sensitive data",
+    "confidence": "High",
+    "context_needed": [],
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:18:42.158130",
+    "iterations": 1,
+    "data_flow": "cvv generation (line 14) → cvv variable → print output (line 17)",
+    "cost_usd": 0.0,
+    "elapsed_seconds": 4.646680116653442,
+    "cached_input_tokens": 0,
+    "answers": [
+      "The sensitive data is CVV (Card Verification Value) payment card information, visible on line 17 where cvv.decode() is printed",
+      "The data is stored in console output via print() function on line 17",
+      "No, the data is not encrypted or hashed before output - it's printed in cleartext",
+      "Yes, an attacker with access to console logs or output captures could read the CVV data",
+      "The storage is reachable whenever this script runs, though it appears to be a utility script",
+      "High blast radius - CVV exposure could enable financial fraud and regulatory violations"
+    ],
+    "tokens_used": 4002,
+    "input_tokens": 3399,
+    "output_tokens": 603,
+    "model": "ollama_chat/qwen3-coder:480b-cloud"
+  },
+  "function": {
+    "name": "crack_cvv",
+    "file": "utils/crack-cvv.py",
+    "start_line": 11,
+    "end_line": 18,
+    "scope": ""
+  },
+  "web_params": []
+}

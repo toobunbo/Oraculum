@@ -1,0 +1,562 @@
+[
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-damn-vulnerable-flask-application/fuzz_targets/py_code_injection_app_py_120.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-damn-vulnerable-flask-application/fuzz_targets/py_reflective_xss_app_py_163.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-damn-vulnerable-flask-application/fuzz_targets/py_reflective_xss_app_py_205.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-damn-vulnerable-flask-application/fuzz_targets/py_template_injection_app_py_205.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-damn-vulnerable-graphql-application/fuzz_targets/py_shell_command_constructed_from_input_core_views_py_211.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-damn-vulnerable-graphql-application/fuzz_targets/py_shell_command_constructed_from_input_core_views_py_352.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-djangoat/fuzz_targets/py_code_injection_app_views_api_mobile_views_py_27.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-djangoat/fuzz_targets/py_path_injection_app_models_Benefits_benefits_py_68.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-djangoat/fuzz_targets/py_path_injection_app_views_users_benefit_forms_views_py_34.py",
+    "fixes": [
+      "I1:import_error"
+    ],
+    "iterations": 1,
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-djangoat/fuzz_targets/py_reflective_xss_app_views_dashboard_views_py_37.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-djangoat/fuzz_targets/py_reflective_xss_app_views_users_pay_views_py_75.py",
+    "fixes": [
+      "I1:import_error"
+    ],
+    "iterations": 1,
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-djangoat/fuzz_targets/py_reflective_xss_app_views_users_views_py_55.py",
+    "fixes": [
+      "I1:import_error"
+    ],
+    "iterations": 1,
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-dsvpwa/fuzz_targets/py_path_injection_dsvpwa_handlers_py_116.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-dsvpwa/fuzz_targets/py_path_injection_dsvpwa_handlers_py_118.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-dsvw/fuzz_targets/py_full_ssrf_dsvw_py_56.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-dsvw/fuzz_targets/py_http_response_splitting_dsvw_py_78.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-dsvw/fuzz_targets/py_sql_injection_dsvw_py_67.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-dvblab/fuzz_targets/py_sql_injection_backend_routes_auth_routes_py_23.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-dvblab/fuzz_targets/py_sql_injection_backend_routes_auth_routes_py_37.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-dvblab/fuzz_targets/py_sql_injection_backend_routes_transaction_routes_py_50.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-dvblab/fuzz_targets/py_sql_injection_backend_routes_transaction_routes_py_95.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-dvblab/fuzz_targets/py_stack_trace_exposure_backend_routes_auth_routes_py_165.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-dvblab/fuzz_targets/py_unsafe_deserialization_backend_routes_auth_routes_py_157.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-dvblab/fuzz_targets/py_weak_sensitive_data_hashing_backend_routes_auth_routes_py_21.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-dvpwa/fuzz_targets/py_weak_sensitive_data_hashing_sqli_dao_user_py_41.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-extremely-vulnerable-flask-app/fuzz_targets/py_sql_injection_routes_account_py_33.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-extremely-vulnerable-flask-app/fuzz_targets/py_unsafe_deserialization_routes_account_py_118.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-flask-xss/fuzz_targets/py_clear_text_logging_sensitive_data_manage_py_21.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-flask-xss/fuzz_targets/py_url_redirection_app_blueprints_xss_protection_views_py_12.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-insecure-web/fuzz_targets/py_reflective_xss_app_app_py_53.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-lets-be-bad-guys/fuzz_targets/py_path_injection_badguys_vulnerable_views_py_42.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-lets-be-bad-guys/fuzz_targets/py_url_redirection_badguys_vulnerable_views_py_178.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-python-insecure-app/fuzz_targets/py_jinja2_autoescape_false_app_main_py_41.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-python-insecure-app/fuzz_targets/py_template_injection_app_main_py_41.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-pythonssti/fuzz_targets/py_jinja2_autoescape_false_main_py_11.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-pythonssti/fuzz_targets/py_template_injection_main_py_14.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-threatbyte/fuzz_targets/py_path_injection_server_routes_py_264.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-threatbyte/fuzz_targets/py_path_injection_server_routes_py_363.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-threatbyte/fuzz_targets/py_path_injection_server_routes_py_364.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-threatbyte/fuzz_targets/py_sql_injection_server_routes_py_138.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-threatbyte/fuzz_targets/py_url_redirection_server_routes_py_256.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-threatbyte/fuzz_targets/py_url_redirection_server_routes_py_260.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-threatbyte/fuzz_targets/py_weak_sensitive_data_hashing_db_create_dummy_data_py_8.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vfapi/fuzz_targets/py_weak_sensitive_data_hashing_main_py_113.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vfapi/fuzz_targets/py_weak_sensitive_data_hashing_main_py_187.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vulnerable-flask-app/fuzz_targets/py_sql_injection_app_app_py_265.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vulnerable-flask-app/fuzz_targets/py_stack_trace_exposure_app_app_py_281.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vulnerable-flask-app/fuzz_targets/py_weak_sensitive_data_hashing_app_app_py_141.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vulnerable-python-apps/fuzz_targets/py_incomplete_url_substring_sanitization_Other_url_fetch_py_14.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vulnpy/fuzz_targets/py_command_line_injection_apps_fastapi_app_py_43.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vulnpy/fuzz_targets/py_reflective_xss_src_vulnpy_aiohttp_vulnerable_routes_py_31.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vulnpy/fuzz_targets/py_reflective_xss_src_vulnpy_django_vulnerable_asgi_py_57.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vulnpy/fuzz_targets/py_reflective_xss_src_vulnpy_django_vulnerable_py_38.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vulnpy/fuzz_targets/py_reflective_xss_src_vulnpy_fastapi_vulnerable_py_44.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vulnpy/fuzz_targets/py_reflective_xss_src_vulnpy_flask_blueprint_py_57.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vulnpy/fuzz_targets/py_shell_command_constructed_from_input_apps_falcon_app_py_63.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vulpy/fuzz_targets/py_clear_text_logging_sensitive_data_bad_api_post_py_24.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vulpy/fuzz_targets/py_clear_text_logging_sensitive_data_utils_httpbrute_py_26.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vulpy/fuzz_targets/py_clear_text_logging_sensitive_data_utils_httpbrute_py_28.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vulpy/fuzz_targets/py_clear_text_storage_sensitive_data_bad_api_post_py_27.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vulpy/fuzz_targets/py_cookie_injection_bad_libsession_py_7.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vulpy/fuzz_targets/py_sql_injection_bad_libuser_py_12.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vulpy/fuzz_targets/py_sql_injection_bad_libuser_py_25.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/realvuln-vulpy/fuzz_targets/py_sql_injection_bad_libuser_py_53.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-crm-saas-django/fuzz_targets/py_command_line_injection_crm_project_partner_console_py_151.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-crm-saas-django/fuzz_targets/py_full_ssrf_crm_project_partner_console_py_52.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-crm-saas-django/fuzz_targets/py_path_injection_crm_project_partner_console_py_142.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-crm-saas-django/fuzz_targets/py_path_injection_crm_project_partner_console_py_143.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-crm-saas-django/fuzz_targets/py_path_injection_crm_project_partner_console_py_42.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-crm-saas-django/fuzz_targets/py_path_injection_crm_project_partner_console_py_91.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-crm-saas-django/fuzz_targets/py_path_injection_crm_project_partner_console_py_92.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-crm-saas-django/fuzz_targets/py_template_injection_crm_project_partner_console_py_134.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-crm-saas-django/fuzz_targets/py_url_redirection_crm_project_partner_console_py_73.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-crm-saas-django/fuzz_targets/py_xxe_crm_project_partner_console_py_193.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-education-lms-django/fuzz_targets/py_command_line_injection_lms_course_operations_py_141.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-education-lms-django/fuzz_targets/py_template_injection_lms_course_operations_py_124.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_clear_text_storage_sensitive_data_backend_app_loan_operations_py_78.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_clear_text_storage_sensitive_data_backend_app_routers_users_py_80.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_command_line_injection_backend_app_loan_operations_py_127.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_cookie_injection_backend_app_loan_operations_py_84.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_jinja2_autoescape_false_backend_app_loan_operations_py_113.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_log_injection_backend_app_loan_operations_py_33.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_path_injection_backend_app_loan_operations_py_120.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_path_injection_backend_app_loan_operations_py_121.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_path_injection_backend_app_loan_operations_py_77.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_path_injection_backend_app_loan_operations_py_78.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_stack_trace_exposure_backend_app_loan_operations_py_27.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_template_injection_backend_app_loan_operations_py_113.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_unsafe_deserialization_backend_app_loan_operations_py_61.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_url_redirection_backend_app_loan_operations_py_39.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_xxe_backend_app_loan_operations_py_164.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-healthcare-clinic-django/fuzz_targets/py_code_injection_clinic_portal_patient_operations_py_88.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-healthcare-clinic-django/fuzz_targets/py_command_line_injection_clinic_portal_patient_operations_py_138.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-healthcare-clinic-django/fuzz_targets/py_jinja2_autoescape_false_clinic_portal_patient_operations_py_130.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-healthcare-clinic-django/fuzz_targets/py_nosql_injection_clinic_portal_patient_operations_py_156.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-healthcare-clinic-django/fuzz_targets/py_template_injection_clinic_portal_patient_operations_py_130.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-healthcare-clinic-django/fuzz_targets/py_url_redirection_clinic_portal_patient_operations_py_58.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-healthcare-clinic-django/fuzz_targets/py_xxe_clinic_portal_patient_operations_py_188.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-hr-payroll-django/fuzz_targets/py_code_injection_hr_portal_payroll_operations_py_97.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-hr-payroll-django/fuzz_targets/py_full_ssrf_hr_portal_payroll_operations_py_52.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-hr-payroll-django/fuzz_targets/py_path_injection_hr_portal_payroll_operations_py_147.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-hr-payroll-django/fuzz_targets/py_path_injection_hr_portal_payroll_operations_py_148.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-hr-payroll-django/fuzz_targets/py_path_injection_hr_portal_payroll_operations_py_42.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-claude-code-seeded-v2-support-desk-fastapi/fuzz_targets/py_full_ssrf_backend_app_support_operations_py_75.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-codex-high-seeded-v2-crm-saas-django/fuzz_targets/py_jinja2_autoescape_false_config_partner_console_py_142.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-codex-high-seeded-v2-education-lms-django/fuzz_targets/py_clear_text_storage_sensitive_data_education_lms_course_operations_py_82.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-codex-high-seeded-v2-education-lms-django/fuzz_targets/py_command_line_injection_education_lms_course_operations_py_174.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-codex-high-seeded-v2-education-lms-django/fuzz_targets/py_reflective_xss_education_lms_course_operations_py_33.py",
+    "status": "FAIL",
+    "error_type": "django_setup"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-codex-high-seeded-v2-education-lms-django/fuzz_targets/py_url_redirection_education_lms_course_operations_py_67.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_command_line_injection_app_loan_operations_py_150.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_cookie_injection_app_loan_operations_py_79.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_jinja2_autoescape_false_app_loan_operations_py_115.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_jinja2_autoescape_false_app_loan_operations_py_85.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_log_injection_app_loan_operations_py_33.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_path_injection_app_loan_operations_py_122.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_path_injection_app_loan_operations_py_123.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_stack_trace_exposure_app_loan_operations_py_27.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_template_injection_app_loan_operations_py_115.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_unsafe_deserialization_app_loan_operations_py_61.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_url_redirection_app_loan_operations_py_39.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_weak_sensitive_data_hashing_app_security_py_92.py",
+    "status": "FAIL",
+    "error_type": "unknown"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/fuzz_targets/py_xxe_app_loan_operations_py_137.py",
+    "status": "PASS"
+  },
+  {
+    "file": "/home/trieudai/Oraculum/output/python/python/vc-codex-high-seeded-v2-healthcare-clinic-django/fuzz_targets/py_cookie_injection_clinic_portal_patient_operations_py_96.py",
+    "status": "PASS"
+  }
+]

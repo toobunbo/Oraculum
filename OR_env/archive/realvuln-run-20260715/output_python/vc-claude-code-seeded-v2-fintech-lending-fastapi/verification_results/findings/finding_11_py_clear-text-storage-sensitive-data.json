@@ -1,0 +1,69 @@
+{
+  "id": "11",
+  "rule_slug": "py_clear-text-storage-sensitive-data",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-claude-code-seeded-v2-fintech-lending-fastapi_20260714_152421.json"
+  },
+  "finding": {
+    "rule_id": "py/clear-text-storage-sensitive-data",
+    "message": "This expression stores [sensitive data (private)](1) as clear text.",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 78,
+    "end_line": 78,
+    "repo_name": "vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/vc-claude-code-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 78: ControlFlowNode for Attribute()",
+      "line 78: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-312",
+      "CWE-315",
+      "CWE-359"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "confidence": "High",
+    "iterations": 1,
+    "answers": [
+      "The sensitive data being stored includes SSN and credit card number, as seen on line 78 where 'ssn' and 'card' fields are extracted from the payload.",
+      "The data is stored in a JSON file, as indicated by line 76 where a file path with .json extension is created, and line 78 where write_text is used to store the data.",
+      "No, the data is not encrypted or hashed before storage. Line 78 directly writes the sensitive data to a file using json.dumps without any encryption or hashing.",
+      "Yes, an attacker with access to the storage medium (the JSON file) could read the sensitive data in cleartext, as it's stored without any encryption or protection.",
+      "This storage is likely reachable in production as it's part of a FastAPI router endpoint that appears to be a functional part of the application, not just for testing.",
+      "The blast radius is high as exposure of SSN and credit card numbers could lead to identity theft, financial fraud, and regulatory violations such as GDPR or PCI DSS."
+    ],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 3.1004881858825684,
+    "output_tokens": 369,
+    "context_needed": [],
+    "reasoning": "The code stores sensitive PII (SSN) and payment card data in cleartext JSON files without any encryption or hashing, creating a clear violation of CWE-312. The data flow from request to file storage is direct and unprotected.",
+    "data_flow": "request.json() (line 74) → payload.get('ssn') and payload.get('card') (line 78) → target.write_text() (line 78)",
+    "confidence_score": 0.95,
+    "timestamp": "2026-07-14T15:23:47.862673",
+    "cost_usd": 0.0,
+    "input_tokens": 4953,
+    "cached_input_tokens": 0,
+    "tokens_used": 5322
+  },
+  "function": {
+    "name": "loan_vault_stash_235",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 72,
+    "end_line": 79,
+    "scope": ""
+  },
+  "web_params": []
+}

@@ -1,0 +1,75 @@
+{
+  "id": "10",
+  "rule_slug": "py_weak-sensitive-data-hashing",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-legal-case-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/verification_results/summary_vc-claude-code-seeded-v2-legal-case-django_20260714_152949.json"
+  },
+  "finding": {
+    "rule_id": "py/weak-sensitive-data-hashing",
+    "message": "[Sensitive data (password)](1) is used in a hashing algorithm (SHA256) that is insecure for password hashing, since it is not a computationally expensive hash function.",
+    "file": "integrations/models.py",
+    "start_line": 46,
+    "end_line": 46,
+    "repo_name": "vc-claude-code-seeded-v2-legal-case-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/vc-claude-code-seeded-v2-legal-case-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 25: ControlFlowNode for Attribute()",
+      "line 25: ControlFlowNode for BoolExpr",
+      "line 32: ControlFlowNode for _extract_token()",
+      "line 32: ControlFlowNode for token",
+      "line 33: ControlFlowNode for token",
+      "line 42: ControlFlowNode for token",
+      "line 46: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-327",
+      "CWE-328",
+      "CWE-916"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "answers": [
+      "The exact crypto call is `hashlib.sha256(token.encode(\"utf-8\")).hexdigest()` on line 46. The algorithm is SHA256.",
+      "The algorithm is specified via a hardcoded method call `hashlib.sha256` on line 46.",
+      "The output of the SHA256 hash is used for authentication purposes in a comparison with `key.key_hash` using `hmac.compare_digest` on line 48. This is a SECURITY use-case as it involves authentication token verification.",
+      "Collision resistance is not the primary concern here since the hash is used for authentication (comparing against a stored hash). However, SHA256 is generally secure for this purpose if used correctly.",
+      "The specific defense required for password/token hashing is a computationally expensive function like bcrypt, scrypt, or Argon2. SHA256 alone is not suitable for password hashing because it is fast and thus vulnerable to brute-force attacks. The code does not implement any key derivation function or salt usage for password hashing.",
+      "There is no indication in the provided code that this is for backward-compatibility with an external system.",
+      "The use-case is SECURITY (authentication token verification), and the defense required is a slow hashing function like bcrypt, scrypt, or Argon2. Since SHA256 is used directly without a key derivation function, it is inappropriate for password/token hashing."
+    ],
+    "reasoning": "The code uses SHA256 directly for hashing authentication tokens, which is insecure for password/token hashing as it lacks a computationally expensive key derivation function. The data flow shows tokens are hashed and compared for authentication, confirming a security-sensitive use-case. No additional context changed this assessment.",
+    "cost_usd": 0.0,
+    "iterations": 3,
+    "input_tokens": 14680,
+    "cached_input_tokens": 0,
+    "output_tokens": 1374,
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "token (line 42) → hashlib.sha256(token.encode(\"utf-8\")).hexdigest() (line 46) → hmac.compare_digest(key.key_hash, digest) (line 48)",
+    "elapsed_seconds": 17.301867961883545,
+    "tokens_used": 16054,
+    "verdict": "True Positive",
+    "confidence": "High",
+    "timestamp": "2026-07-14T15:29:48.059335"
+  },
+  "function": {
+    "name": "authenticate",
+    "file": "integrations/models.py",
+    "start_line": 42,
+    "end_line": 52,
+    "scope": "APIKey"
+  },
+  "web_params": []
+}

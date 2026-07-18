@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Parser configured with no_network=False, load_dtd=True, resolve_entities=True, enabling network I/O for external entity/DTD resolution during XML parsing."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "N/A, stopped at Q1"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "N/A, stopped at Q1"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the etree.fromstring call on line 164 to prevent actual XML parsing with the unsafe parser.",
+    "capture": "Capture the raw bytes passed as the first argument to etree.fromstring (i.e., the result of await request.body()) to verify malicious payloads are correctly rejected or sanitized.",
+    "fake_behavior": "Return a safe, dummy lxml ElementTree node (e.g., etree.Element('safe_root')) so that the subsequent doc.tag access and return statement succeed without error.",
+    "notes": [
+      "The unsafe parser is created on line 163 and passed to fromstring on line 164; mocking fromstring itself is simplest.",
+      "Alternatively, patch etree.XMLParser to force no_network=True, load_dtd=False, resolve_entities=False, and let parsing proceed safely if structural coverage of the rest of the function is needed."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

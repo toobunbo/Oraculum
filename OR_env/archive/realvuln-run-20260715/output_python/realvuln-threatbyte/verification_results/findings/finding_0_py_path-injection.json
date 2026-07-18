@@ -1,0 +1,94 @@
+{
+  "id": "0",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-threatbyte",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte/verification_results/summary_realvuln-threatbyte_20260714_150915.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "server/routes.py",
+    "start_line": 264,
+    "end_line": 264,
+    "repo_name": "realvuln-threatbyte",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte/realvuln-threatbyte.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 253: ControlFlowNode for request",
+      "line 257: ControlFlowNode for file",
+      "line 262: ControlFlowNode for filename",
+      "line 263: ControlFlowNode for filepath",
+      "line 264: ControlFlowNode for filepath",
+      "--- Flow 2 ---",
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 254: ControlFlowNode for request",
+      "line 257: ControlFlowNode for file",
+      "line 262: ControlFlowNode for filename",
+      "line 263: ControlFlowNode for filepath",
+      "line 264: ControlFlowNode for filepath",
+      "--- Flow 3 ---",
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 257: ControlFlowNode for request",
+      "line 257: ControlFlowNode for file",
+      "line 262: ControlFlowNode for filename",
+      "line 263: ControlFlowNode for filepath",
+      "line 264: ControlFlowNode for filepath"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "The uploaded filename flows directly into a file path used by `file.save()` without any sanitization or validation, allowing potential directory traversal. No defensive code is present to prevent this, and the missing context (UPLOAD_FOLDER value and file.save implementation) does not change the fact that the filename is used unsanitized in a path.",
+    "input_tokens": 16539,
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:08:39.575534",
+    "data_flow": "request.files['file'].filename (line 257) → filename (line 262) → filepath (line 263) → file.save(filepath) (line 264)",
+    "confidence_score": 0.9,
+    "answers": [
+      "The EXACT file-operation sink is `file.save(filepath)` on line 264. The path value passed to it is `filepath`.",
+      "The assignments to `filepath` are: line 263: `filepath = os.path.join(UPLOAD_FOLDER, filename)`.",
+      "The value of `filepath` derives from user input. The data flow is: `request.files['file']` (line 257) → `file.filename` (line 262, assigned to `filename`) → `os.path.join(UPLOAD_FOLDER, filename)` (line 263, assigned to `filepath`). The filename comes directly from the uploaded file without sanitization.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. No defensive code is present between the user input and the sink.",
+      "There is no specific defense present. The code does not use `secure_filename`, path resolution checks, or any allow-list/deny-list mechanisms to prevent directory traversal. The UPLOAD_FOLDER global variable is not visible, so we cannot determine if it provides any protection.",
+      "The user-tainted value (`filename` from `file.filename`) reaches the sink (`file.save(filepath)`) directly without any sanitization or validation to prevent path traversal. The behavior of `file.save()` is unknown but likely saves to the filesystem, and without knowing the value of UPLOAD_FOLDER, we cannot determine if it provides adequate protection."
+    ],
+    "cost_usd": 0.0,
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "confidence": "High",
+    "output_tokens": 1184,
+    "elapsed_seconds": 11.508557796478271,
+    "tokens_used": 17723
+  },
+  "function": {
+    "name": "upload_file",
+    "file": "server/routes.py",
+    "start_line": 249,
+    "end_line": 280,
+    "scope": ""
+  },
+  "web_params": []
+}

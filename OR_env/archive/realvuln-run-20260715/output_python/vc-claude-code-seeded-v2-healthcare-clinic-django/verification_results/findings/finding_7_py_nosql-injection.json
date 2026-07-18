@@ -1,0 +1,73 @@
+{
+  "id": "7",
+  "rule_slug": "py_nosql-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/summary_vc-claude-code-seeded-v2-healthcare-clinic-django_20260714_152609.json"
+  },
+  "finding": {
+    "rule_id": "py/nosql-injection",
+    "message": "This NoSQL query contains an unsanitized [user-provided value](1).",
+    "file": "clinic_portal/patient_operations.py",
+    "start_line": 156,
+    "end_line": 156,
+    "repo_name": "vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/vc-claude-code-seeded-v2-healthcare-clinic-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 150: ControlFlowNode for request",
+      "line 154: ControlFlowNode for BoolExpr",
+      "line 154: ControlFlowNode for Attribute()",
+      "line 154: ControlFlowNode for payload",
+      "line 155: ControlFlowNode for payload",
+      "line 155: ControlFlowNode for Attribute()",
+      "line 155: ControlFlowNode for query",
+      "line 156: ControlFlowNode for query"
+    ],
+    "severity": "8.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-943"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "User-controlled JSON input from request.body flows directly into a MongoDB query with no sanitization, allowing injection of operators like $where or $gt. The use of pymongo confirms the sink type, and the lack of validation or middleware confirms exploitability.",
+    "cost_usd": 0.0,
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 408,
+    "tokens_used": 4956,
+    "elapsed_seconds": 3.727301836013794,
+    "cached_input_tokens": 0,
+    "timestamp": "2026-07-14T15:25:48.954678",
+    "iterations": 1,
+    "input_tokens": 4548,
+    "context_needed": [],
+    "data_flow": "request.body (line 154) → json.loads(request.body) → payload.get('filter', payload) (line 155) → query (line 155) → MongoClient(...).ops.records.find_one(query) (line 156)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "answers": [
+      "The input originates from `request.body` which is user-controlled JSON data (line 154).",
+      "Yes, the user input is used directly as a MongoDB query object via `find_one(query)` where `query = payload.get('filter', payload)` (lines 155-156).",
+      "Yes, an attacker can supply JSON operators like `{'$gt': ''}` or `{'$where': 'sleep(1000)'}` because the input is parsed as raw JSON and used directly in the query without sanitization (line 154 and 155).",
+      "No, there is no validation to ensure the input is a scalar value; it accepts arbitrary dictionaries through JSON parsing (lines 154-155).",
+      "Yes, `pymongo` is used (line 153), but there is no input sanitization or middleware protecting against NoSQL injection (lines 154-156).",
+      "The impact could include authentication bypass, data exfiltration, or DoS via `$where` expressions due to unsanitized query input (line 156)."
+    ]
+  },
+  "function": {
+    "name": "patient_mongo_lane_412",
+    "file": "clinic_portal/patient_operations.py",
+    "start_line": 150,
+    "end_line": 157,
+    "scope": ""
+  },
+  "web_params": []
+}

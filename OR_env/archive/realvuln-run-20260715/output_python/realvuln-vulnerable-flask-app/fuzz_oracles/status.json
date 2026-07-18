@@ -1,0 +1,74 @@
+{
+  "stage": "oracle",
+  "repo": "realvuln-vulnerable-flask-app",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/oracle.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/realvuln-vulnerable-flask-app/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 4,
+    "generated": 2,
+    "skipped": 0,
+    "failed": 2
+  },
+  "oracles": [
+    {
+      "id": "0",
+      "target_id": "py_stack_trace_exposure_app_app_py_281",
+      "rule_id": "py/stack-trace-exposure",
+      "file": "app/app.py",
+      "start_line": "281",
+      "function_name": "search_customer",
+      "finding_artifact": "output/python/realvuln-vulnerable-flask-app/verification_results/findings/finding_0_py_stack-trace-exposure.json",
+      "oracle": "output/python/realvuln-vulnerable-flask-app/fuzz_oracles/py_stack_trace_exposure_app_app_py_281.json",
+      "status": "failed"
+    },
+    {
+      "id": "2",
+      "target_id": "py_sql_injection_app_app_py_265",
+      "rule_id": "py/sql-injection",
+      "file": "app/app.py",
+      "start_line": "265",
+      "function_name": "search_customer",
+      "finding_artifact": "output/python/realvuln-vulnerable-flask-app/verification_results/findings/finding_2_py_sql-injection.json",
+      "oracle": "output/python/realvuln-vulnerable-flask-app/fuzz_oracles/py_sql_injection_app_app_py_265.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "3",
+      "target_id": "py_weak_sensitive_data_hashing_app_app_py_141",
+      "rule_id": "py/weak-sensitive-data-hashing",
+      "file": "app/app.py",
+      "start_line": "141",
+      "function_name": "reg_customer",
+      "finding_artifact": "output/python/realvuln-vulnerable-flask-app/verification_results/findings/finding_3_py_weak-sensitive-data-hashing.json",
+      "oracle": "output/python/realvuln-vulnerable-flask-app/fuzz_oracles/py_weak_sensitive_data_hashing_app_app_py_141.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "4",
+      "target_id": "py_template_injection_app_app_py_114",
+      "rule_id": "py/template-injection",
+      "file": "app/app.py",
+      "start_line": "114",
+      "function_name": "pnf",
+      "finding_artifact": "output/python/realvuln-vulnerable-flask-app/verification_results/findings/finding_4_py_template-injection.json",
+      "oracle": "output/python/realvuln-vulnerable-flask-app/fuzz_oracles/py_template_injection_app_app_py_114.json",
+      "status": "failed"
+    }
+  ],
+  "errors": [
+    {
+      "finding_artifact": "output/python/realvuln-vulnerable-flask-app/verification_results/findings/finding_0_py_stack-trace-exposure.json",
+      "error": "_meta missing field: 'tainted_params'"
+    },
+    {
+      "finding_artifact": "output/python/realvuln-vulnerable-flask-app/verification_results/findings/finding_4_py_template-injection.json",
+      "error": "tainted_params[0].index must be >= 0 for direct_params strategy"
+    }
+  ]
+}

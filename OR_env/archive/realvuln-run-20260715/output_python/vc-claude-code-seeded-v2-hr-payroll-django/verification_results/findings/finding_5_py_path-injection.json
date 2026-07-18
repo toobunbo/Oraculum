@@ -1,0 +1,76 @@
+{
+  "id": "5",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/summary_vc-claude-code-seeded-v2-hr-payroll-django_20260714_152802.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 148,
+    "end_line": 148,
+    "repo_name": "vc-claude-code-seeded-v2-hr-payroll-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/vc-claude-code-seeded-v2-hr-payroll-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 142: ControlFlowNode for request",
+      "line 145: ControlFlowNode for Attribute",
+      "line 145: ControlFlowNode for Attribute()",
+      "line 145: ControlFlowNode for name",
+      "line 146: ControlFlowNode for target",
+      "line 148: ControlFlowNode for target"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "data_flow": "request (line 142) → name = request.GET.get(\"name\", \"packet.bin\") (line 145) → target = BASE_EXPORT_DIR / name (line 146) → target.write_bytes(request.body) (line 148)",
+    "iterations": 4,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "tokens_used": 19983,
+    "timestamp": "2026-07-14T15:27:51.704265",
+    "input_tokens": 17945,
+    "output_tokens": 2038,
+    "confidence_score": 0.95,
+    "elapsed_seconds": 15.68025255203247,
+    "reasoning": "User-controlled input `name` is directly used to construct a file path via `BASE_EXPORT_DIR / name` without any sanitization or validation, leading to a path traversal vulnerability when `target.write_bytes(request.body)` is called. No defensive measures are present to prevent directory traversal attacks.",
+    "cost_usd": 0.0,
+    "answers": [
+      "The exact file-operation sink is `target.write_bytes(request.body)` on line 148. The path value passed to it is `target`, which is derived from `BASE_EXPORT_DIR / name`.",
+      "The assignments to the path value `target` are: Line 146: `target = BASE_EXPORT_DIR / name`. This is the only assignment to `target` before it reaches the sink on line 148.",
+      "The value of `target` derives from `name`, which is assigned on line 145: `name = request.GET.get(\"name\", \"packet.bin\")`. This value comes directly from user input via `request.GET`, making it user-controlled. The data flow is: `request` (line 142) → `name` (line 145) → `target` (line 146) → sink (line 148).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value `name` or `target` on the path to the sink. No defensive checks or overrides are present in the code.",
+      "There is no specific defense mechanism applied to the path. The code does not use `secure_filename`, `resolve()` with `is_relative_to()`, or any allow-list or blocklist sanitization. The `Path` object is used, but no validation or sanitization is performed on the user-provided `name`. While `BASE_EXPORT_DIR` is not visible, its absence from the code context suggests it's not providing active protection.",
+      "The user-tainted value `name` reaches the sink via `target`, and no defense mechanisms are present to prevent path traversal. The use of `Path` objects with `/` operator does not automatically prevent directory traversal when the filename itself contains traversal sequences like `../`."
+    ],
+    "cached_input_tokens": 0,
+    "context_needed": []
+  },
+  "function": {
+    "name": "payroll_dock_shelf_391",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 142,
+    "end_line": 149,
+    "scope": ""
+  },
+  "web_params": []
+}

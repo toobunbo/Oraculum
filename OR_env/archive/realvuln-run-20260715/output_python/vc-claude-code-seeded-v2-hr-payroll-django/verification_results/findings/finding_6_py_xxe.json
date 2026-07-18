@@ -1,0 +1,68 @@
+{
+  "id": "6",
+  "rule_slug": "py_xxe",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/summary_vc-claude-code-seeded-v2-hr-payroll-django_20260714_152802.json"
+  },
+  "finding": {
+    "rule_id": "py/xxe",
+    "message": "XML parsing depends on a [user-provided value](1) without guarding against external entity expansion.",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 197,
+    "end_line": 197,
+    "repo_name": "vc-claude-code-seeded-v2-hr-payroll-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/vc-claude-code-seeded-v2-hr-payroll-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 192: ControlFlowNode for request",
+      "line 197: ControlFlowNode for Attribute"
+    ],
+    "severity": "9.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-611",
+      "CWE-827"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "data_flow": "request (line 192) → request.body (line 197) → etree.fromstring() with vulnerable parser (line 197)",
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "tokens_used": 12508,
+    "timestamp": "2026-07-14T15:27:47.389210",
+    "input_tokens": 11543,
+    "output_tokens": 965,
+    "confidence_score": 0.95,
+    "elapsed_seconds": 9.561148166656494,
+    "reasoning": "The code uses lxml's XMLParser with resolve_entities=True and load_dtd=True, which enables XXE attacks, and directly parses user-controlled request.body without any sanitization. The function appears to be an HTTP endpoint that processes XML data from requests.",
+    "cost_usd": 0.0,
+    "answers": [
+      "The EXACT XML-parse sink is `etree.fromstring(request.body, parser)` on line 197. The parser object is `parser` and the input bytes/text passed to it is `request.body`.",
+      "The only assignment to the XML input that reaches the parse call is `request.body` on line 197 (it's directly used as an argument).",
+      "The value `request.body` derives from user input. The data-flow chain is established by the CodeQL analysis which shows the source as `request` on line 192 reaching the sink on line 197.",
+      "The parser configuration on line 196 is `etree.XMLParser(load_dtd=True, resolve_entities=True, no_network=False)`.",
+      "The parser configuration ENABLES external entities (`resolve_entities=True`), DTD loading (`load_dtd=True`), and network access (`no_network=False`). This is configured on line 196.",
+      "Yes, the parser ENABLES external entities with `resolve_entities=True` on line 196, and the input is user-controlled as `request.body` from the HTTP request."
+    ],
+    "cached_input_tokens": 0,
+    "context_needed": []
+  },
+  "function": {
+    "name": "payroll_xml_fold_454",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 192,
+    "end_line": 198,
+    "scope": ""
+  },
+  "web_params": []
+}

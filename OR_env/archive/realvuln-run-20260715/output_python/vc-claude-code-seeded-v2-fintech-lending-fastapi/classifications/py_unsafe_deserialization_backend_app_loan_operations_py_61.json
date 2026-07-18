@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink is pickle.loads(raw) on user-controlled input, which is an unsafe deserializer that leads to Remote Code Execution (RCE)."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "N/A"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "N/A"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock pickle.loads to prevent RCE during testing.",
+    "capture": "Capture the raw argument passed to pickle.loads to verify it contains the expected user-controlled payload.",
+    "fake_behavior": "Return a safe, predetermined dummy dictionary (e.g., {'bundle': 'mocked'}) to allow execution to continue without deserializing the untrusted bytes.",
+    "notes": [
+      "Ensure the mock intercepts the call before the actual pickle module processes the bytes.",
+      "Validate that the captured raw argument matches the expected test input (e.g., from request.body or query_params)."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

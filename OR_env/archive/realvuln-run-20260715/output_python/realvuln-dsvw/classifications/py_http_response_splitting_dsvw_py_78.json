@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is self.send_header which performs HTTP network I/O"
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Stopped at Q1"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Stopped at Q1"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock self.send_header to intercept the header name and value arguments",
+    "capture": "Capture the second argument passed to self.send_header on line 78, checking for CRLF sequences (\\r\\n) in the constructed Content-Type string",
+    "fake_behavior": "Make self.send_header a no-op that records its arguments without sending data over the network",
+    "notes": [
+      "Ensure the mock replaces the method on the handler instance before do_GET is invoked",
+      "The injected payload comes from params.get('charset', 'utf8') derived from the query string"
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

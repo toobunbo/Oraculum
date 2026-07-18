@@ -1,0 +1,76 @@
+{
+  "id": "2",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/summary_vc-claude-code-seeded-v2-crm-saas-django_20260714_152015.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "crm_project/partner_console.py",
+    "start_line": 91,
+    "end_line": 91,
+    "repo_name": "vc-claude-code-seeded-v2-crm-saas-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/vc-claude-code-seeded-v2-crm-saas-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 86: ControlFlowNode for request",
+      "line 89: ControlFlowNode for Attribute",
+      "line 89: ControlFlowNode for Attribute()",
+      "line 89: ControlFlowNode for ref",
+      "line 90: ControlFlowNode for target",
+      "line 91: ControlFlowNode for Attribute"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 16993,
+    "confidence": "High",
+    "iterations": 3,
+    "output_tokens": 1514,
+    "context_needed": [],
+    "reasoning": "User-controlled input `ref` is used to construct a file path that is then used in a directory creation operation without sanitization or validation, allowing potential directory traversal. The unknown value of BASE_EXPORT_DIR does not provide sufficient protection.",
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:19:54.278375",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request.GET.get('ref', 'daily') (line 89) → ref (line 89) → f'{ref}.json' (line 90) → target (line 90) → target.parent (line 91)",
+    "cost_usd": 0.0,
+    "cached_input_tokens": 0,
+    "tokens_used": 18507,
+    "elapsed_seconds": 12.244671821594238,
+    "confidence_score": 0.9,
+    "answers": [
+      "The EXACT flagged line is: `target.parent.mkdir(parents=True, exist_ok=True)` on line 91. This line is located in the function `acct_vault_stash_233`.",
+      "The path value passed to the sink is `target.parent`, where `target` is assigned on line 90: `target = BASE_EXPORT_DIR / f'{ref}.json'`. This is the only assignment to `target` on the path to the sink.",
+      "The value of `target` derives from `ref`, which is assigned on line 89: `ref = request.GET.get('ref', 'daily')`. This value comes directly from user input via `request.GET`, making it tainted. The data flow is: `request.GET.get('ref', 'daily')` (line 89) → `ref` (line 89) → `f'{ref}.json'` (line 90) → `target` (line 90) → `target.parent` (line 91).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value `ref` on the path to the sink. No defensive logic is present between the assignment of `ref` and the use of `target.parent`.",
+      "There is no specific defense applied to the path. The code does not use `secure_filename`, `Path.resolve()` with `is_relative_to()`, or any other explicit sanitization or validation to prevent directory traversal. The value of `BASE_EXPORT_DIR` is not visible, so we cannot determine if it provides any containment.",
+      "The user-tainted value `ref` from `request.GET` reaches the sink `target.parent.mkdir(...)` without any sanitization or validation. Since `ref` can contain directory traversal sequences (e.g., `../../../etc/passwd`), this constitutes a path traversal vulnerability. The unknown value of `BASE_EXPORT_DIR` does not change the fact that user input directly influences the path."
+    ]
+  },
+  "function": {
+    "name": "acct_vault_stash_233",
+    "file": "crm_project/partner_console.py",
+    "start_line": 86,
+    "end_line": 93,
+    "scope": ""
+  },
+  "web_params": []
+}

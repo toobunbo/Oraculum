@@ -1,0 +1,81 @@
+{
+  "id": "27",
+  "rule_slug": "py_url-redirection",
+  "source": {
+    "vhx_root": "/home/trieudai/",
+    "vhx_repo_root": "/home/trieudai/bench-src",
+    "vhx_output_root": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python",
+    "summary_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/verification_results/summary_benchmark-python_filtered_20260610_105228.json"
+  },
+  "finding": {
+    "rule_id": "py/url-redirection",
+    "message": "Untrusted URL redirection depends on a [user-provided value](1).",
+    "file": "testcode/BenchmarkTest00151.py",
+    "start_line": 64,
+    "end_line": 64,
+    "repo_name": "benchmark-python",
+    "lang": "python",
+    "sarif_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/benchmark-python.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 31: ControlFlowNode for request",
+      "line 31: ControlFlowNode for Attribute",
+      "line 31: ControlFlowNode for Attribute()",
+      "line 31: ControlFlowNode for param",
+      "line 40: ControlFlowNode for bar",
+      "line 64: ControlFlowNode for bar",
+      "--- Flow 2 ---",
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 31: ControlFlowNode for request",
+      "line 31: ControlFlowNode for Attribute",
+      "line 31: ControlFlowNode for Attribute()",
+      "line 31: ControlFlowNode for param",
+      "line 44: ControlFlowNode for bar",
+      "line 64: ControlFlowNode for bar"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [],
+    "tags": [
+      "security",
+      "external/cwe/cwe-601"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-06-10T10:46:51.118786",
+    "context_needed": [],
+    "data_flow": "request.form.get(\"BenchmarkTest00151\") (line 31) → param (line 31) → bar (line 37) → flask.redirect(bar) (line 64)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "answers": [
+      "The redirect sink is `flask.redirect(bar)` on line 64 in function `BenchmarkTest00151_post`. The URL/target value passed to it is `bar`.",
+      "The assignments to `bar` are:\n- Line 37: `bar = param` (when `guess` is 'A')\n- Line 41: `bar = 'bob'` (when `guess` is 'B')\n- Line 43: `bar = param` (when `guess` is 'C' or 'D')\n- Line 45: `bar = 'bob\\'s your uncle'` (default case)\n\nThe last assignment is `bar = param` on line 37, since `guess = possible[0]` where `possible = 'ABC'`, so `guess` is always 'A'.",
+      "The value of `bar` derives from `param` which comes from `request.form.get(\"BenchmarkTest00151\")` on line 31. This is user input from form data, making it user-controlled.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The match-case block assigns `bar = param` directly without additional validation after the case 'A' branch.",
+      "The validation check is `if url.netloc not in ['google.com'] or url.scheme != 'https'` on lines 52-55. This is insufficient as a defense because it only checks that the netloc is 'google.com' and scheme is 'https', but doesn't prevent redirects to malicious paths on google.com (e.g., https://google.com/evil). Additionally, the logic is flawed - it should be `and` not `or` to properly restrict URLs.",
+      "The user-tainted value flows directly from request input to the redirect: request.form.get() → param → bar → flask.redirect(). The validation is insufficient to prevent malicious URL redirection."
+    ],
+    "confidence_score": 0.9,
+    "iterations": 3,
+    "input_tokens": 9610,
+    "elapsed_seconds": 52.63704776763916,
+    "confidence": "High",
+    "cached_input_tokens": 0,
+    "tokens_used": 11311,
+    "reasoning": "User-controlled input flows directly to flask.redirect() with insufficient validation. The netloc/scheme check is bypassable and the logic is flawed (using 'or' instead of 'and').",
+    "verdict": "True Positive",
+    "output_tokens": 1701
+  },
+  "function": {
+    "name": "BenchmarkTest00151_post",
+    "file": "testcode/BenchmarkTest00151.py",
+    "start_line": 28,
+    "end_line": 66,
+    "scope": "Function init"
+  }
+}

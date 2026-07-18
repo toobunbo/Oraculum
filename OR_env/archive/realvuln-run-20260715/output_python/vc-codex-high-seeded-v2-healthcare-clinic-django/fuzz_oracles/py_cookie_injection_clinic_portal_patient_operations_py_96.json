@@ -1,0 +1,49 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "string representation of response.cookies via str(return_value.cookies)",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The string representation of the response's SimpleCookie contains injected cookie attributes (HttpOnly, Secure, Domain) that were not explicitly set by set_cookie(), confirming cookie attribute injection via the unsanitized marker value.",
+    "trigger_patterns": [
+      ";\\s*HttpOnly",
+      ";\\s*Secure",
+      ";\\s*Domain\\s*="
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_COOKIE_INJECTION: cookie attribute injection detected in response cookies — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "portal; HttpOnly=False",
+      "portal; Secure=False",
+      "portal; Domain=attacker.com",
+      "portal; HttpOnly=False; Secure=False; Domain=evil.com",
+      "x; Domain=.evil.com; Secure"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "patient_crumb_lane_297",
+    "file": "clinic_portal/patient_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def patient_crumb_lane_297(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "HttpRequest"
+      }
+    ],
+    "target_id": "py_cookie_injection_clinic_portal_patient_operations_py_96",
+    "finding_id": "1",
+    "rule_id": "py/cookie-injection",
+    "rule_slug": "py_cookie-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-codex-high-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_1_py_cookie-injection.json"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "id": "10",
+  "rule_slug": "py_template-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/summary_vc-codex-high-seeded-v2-education-lms-django_20260714_154006.json"
+  },
+  "finding": {
+    "rule_id": "py/template-injection",
+    "message": "This template construction depends on a [user-provided value](1).",
+    "file": "education_lms/course_operations.py",
+    "start_line": 132,
+    "end_line": 132,
+    "repo_name": "vc-codex-high-seeded-v2-education-lms-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/vc-codex-high-seeded-v2-education-lms-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 127: ControlFlowNode for request",
+      "line 131: ControlFlowNode for Attribute",
+      "line 131: ControlFlowNode for Attribute()",
+      "line 131: ControlFlowNode for fragment",
+      "line 132: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "9.3",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-74"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:40:06.984049",
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "iterations": 3,
+    "tokens_used": 17948,
+    "cost_usd": 0.0,
+    "answers": [
+      "The EXACT template-render sink is: `Template(\"Result: \" + fragment).render()` on line 132. The template-source string passed to it is: `\"Result: \" + fragment`.",
+      "The template-source string `\"Result: \" + fragment` is assigned directly in the `Template()` constructor on line 132. The variable `fragment` is assigned on line 131: `fragment = request.GET.get(\"fragment\", \"{{ 7 * 7 }}\")`.",
+      "The value of `fragment` derives from user input via `request.GET.get(\"fragment\", \"{{ 7 * 7 }}\")` on line 131. The data-flow chain is: `request` (line 127, [SOURCE]) → `request.GET.get()` (line 131) → `fragment` (line 131) → `\"Result: \" + fragment` (line 132) → `Template(...).render()` (line 132, [SINK]).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value of `fragment` before it reaches the sink on line 132.",
+      "There is no specific defense preventing SSTI. The user input is directly embedded into the template source string, and no sandboxing (e.g., `jinja2.sandbox.SandboxedEnvironment`), escaping, or safe rendering mechanism is used. The default `jinja2.Template` is used, which is vulnerable to SSTI if the template source is tainted.",
+      "User-controlled data (`fragment` from `request.GET`) reaches the template SOURCE (`\"Result: \" + fragment`) with concrete line numbers (131 → 132), and there is no defense present in the code to prevent SSTI."
+    ],
+    "context_needed": [],
+    "verdict": "True Positive",
+    "data_flow": "request (line 127) → fragment = request.GET.get(\"fragment\", ...) (line 131) → Template(\"Result: \" + fragment).render() (line 132)",
+    "elapsed_seconds": 16.441023588180542,
+    "reasoning": "User-controlled input (`fragment`) is directly embedded into a Jinja2 template source string without sanitization or sandboxing, leading to a clear Server-Side Template Injection (CWE-74) vulnerability. The lack of callers does not change the fact that the function is vulnerable as written.",
+    "cached_input_tokens": 0,
+    "output_tokens": 1374,
+    "input_tokens": 16574,
+    "model": "ollama_chat/qwen3-coder:480b-cloud"
+  },
+  "function": {
+    "name": "course_jinja_cast_586",
+    "file": "education_lms/course_operations.py",
+    "start_line": 127,
+    "end_line": 133,
+    "scope": ""
+  },
+  "web_params": []
+}

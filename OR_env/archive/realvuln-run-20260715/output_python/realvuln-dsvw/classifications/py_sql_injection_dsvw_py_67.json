@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink is `cursor.execute()` which performs a database write operation and is dangerous in a test environment."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "The SQL injection vulnerability occurs during execution and does not produce observable side effects after the function returns."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "The returns.kind is 'none' and returns.exprs is empty, indicating no return value."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "cursor.execute()",
+    "capture": "the SQL query string being executed",
+    "fake_behavior": "mock the execute call to prevent actual database interaction while capturing the query for verification",
+    "notes": [
+      "The SQL query is constructed via string concatenation with user input",
+      "Need to capture both username and password parameters from the request"
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

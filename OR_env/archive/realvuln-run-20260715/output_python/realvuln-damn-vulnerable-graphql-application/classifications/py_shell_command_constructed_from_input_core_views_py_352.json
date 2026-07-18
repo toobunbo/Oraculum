@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is helpers.run_cmd('ps {}'.format(arg)), which executes a shell command constructed from unsanitized user input, i.e., shell execution."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; Q1 already selected recorded_call."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; Q1 already selected recorded_call."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock helpers.run_cmd to intercept the shell command execution.",
+    "capture": "Capture the first positional argument (the command string) passed to helpers.run_cmd. Verify that the captured string contains the tainted 'arg' value and confirm the injection is possible (e.g., trailing shell metacharacters).",
+    "fake_behavior": "Return a plausible fake string (e.g., an empty string or a stub process listing) to allow execution to continue without invoking a real shell.",
+    "notes": [
+      "The vulnerability is in the command string construction, so capturing the argument before execution is sufficient to prove the finding.",
+      "Ensure the mock replaces helpers.run_cmd at the module level where it is imported."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

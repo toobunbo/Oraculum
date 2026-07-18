@@ -1,0 +1,78 @@
+{
+  "id": "4",
+  "rule_slug": "py_sql-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-dvblab",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab/verification_results/summary_realvuln-dvblab_20260714_145756.json"
+  },
+  "finding": {
+    "rule_id": "py/sql-injection",
+    "message": "This SQL query depends on a [user-provided value](1).",
+    "file": "backend/routes/transaction_routes.py",
+    "start_line": 95,
+    "end_line": 95,
+    "repo_name": "realvuln-dvblab",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab/realvuln-dvblab.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 89: ControlFlowNode for request",
+      "line 89: ControlFlowNode for Attribute",
+      "line 89: ControlFlowNode for Attribute()",
+      "line 89: ControlFlowNode for search_term",
+      "line 93: ControlFlowNode for query",
+      "line 95: ControlFlowNode for query"
+    ],
+    "severity": "8.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-89"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "The user-controlled input `search_term` is directly embedded into the SQL query string via an f-string on line 93, and passed to `db.session.execute()` on line 95 without any sanitization or parameterization. Even though the exact implementation of db.session.execute is not visible, the naming convention suggests it's a SQLAlchemy method that would execute raw SQL, making this a clear case of SQL injection vulnerability.",
+    "elapsed_seconds": 18.337282180786133,
+    "answers": [
+      "The exact sink statement is: `result = db.session.execute(query)` on line 95. The variable passed to it is `query`.",
+      "The assignment to `query` is on line 93: `query = f\"SELECT * FROM \\\"transaction\\\" WHERE (sender_id = {current_user.id} OR receiver_id = {current_user.id}) AND description LIKE '%{search_term}%'\"`",
+      "The value of `query` is derived from: (a) `current_user.id` (from the authenticated user context, not directly user-controllable in this request) and (b) `search_term` which is obtained from user input via `request.args.get('description', '')` on line 89. The `search_term` is directly embedded into the SQL string without sanitization.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The `query` variable is built directly from the user input and used immediately.",
+      "There is no specific defense such as parameterized queries or ORM methods. The query is constructed using an f-string, which is vulnerable to SQL injection. The implementation of db.session.execute is not available, but based on the naming convention, it's likely a SQLAlchemy session execute method which would be vulnerable to injection when passed a raw SQL string.",
+      "The user-tainted value `search_term` reaches the sink via line 89 → line 93 → line 95. There is no sanitization or parameterization."
+    ],
+    "cached_input_tokens": 0,
+    "tokens_used": 16006,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence_score": 0.9,
+    "timestamp": "2026-07-14T14:57:46.057551",
+    "context_needed": [],
+    "data_flow": "request.args.get('description', '') (line 89) → search_term (line 89) → query (line 93) → db.session.execute(query) (line 95)",
+    "output_tokens": 1355,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "iterations": 3,
+    "verdict": "True Positive",
+    "input_tokens": 14651
+  },
+  "function": {
+    "name": "search_transactions",
+    "file": "backend/routes/transaction_routes.py",
+    "start_line": 88,
+    "end_line": 111,
+    "scope": ""
+  },
+  "web_params": [
+    {
+      "name": "description",
+      "source": "args"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is target.write_bytes(request.body) on line 133, an irreversible filesystem write side effect."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; Q1 was true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; Q1 was true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock or record the pathlib.Path.write_bytes method on the target object constructed from BASE_EXPORT_DIR / name.",
+    "capture": "Capture the exact target path string and the full request.body bytes passed to write_bytes to verify path traversal (e.g., '..' segments) without performing the write.",
+    "fake_behavior": "Prevent the actual filesystem write; optionally return a dummy byte count (e.g., len(request.body)) so the subsequent JsonResponse construction succeeds if the harness continues execution.",
+    "notes": [
+      "The target is a pathlib.Path instance; patching pathlib.Path.write_bytes or the specific instance's method is appropriate.",
+      "Although the function returns a JsonResponse containing the stored path and byte count, the dangerous side effect occurs before the return, so recording the call is the correct strategy."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

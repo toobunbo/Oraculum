@@ -1,0 +1,65 @@
+{
+  "id": "10",
+  "rule_slug": "py_jinja2_autoescape-false",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/summary_vc-claude-code-seeded-v2-healthcare-clinic-django_20260714_152609.json"
+  },
+  "finding": {
+    "rule_id": "py/jinja2/autoescape-false",
+    "message": "Using jinja2 templates with autoescape=False can potentially allow XSS attacks.",
+    "file": "clinic_portal/patient_operations.py",
+    "start_line": 130,
+    "end_line": 130,
+    "repo_name": "vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/vc-claude-code-seeded-v2-healthcare-clinic-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [],
+    "severity": "6.1",
+    "precision": "medium",
+    "cwe_ids": [
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "User-controlled input `fragment` is directly embedded into a Jinja2 template without enabling autoescape, leading to potential XSS. No sanitization or escaping is applied.",
+    "cost_usd": 0.0,
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 1250,
+    "tokens_used": 17385,
+    "elapsed_seconds": 10.888838052749634,
+    "cached_input_tokens": 0,
+    "timestamp": "2026-07-14T15:26:08.017935",
+    "iterations": 3,
+    "input_tokens": 16135,
+    "context_needed": [],
+    "data_flow": "request.GET.get(\"fragment\", ...) (line 129) → Template(\"Result: \" + fragment).render() (line 130)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "answers": [
+      "The sink is `Template(\"Result: \" + fragment).render()` on line 130. The value being rendered is the string `\"Result: \" + fragment`, where `fragment` is user-controlled input from the request.",
+      "The value `fragment` is assigned on line 129: `fragment = request.GET.get(\"fragment\", \"{{ 7 * 7 }}\")`. This is the only assignment to `fragment` on this path.",
+      "The value of `fragment` is derived from user input via `request.GET.get(\"fragment\", \"{{ 7 * 7 }}\")` on line 129. The default value is a safe constant, but the user can override it with arbitrary input.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the path to the sink.",
+      "No specific defense is present. The Jinja2 `Template` is instantiated without enabling autoescape (`autoescape=False` is the default unless explicitly set otherwise). There is no call to `html.escape()`, `markupsafe.escape()`, or any equivalent sanitization.",
+      "The Jinja2 `Template` is created without enabling autoescape, which is equivalent to `autoescape=False`. This disables escaping by default for the template rendering. The disabler is implicit in the use of `Template(...)` without setting `autoescape=True`.",
+      "The user-tainted value `fragment` reaches the sink at line 130, and there is no escaping or sanitization applied. The implicit `autoescape=False` in the `Template` constructor disables defenses, making this a real vulnerability."
+    ]
+  },
+  "function": {
+    "name": "patient_jinja_cast_383",
+    "file": "clinic_portal/patient_operations.py",
+    "start_line": 125,
+    "end_line": 131,
+    "scope": ""
+  },
+  "web_params": []
+}

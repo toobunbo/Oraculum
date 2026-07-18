@@ -1,0 +1,68 @@
+{
+  "id": "13",
+  "rule_slug": "py_log-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/summary_vc-codex-high-seeded-v2-education-lms-django_20260714_154006.json"
+  },
+  "finding": {
+    "rule_id": "py/log-injection",
+    "message": "This log entry depends on a [user-provided value](1).",
+    "file": "education_lms/course_operations.py",
+    "start_line": 73,
+    "end_line": 73,
+    "repo_name": "vc-codex-high-seeded-v2-education-lms-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/vc-codex-high-seeded-v2-education-lms-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 69: ControlFlowNode for request",
+      "line 73: ControlFlowNode for Attribute",
+      "line 73: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.8",
+    "precision": "medium",
+    "cwe_ids": [
+      "CWE-117"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:40:02.724573",
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "iterations": 1,
+    "tokens_used": 3553,
+    "cost_usd": 0.0,
+    "answers": [
+      "The log data originates from the request body (line 72: `body = request.body.decode(\"utf-8\", errors=\"replace\")`) and the Authorization header (line 73: `request.headers.get(\"authorization\")`), both of which are user-provided values.",
+      "Yes, the data is written to a log using `logger.warning` without any sanitization (line 73).",
+      "Yes, an attacker could embed newline characters (\\n, \\r) in the request body or authorization header, which are directly logged, enabling log forging.",
+      "Yes, injected entries could mask real security events or mislead incident responders by forging log entries that appear legitimate.",
+      "It is likely that the log is consumed by a log aggregation system, as this is a common practice, and such systems can be confused by crafted entries containing newlines.",
+      "Yes, stripping or encoding newlines and control characters from user data before logging would prevent this vulnerability."
+    ],
+    "context_needed": [],
+    "verdict": "True Positive",
+    "data_flow": "request.body (line 72) → body variable (line 72) → logger.warning (line 73)",
+    "elapsed_seconds": 4.668955326080322,
+    "reasoning": "User-controlled data from the request body and headers flows directly into a log message without sanitization, enabling log injection. The framework does not appear to provide automatic protection against this.",
+    "cached_input_tokens": 0,
+    "output_tokens": 319,
+    "input_tokens": 3234,
+    "model": "ollama_chat/qwen3-coder:480b-cloud"
+  },
+  "function": {
+    "name": "course_wire_tally_222",
+    "file": "education_lms/course_operations.py",
+    "start_line": 69,
+    "end_line": 74,
+    "scope": ""
+  },
+  "web_params": []
+}

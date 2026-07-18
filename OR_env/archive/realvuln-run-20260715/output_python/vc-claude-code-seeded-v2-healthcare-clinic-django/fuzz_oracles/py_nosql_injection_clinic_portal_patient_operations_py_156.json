@@ -1,0 +1,53 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "pymongo.collection.Collection.find_one",
+    "target_arg_index": 0,
+    "target_arg_name": "filter",
+    "capture_what": "query dictionary passed to find_one containing potentially injected NoSQL operators",
+    "additional_imports": [
+      "pymongo.collection"
+    ]
+  },
+  "oracle_check": {
+    "condition_description": "The captured query dict contains keys that are MongoDB query operators (starting with $) such as $where, $gt, $ne, or $regex, indicating NoSQL injection",
+    "trigger_patterns": [
+      "\\$where",
+      "\\$gt",
+      "\\$ne",
+      "\\$regex"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_NOSQL_INJECTION: NoSQL operator injected into find_one query — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "{\"$gt\": \"\"}",
+      "{\"$where\": \"sleep(1000)\"}",
+      "{\"filter\": {\"$gt\": \"\"}}",
+      "{\"filter\": {\"$where\": \"sleep(1000)\"}}",
+      "{\"$ne\": null}",
+      "{\"$regex\": \".*\"}"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "patient_mongo_lane_412",
+    "file": "clinic_portal/patient_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def patient_mongo_lane_412(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "HttpRequest"
+      }
+    ],
+    "target_id": "py_nosql_injection_clinic_portal_patient_operations_py_156",
+    "finding_id": "7",
+    "rule_id": "py/nosql-injection",
+    "rule_slug": "py_nosql-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_7_py_nosql-injection.json"
+  }
+}

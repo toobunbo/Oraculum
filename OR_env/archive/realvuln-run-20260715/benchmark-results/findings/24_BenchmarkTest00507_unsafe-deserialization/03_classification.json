@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink is `pickle.loads()` which is dangerous due to potential RCE from unsafe deserialization of user-controlled input."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "Not evaluated because Q1 was true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated because Q1 was true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the `pickle.loads()` call to prevent actual deserialization of untrusted data.",
+    "capture": "Capture the argument passed to `pickle.loads()` to verify it originates from user input.",
+    "fake_behavior": "Return a safe dummy object or raise an exception to simulate defense against unsafe deserialization.",
+    "notes": [
+      "Ensure the mock prevents execution of arbitrary code during deserialization.",
+      "Verify that base64 decoding occurs before the mocked pickle.loads call."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

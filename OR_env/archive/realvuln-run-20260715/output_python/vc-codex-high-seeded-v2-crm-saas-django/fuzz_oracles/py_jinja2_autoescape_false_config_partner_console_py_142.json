@@ -1,0 +1,55 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of acct_jinja_cast_585, which is the HttpResponse containing the Jinja2-rendered body with autoescape=False",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The rendered template output contains unescaped HTML tags (<script, <img, <svg, <iframe) that would have been escaped to &lt;...&gt; if autoescape were enabled, confirming the autoescape=False bypass allows raw HTML injection into the response.",
+    "trigger_patterns": [
+      "<script[\\s>]",
+      "<img[\\s>]",
+      "<svg[\\s>]",
+      "<iframe[\\s>]",
+      "<body[\\s>]",
+      "<input[\\s>]",
+      "<details[\\s>]",
+      "<marquee[\\s>]"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_JINJA2_AUTOESCAPE_FALSE: unescaped HTML tag survived Jinja2 rendering with autoescape=False — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "<script>alert(1)</script>",
+      "<img src=x onerror=alert(1)>",
+      "<svg onload=alert(1)>",
+      "<iframe src=\"javascript:alert(1)\">",
+      "<details open ontoggle=alert(1)>",
+      "<input onfocus=alert(1) autofocus>"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "acct_jinja_cast_585",
+    "file": "config/partner_console.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def acct_jinja_cast_585(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "HttpRequest"
+      }
+    ],
+    "target_id": "py_jinja2_autoescape_false_config_partner_console_py_142",
+    "finding_id": "11",
+    "rule_id": "py/jinja2/autoescape-false",
+    "rule_slug": "py_jinja2_autoescape-false",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_11_py_jinja2_autoescape-false.json"
+  }
+}

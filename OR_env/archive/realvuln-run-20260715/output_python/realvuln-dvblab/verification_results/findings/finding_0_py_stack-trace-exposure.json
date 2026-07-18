@@ -1,0 +1,68 @@
+{
+  "id": "0",
+  "rule_slug": "py_stack-trace-exposure",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-dvblab",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab/verification_results/summary_realvuln-dvblab_20260714_145756.json"
+  },
+  "finding": {
+    "rule_id": "py/stack-trace-exposure",
+    "message": "[Stack trace information](1) flows to this location and may be exposed to an external user.",
+    "file": "backend/routes/auth_routes.py",
+    "start_line": 165,
+    "end_line": 165,
+    "repo_name": "realvuln-dvblab",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab/realvuln-dvblab.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 164: ControlFlowNode for e",
+      "line 165: ControlFlowNode for Dict"
+    ],
+    "severity": "5.4",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-209",
+      "CWE-497"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "Raw exception messages containing sensitive internal system information are directly exposed to external users through HTTP responses. This violates CWE-209 by revealing application internals that aid attackers in reconnaissance and exploitation.",
+    "elapsed_seconds": 15.027348279953003,
+    "answers": [
+      "The exception message `str(e)` on line 165 exposes stack traces, file paths, internal variable values, and application structure details",
+      "Yes, line 165 returns the error in an HTTP response via `jsonify({'error': str(e)}), 400`",
+      "Not visible in context, but the pattern represents a security vulnerability regardless",
+      "Yes, external attackers can trigger this by sending malformed YAML to the import endpoint",
+      "Yes, the broad `except Exception as e:` catches all exceptions and exposes raw messages without sanitization",
+      "External users via the HTTP API response"
+    ],
+    "cached_input_tokens": 0,
+    "tokens_used": 14248,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence_score": 0.9,
+    "timestamp": "2026-07-14T14:57:32.397079",
+    "context_needed": [],
+    "data_flow": "User-provided YAML (line 155) → yaml.load() exception (line 157) → exception message str(e) (line 164) → HTTP response JSON (line 165)",
+    "output_tokens": 1846,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "iterations": 2,
+    "verdict": "True Positive",
+    "input_tokens": 12402
+  },
+  "function": {
+    "name": "import_profile",
+    "file": "backend/routes/auth_routes.py",
+    "start_line": 153,
+    "end_line": 165,
+    "scope": ""
+  },
+  "web_params": []
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "strategy": "return_value",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "Django's redirect() returns an HttpResponseRedirect object without performing actual network I/O, so it is safe to execute in a test environment."
+    },
+    "q2_observable_after_return": {
+      "answer": true,
+      "evidence": "The violation (open redirect) is observable by inspecting the Location header or url attribute of the returned HttpResponseRedirect object."
+    },
+    "q3_result_in_memory": {
+      "answer": true,
+      "evidence": "returns.kind is 'value' and returns.exprs contains 'redirect(lane)', meaning the HttpResponseRedirect object is directly returned and accessible in memory."
+    }
+  },
+  "mock_guidance": null,
+  "confidence": "high",
+  "warnings": []
+}

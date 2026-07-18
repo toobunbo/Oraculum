@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "strategy": "filesystem_state",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "Sink is HTMLResponse(template) which creates a response object, not a network I/O, shell execution, or irreversible side effect."
+    },
+    "q2_observable_after_return": {
+      "answer": true,
+      "evidence": "The XSS violation (unescaped user_input concatenated into the HTML string) is present in the returned HTMLResponse object."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "returns.kind is 'none' and returns.exprs is empty, triggering the fallback rule for Q3."
+    }
+  },
+  "mock_guidance": null,
+  "confidence": "low",
+  "warnings": [
+    "Strategy defaults to filesystem_state due to returns.kind being 'none', even though the XSS payload is technically in memory within the HTMLResponse object."
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "Sink is re.findall() with user-controlled pattern causing ReDoS (CPU exhaustion), which is not network I/O, shell execution, RCE, or irreversible side effects."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "The violation is catastrophic backtracking (ReDoS), which occurs during execution and is not observable via return state (returns.kind is none)."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "N/A"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock or record the re.findall() call at line 26.",
+    "capture": "Capture the dynamically constructed regex pattern string passed to re.findall() to verify it contains unescaped user input.",
+    "fake_behavior": "Return a static empty list or a safe pre-computed match list to bypass regex execution entirely and prevent test hangs from ReDoS.",
+    "notes": [
+      "No timeout is configured on the regex, so actual execution must be prevented in tests to avoid hanging the test runner."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

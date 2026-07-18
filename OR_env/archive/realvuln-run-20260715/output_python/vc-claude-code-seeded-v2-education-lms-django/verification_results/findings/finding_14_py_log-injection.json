@@ -1,0 +1,68 @@
+{
+  "id": "14",
+  "rule_slug": "py_log-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-education-lms-django/verification_results/summary_vc-claude-code-seeded-v2-education-lms-django_20260714_152145.json"
+  },
+  "finding": {
+    "rule_id": "py/log-injection",
+    "message": "This log entry depends on a [user-provided value](1).",
+    "file": "lms/course_operations.py",
+    "start_line": 73,
+    "end_line": 73,
+    "repo_name": "vc-claude-code-seeded-v2-education-lms-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-education-lms-django/vc-claude-code-seeded-v2-education-lms-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 69: ControlFlowNode for request",
+      "line 73: ControlFlowNode for Attribute",
+      "line 73: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.8",
+    "precision": "medium",
+    "cwe_ids": [
+      "CWE-117"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:21:43.053871",
+    "cost_usd": 0.0,
+    "verdict": "True Positive",
+    "context_needed": [],
+    "data_flow": "request.body (line 72) → body variable (line 72) → logger.warning (line 73)",
+    "answers": [
+      "The log data originates from the request body (line 72: `body = request.body.decode(\"utf-8\", errors=\"replace\")`) and the Authorization header (line 73: `request.headers.get(\"authorization\")`), both of which are user-provided values.",
+      "Yes, the data is written to a log via `logger.warning` on line 73 without any sanitization or encoding.",
+      "Yes, an attacker could embed newline characters (\\n, \\r) in the request body or authorization header, which are directly interpolated into the log message on line 73.",
+      "Yes, injected newline characters could be used to forge fake log entries, potentially masking real security events or misleading incident responders.",
+      "Not visible in provided context, but log aggregation systems like ELK or Splunk are commonly used and vulnerable to such injection if newlines are not handled.",
+      "Yes, stripping or encoding newlines and control characters from user data before logging would prevent this vulnerability."
+    ],
+    "output_tokens": 337,
+    "tokens_used": 3570,
+    "confidence": "High",
+    "iterations": 1,
+    "reasoning": "User-controlled input (request body and headers) flows directly into a log message without sanitization, allowing potential log injection via newline characters. This is a clear case of CWE-117 (Improper Output Neutralization for Logs).",
+    "cached_input_tokens": 0,
+    "confidence_score": 0.95,
+    "input_tokens": 3233,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 3.0251219272613525
+  },
+  "function": {
+    "name": "course_wire_tally_211",
+    "file": "lms/course_operations.py",
+    "start_line": 69,
+    "end_line": 74,
+    "scope": ""
+  },
+  "web_params": []
+}

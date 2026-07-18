@@ -1,0 +1,74 @@
+{
+  "id": "6",
+  "rule_slug": "py_clear-text-logging-sensitive-data",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/summary_vc-claude-code-seeded-v2-support-desk-fastapi_20260714_153638.json"
+  },
+  "finding": {
+    "rule_id": "py/clear-text-logging-sensitive-data",
+    "message": "This expression logs [sensitive data (password)](1) as clear text.\nThis expression logs [sensitive data (password)](1) as clear text.\nThis expression logs [sensitive data (password)](1) as clear text.\nThis expression logs [sensitive data (password)](1) as clear text.",
+    "file": "backend/app/seed.py",
+    "start_line": 535,
+    "end_line": 535,
+    "repo_name": "vc-claude-code-seeded-v2-support-desk-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/vc-claude-code-seeded-v2-support-desk-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 482: ControlFlowNode for BinaryExpr",
+      "line 482: ControlFlowNode for api_key_plain",
+      "line 523: ControlFlowNode for stats",
+      "line 534: ControlFlowNode for stats",
+      "line 534: ControlFlowNode for Attribute()",
+      "line 534: ControlFlowNode for k",
+      "line 535: ControlFlowNode for Fstring"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-312",
+      "CWE-359",
+      "CWE-532"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 4176,
+    "cached_input_tokens": 0,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "reasoning": "The code stores and logs the password 'Password123!' in cleartext on line 529, which then flows to the stats dictionary and is printed to stdout on the flagged line 535 without any encryption or sanitization.",
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 845,
+    "tokens_used": 5021,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "answers": [
+      "The sensitive data includes passwords (line 529: \"Password123!\") and API keys (line 530: api_key_plain)",
+      "The data is stored in a file (demo_credentials.txt, lines 510-521) and printed to stdout (line 535)",
+      "No, the data is stored in cleartext without encryption or hashing - the password is stored directly as \"Password123!\" on line 529",
+      "Yes, an attacker with access to the file or console output could read the sensitive data in cleartext",
+      "This appears to be a seed script for development/demo purposes, but lacks explicit production guards",
+      "High blast radius - account compromise and unauthorized API access possible due to exposed credentials"
+    ],
+    "elapsed_seconds": 5.921414852142334,
+    "timestamp": "2026-07-14T15:36:19.210131",
+    "context_needed": [],
+    "iterations": 1,
+    "data_flow": "password string literal (line 529) → stats dictionary (line 523-530) → print statement (line 535)"
+  },
+  "function": {
+    "name": "seed",
+    "file": "backend/app/seed.py",
+    "start_line": 119,
+    "end_line": 538,
+    "scope": ""
+  },
+  "web_params": []
+}

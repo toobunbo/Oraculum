@@ -1,0 +1,65 @@
+{
+  "id": "1",
+  "rule_slug": "py_jinja2_autoescape-false",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-pythonssti",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-pythonssti",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-pythonssti/verification_results/summary_realvuln-pythonssti_20260714_150718.json"
+  },
+  "finding": {
+    "rule_id": "py/jinja2/autoescape-false",
+    "message": "Using jinja2 templates with autoescape=False can potentially allow XSS attacks.",
+    "file": "main.py",
+    "start_line": 11,
+    "end_line": 11,
+    "repo_name": "realvuln-pythonssti",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-pythonssti/realvuln-pythonssti.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [],
+    "severity": "6.1",
+    "precision": "medium",
+    "cwe_ids": [
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "answers": [
+      "The EXACT flagged line is line 11: `Jinja2 = Environment()`. This line is in the `read_root` function.",
+      "The value being rendered in the template is assigned on line 14: `output = Jinja2.from_string(\"Welcome \" + username + \"!\").render()`.",
+      "The `username` parameter flows from line 8 (function parameter) → line 10 (variable assignment) → line 14 (template string concatenation).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value.",
+      "No specific defense escapes the value at the sink. The Jinja2 Environment is created without autoescape enabled on line 11.",
+      "No explicit escaping disablers like `|safe` are used, but the default Jinja2 Environment has autoescape disabled by default.",
+      "The user-tainted value reaches the sink without adequate defenses, creating a potential XSS vulnerability."
+    ],
+    "confidence_score": 0.3,
+    "input_tokens": 66437,
+    "timestamp": "2026-07-14T15:07:18.210212",
+    "data_flow": "username parameter (line 8) → username variable (line 10) → template string concatenation (line 14) → template render (line 14)",
+    "cached_input_tokens": 0,
+    "cost_usd": 0.0,
+    "output_tokens": 4486,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "verdict": "True Positive",
+    "reasoning": "The code creates a Jinja2 Environment without autoescape enabled (line 11) and directly concatenates user-controlled input (username) into a template string (line 14). This creates a clear XSS vulnerability path where an attacker could inject malicious JavaScript. While caller context is missing, the function name 'read_root' strongly suggests it's a web route handler, and the pattern is a well-known XSS vulnerability.",
+    "tokens_used": 70923,
+    "iterations": 11,
+    "elapsed_seconds": 39.94694972038269,
+    "confidence": "Low",
+    "context_needed": []
+  },
+  "function": {
+    "name": "read_root",
+    "file": "main.py",
+    "start_line": 8,
+    "end_line": 19,
+    "scope": ""
+  },
+  "web_params": []
+}

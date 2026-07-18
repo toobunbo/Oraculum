@@ -1,0 +1,76 @@
+{
+  "id": "3",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/summary_vc-codex-high-seeded-v2-education-lms-django_20260714_154006.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "education_lms/course_operations.py",
+    "start_line": 141,
+    "end_line": 141,
+    "repo_name": "vc-codex-high-seeded-v2-education-lms-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/vc-codex-high-seeded-v2-education-lms-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 135: ControlFlowNode for request",
+      "line 138: ControlFlowNode for Attribute",
+      "line 138: ControlFlowNode for Attribute()",
+      "line 138: ControlFlowNode for name",
+      "line 139: ControlFlowNode for target",
+      "line 141: ControlFlowNode for target"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:39:36.624740",
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "iterations": 3,
+    "tokens_used": 13500,
+    "cost_usd": 0.0,
+    "answers": [
+      "The exact file-operation sink is `target.write_bytes(request.body)` on line 141. The path value passed to it is `target`, which is derived from `BASE_EXPORT_DIR / name`.",
+      "The assignments to the path value are: line 138: `name = request.GET.get(\"name\", \"packet.bin\")`, line 139: `target = BASE_EXPORT_DIR / name`.",
+      "The last assignment to `target` is on line 139: `target = BASE_EXPORT_DIR / name`. The value of `name` derives from user input via `request.GET.get(\"name\", \"packet.bin\")` on line 138. The data flow is: request (line 135) → name (line 138) → target (line 139) → target.write_bytes (line 141).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. No defensive code is present to prevent directory traversal.",
+      "There is no specific defense mechanism in place. The code does not use `secure_filename`, `Path.resolve()` with `is_relative_to()`, or any allow-list or blocklist for filenames.",
+      "The user-tainted value `name` reaches the sink `target.write_bytes` without any sanitization or validation. The absence of any defense mechanism confirms the vulnerability."
+    ],
+    "context_needed": [],
+    "verdict": "True Positive",
+    "data_flow": "request (line 135) → name (line 138) → target (line 139) → target.write_bytes (line 141)",
+    "elapsed_seconds": 9.390705108642578,
+    "reasoning": "The user-controlled `name` parameter is used directly in a file path without sanitization, allowing potential directory traversal. The data flows from the request to the file system operation without any defensive checks. The additional context shows no callers or callees that might provide additional protection.",
+    "cached_input_tokens": 0,
+    "output_tokens": 1138,
+    "input_tokens": 12362,
+    "model": "ollama_chat/qwen3-coder:480b-cloud"
+  },
+  "function": {
+    "name": "course_dock_shelf_593",
+    "file": "education_lms/course_operations.py",
+    "start_line": 135,
+    "end_line": 142,
+    "scope": ""
+  },
+  "web_params": []
+}

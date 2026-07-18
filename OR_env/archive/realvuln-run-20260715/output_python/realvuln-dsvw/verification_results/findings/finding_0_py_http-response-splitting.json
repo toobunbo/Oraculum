@@ -1,0 +1,98 @@
+{
+  "id": "0",
+  "rule_slug": "py_http-response-splitting",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-dsvw",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvw",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvw/verification_results/summary_realvuln-dsvw_20260714_141916.json"
+  },
+  "finding": {
+    "rule_id": "py/http-response-splitting",
+    "message": "This HTTP header is constructed from a [user-provided value](1).\nThis HTTP header is constructed from a [user-provided value](1).",
+    "file": "dsvw.py",
+    "start_line": 78,
+    "end_line": 78,
+    "repo_name": "realvuln-dsvw",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvw/realvuln-dsvw.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 24: ControlFlowNode for self",
+      "line 25: ControlFlowNode for query",
+      "line 26: ControlFlowNode for query",
+      "line 26: ControlFlowNode for Attribute() [List element, Attribute string]",
+      "line 26: ControlFlowNode for .0 [List element, Attribute string]",
+      "line 26: ControlFlowNode for match [Attribute string]",
+      "line 26: ControlFlowNode for match [Attribute string]",
+      "line 26: ControlFlowNode for Attribute()",
+      "line 26: ControlFlowNode for Yield",
+      "line 26: ControlFlowNode for GeneratorExp",
+      "line 26: ControlFlowNode for dict()",
+      "line 78: ControlFlowNode for params",
+      "line 78: ControlFlowNode for Attribute()",
+      "line 78: ControlFlowNode for BinaryExpr",
+      "--- Flow 2 ---",
+      "line 24: ControlFlowNode for self",
+      "line 25: ControlFlowNode for Tuple",
+      "line 25: ControlFlowNode for query",
+      "line 26: ControlFlowNode for query",
+      "line 26: ControlFlowNode for Attribute() [List element, Attribute string]",
+      "line 26: ControlFlowNode for .0 [List element, Attribute string]",
+      "line 26: ControlFlowNode for match [Attribute string]",
+      "line 26: ControlFlowNode for match [Attribute string]",
+      "line 26: ControlFlowNode for Attribute()",
+      "line 26: ControlFlowNode for Yield",
+      "line 26: ControlFlowNode for GeneratorExp",
+      "line 26: ControlFlowNode for dict()",
+      "line 26: ControlFlowNode for params",
+      "line 78: ControlFlowNode for params",
+      "line 78: ControlFlowNode for Attribute()",
+      "line 78: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-113",
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "context_needed": [],
+    "input_tokens": 19250,
+    "reasoning": "User-controlled charset parameter from query string flows directly to HTTP Content-Type header without any CRLF sanitization, enabling HTTP response splitting attacks",
+    "confidence": "High",
+    "cost_usd": 0.0,
+    "confidence_score": 0.95,
+    "cached_input_tokens": 0,
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "iterations": 3,
+    "data_flow": "query string extraction (line 25) → params dictionary creation (lines 25-26) → params.get(\"charset\", \"utf8\") (line 78) → Content-Type header (line 78)",
+    "timestamp": "2026-07-14T14:18:03.298001",
+    "answers": [
+      "Line 78: self.send_header(\"Content-Type\", \"%s%s\" % (\"text/html\" if content.startswith(\"<!DOCTYPE html>\") else \"text/plain\", \"; charset=%s\" % params.get(\"charset\", \"utf8\")))",
+      "The value is constructed directly on line 78 using params.get(\"charset\", \"utf8\")",
+      "The value derives from user input via the query string parsing that creates the params dictionary (lines 25-26)",
+      "No conditions override the charset parameter",
+      "No defense - there is no CRLF sanitization visible in the code path",
+      "User-controlled charset parameter from query string flows directly to Content-Type header without sanitization"
+    ],
+    "tokens_used": 20935,
+    "elapsed_seconds": 101.67547369003296,
+    "output_tokens": 1685
+  },
+  "function": {
+    "name": "do_GET",
+    "file": "dsvw.py",
+    "start_line": 24,
+    "end_line": 81,
+    "scope": "ReqHandler"
+  },
+  "web_params": []
+}

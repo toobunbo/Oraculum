@@ -1,0 +1,56 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "builtins.eval",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "expression string passed to eval() from request.form['expression']",
+    "additional_imports": [
+      "builtins"
+    ]
+  },
+  "oracle_check": {
+    "condition_description": "The captured eval argument contains Python code constructs indicative of injection (e.g., __import__, exec, os.system calls, or attribute chains accessing dangerous modules), confirming that untrusted user input reached the eval sink without sanitization.",
+    "trigger_patterns": [
+      "__import__\\s*\\(",
+      "exec\\s*\\(",
+      "eval\\s*\\(",
+      "os\\.system\\s*\\(",
+      "subprocess\\.",
+      "open\\s*\\(['\"]",
+      "__builtins__",
+      "getattr\\s*\\("
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_CODE_INJECTION: untrusted input reached eval() — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "__import__('os').system('id')",
+      "exec('import os; os.system(\"whoami\")')",
+      "open('/etc/passwd').read()",
+      "getattr(__builtins__, '__import__')('os').popen('ls').read()",
+      "eval('__import__(\"os\").system(\"cat /etc/passwd\")')"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "evaluate",
+    "file": "app.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def evaluate()",
+    "tainted_params": [
+      {
+        "name": "expression",
+        "index": -1,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_code_injection_app_py_120",
+    "finding_id": "0",
+    "rule_id": "py/code-injection",
+    "rule_slug": "py_code-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-damn-vulnerable-flask-application/verification_results/findings/finding_0_py_code-injection.json"
+  }
+}

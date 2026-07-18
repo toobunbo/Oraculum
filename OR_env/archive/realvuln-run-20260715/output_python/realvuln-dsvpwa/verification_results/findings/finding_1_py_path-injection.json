@@ -1,0 +1,88 @@
+{
+  "id": "1",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-dsvpwa",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvpwa",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvpwa/verification_results/summary_realvuln-dsvpwa_20260714_145612.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "dsvpwa/handlers.py",
+    "start_line": 116,
+    "end_line": 116,
+    "repo_name": "realvuln-dsvpwa",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvpwa/realvuln-dsvpwa.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 196: ControlFlowNode for self",
+      "line 197: ControlFlowNode for self",
+      "line 198: ControlFlowNode for self",
+      "line 211: ControlFlowNode for Attribute",
+      "line 111: ControlFlowNode for path",
+      "line 112: ControlFlowNode for path",
+      "line 116: ControlFlowNode for Attribute()",
+      "--- Flow 2 ---",
+      "line 196: ControlFlowNode for self",
+      "line 197: ControlFlowNode for self",
+      "line 198: ControlFlowNode for Subscript",
+      "line 198: [post] ControlFlowNode for self [Attribute path]",
+      "line 211: ControlFlowNode for self [Attribute path]",
+      "line 211: ControlFlowNode for Attribute",
+      "line 111: ControlFlowNode for path",
+      "line 112: ControlFlowNode for path",
+      "line 116: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "confidence_score": 0.9,
+    "answers": [
+      "The exact flagged line is `self.content = open('./{}'.format(path), 'rb')` at line 116. This line is located in the `find` method of a class.",
+      "The path value passed to the open function is `'./{}'.format(path)`, where `path` is the parameter received by the `find` method.",
+      "The assignments to `path` that reach the sink are: line 111 (function parameter), and line 112 (conditional assignment). The last assignment is line 112.",
+      "The value on line 112 derives from the user-controlled `path` parameter when it's not '/favicon.ico'. When it is '/favicon.ico', it's replaced with a constant.",
+      "There is no specific defense mechanism visible in the provided code. No path sanitization or validation beyond the favicon check is present.",
+      "The user-tainted value can reach the sink when `path` is not '/favicon.ico'. No defense mechanism is visible to prevent directory traversal."
+    ],
+    "data_flow": "user input (external source through dataflow) → path parameter (line 111) → conditional assignment (line 112) → path used in open() call (line 116)",
+    "timestamp": "2026-07-14T14:55:59.608299",
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cached_input_tokens": 0,
+    "reasoning": "The CodeQL dataflow analysis has already established that user-controlled input reaches the path parameter. The code directly uses this user-controlled path in a file operation without adequate sanitization, allowing for directory traversal attacks. The favicon.ico check is insufficient protection.",
+    "context_needed": [],
+    "input_tokens": 13145,
+    "verdict": "True Positive",
+    "output_tokens": 1227,
+    "tokens_used": 14372,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "elapsed_seconds": 10.007917881011963
+  },
+  "function": {
+    "name": "find",
+    "file": "dsvpwa/handlers.py",
+    "start_line": 111,
+    "end_line": 125,
+    "scope": "StaticHandler"
+  },
+  "web_params": []
+}

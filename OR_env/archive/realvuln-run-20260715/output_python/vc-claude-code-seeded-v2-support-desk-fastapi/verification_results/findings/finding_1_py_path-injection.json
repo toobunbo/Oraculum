@@ -1,0 +1,78 @@
+{
+  "id": "1",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/summary_vc-claude-code-seeded-v2-support-desk-fastapi_20260714_153638.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "backend/app/support_operations.py",
+    "start_line": 56,
+    "end_line": 56,
+    "repo_name": "vc-claude-code-seeded-v2-support-desk-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/vc-claude-code-seeded-v2-support-desk-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 51: ControlFlowNode for request",
+      "line 53: ControlFlowNode for payload",
+      "line 54: ControlFlowNode for payload",
+      "line 54: ControlFlowNode for Attribute()",
+      "line 54: ControlFlowNode for Attribute()",
+      "line 54: ControlFlowNode for ref",
+      "line 55: ControlFlowNode for target",
+      "line 56: ControlFlowNode for Attribute"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 17705,
+    "cached_input_tokens": 0,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "reasoning": "The user-controlled input `ref` is directly used to construct a file path, which is then used in a directory creation operation. There is no sanitization or validation to prevent directory traversal, making this a clear path injection vulnerability.",
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 1338,
+    "tokens_used": 19043,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "answers": [
+      "The EXACT flagged line is: `target.parent.mkdir(parents=True, exist_ok=True)` on line 56. This line is located in the function `ticket_vault_stash_232`.",
+      "The path value `target` is assigned on line 55: `target = BASE_EXPORT_DIR / f\"{ref}.json\"`. This is the only assignment to `target` on the path to the sink.",
+      "The value of `target` derives from `ref`, which is obtained from user input. Specifically: `ref = request.query_params.get(\"ref\", payload.get(\"ref\", \"daily\"))` (line 54). This means `ref` is sourced from either a query parameter or a JSON payload field, both of which are user-controllable inputs. The data flow is: user input (line 54) → `ref` → `f\"{ref}.json\"` (line 55) → `target` (line 55) → `target.parent` (line 56).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value `ref` before it reaches the sink. The value flows directly from user input to the path construction without any sanitization or filtering.",
+      "There is no specific defense applied to the path. The code does not use any mechanism like `Path.resolve()`, `os.path.commonpath`, or allow-lists to prevent directory traversal. The `mkdir` call does not inherently prevent path traversal; it simply creates directories.",
+      "The user-tainted value `ref` reaches the sink without any sanitization or defense mechanism. The path construction is vulnerable to directory traversal if `ref` contains path traversal sequences like `../`."
+    ],
+    "elapsed_seconds": 13.367411136627197,
+    "timestamp": "2026-07-14T15:36:14.782329",
+    "context_needed": [],
+    "iterations": 3,
+    "data_flow": "user input (line 54) → ref → f\"{ref}.json\" (line 55) → target (line 55) → target.parent (line 56) → mkdir (line 56)"
+  },
+  "function": {
+    "name": "ticket_vault_stash_232",
+    "file": "backend/app/support_operations.py",
+    "start_line": 51,
+    "end_line": 58,
+    "scope": ""
+  },
+  "web_params": []
+}

@@ -1,0 +1,79 @@
+{
+  "id": "15",
+  "rule_slug": "py_reflective-xss",
+  "source": {
+    "vhx_root": "/home/tuonglnc/repo/VulnHunterX",
+    "vhx_repo_root": "/home/tuonglnc/repo/VulnHunterX/repos/python/benchmark-python",
+    "vhx_output_root": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python",
+    "summary_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/verification_results/summary_benchmark-python_filtered_20260610_105228.json"
+  },
+  "finding": {
+    "rule_id": "py/reflective-xss",
+    "message": "Cross-site scripting vulnerability due to a [user-provided value](1).\nCross-site scripting vulnerability due to a [user-provided value](1).",
+    "file": "testcode/BenchmarkTest00150.py",
+    "start_line": 44,
+    "end_line": 44,
+    "repo_name": "benchmark-python",
+    "lang": "python",
+    "sarif_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/benchmark-python.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 31: ControlFlowNode for request",
+      "line 31: ControlFlowNode for Attribute",
+      "line 31: ControlFlowNode for Attribute()",
+      "line 31: ControlFlowNode for param",
+      "line 37: ControlFlowNode for bar",
+      "line 44: ControlFlowNode for Tuple"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [],
+    "tags": [
+      "security",
+      "external/cwe/cwe-079",
+      "external/cwe/cwe-116"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-06-10T10:44:34.719054",
+    "context_needed": [
+      "caller:main",
+      "callees:make_response"
+    ],
+    "data_flow": "request.form.get('BenchmarkTest00150') (line 4) → param (line 4) → bar (line 11) → response header (line 44)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "answers": [
+      "Step 1: The potentially dangerous data originates from user input via the HTTP request form parameter 'BenchmarkTest00150' (line 4).",
+      "Step 2: The data flows through the following variables with line numbers: param (line 4, 6), bar (line 9, 11).",
+      "Step 3: There is a transformation on line 11 where param is split by space and the first element is taken (param.split(' ')[0]), but this is not sufficient sanitization for XSS as it doesn't prevent injection of HTML/JavaScript.",
+      "Step 4: The sink is the custom header 'yourBenchmarkTest00150' in the response tuple on line 44, where the unsanitized 'bar' value is placed.",
+      "Step 5: The only transformation is the split operation (line 11), which does not provide adequate protection against XSS since HTML/JavaScript can still be injected in the first part of the split.",
+      "Step 6: Not visible in provided context - we don't see the implementation of make_response or how the header is handled, but typically HTTP headers don't auto-escape content.",
+      "Step 7: Not visible in provided context - we don't see the authentication requirements for this endpoint.",
+      "Step 8: The function name suggests it's part of a benchmark test (BenchmarkTest00150_post), which might indicate test code, but we cannot definitively determine if it's production code from the snippet.",
+      "Step 9: The concrete security impact would be Cross-Site Scripting (XSS) if the header value is reflected in the response body or used in JavaScript context, allowing an attacker to inject malicious scripts.",
+      "Step 10: The weakest link is the lack of proper output encoding or sanitization for the 'bar' value before it's placed in the HTTP response header, making it vulnerable to XSS if the header value is used in an HTML context."
+    ],
+    "confidence_score": 0.9,
+    "iterations": 1,
+    "input_tokens": 2202,
+    "elapsed_seconds": 7.478582382202148,
+    "confidence": "High",
+    "cached_input_tokens": 0,
+    "tokens_used": 2773,
+    "reasoning": "User-controlled input from request.form flows directly to an HTTP response header with only minimal transformation (split operation) that doesn't prevent XSS. The data flow from source to sink is clear and lacks adequate sanitization or encoding.",
+    "verdict": "True Positive",
+    "output_tokens": 571
+  },
+  "function": {
+    "name": "BenchmarkTest00150_post",
+    "file": "testcode/BenchmarkTest00150.py",
+    "start_line": 28,
+    "end_line": 47,
+    "scope": "Function init"
+  }
+}

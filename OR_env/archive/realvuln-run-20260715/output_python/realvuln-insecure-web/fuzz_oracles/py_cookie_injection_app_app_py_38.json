@@ -1,0 +1,54 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of the login function (Flask response object)",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The returned Flask response contains a Set-Cookie header where the session cookie value includes semicolons or other cookie-attribute-injection characters, confirming that raw user input passed through to the cookie value without sanitization",
+    "trigger_patterns": [
+      "Set-Cookie.*session=[^;]*;",
+      "Set-Cookie.*session=[^;]*=([^;]|$)",
+      "Set-Cookie.*session=FIXATED_SESSION"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_COOKIE_INJECTION: unsanitized cookie value in response — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "admin; HttpOnly=False",
+      "FIXATED_SESSION; Path=/",
+      "user=evil; Domain=.attacker.com",
+      "normal; Secure",
+      "a=b; c=d"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "login",
+    "file": "app/app.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def login()",
+    "tainted_params": [
+      {
+        "name": "username",
+        "index": -1,
+        "type": "str"
+      },
+      {
+        "name": "password",
+        "index": -1,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_cookie_injection_app_app_py_38",
+    "finding_id": "0",
+    "rule_id": "py/cookie-injection",
+    "rule_slug": "py_cookie-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-insecure-web/verification_results/findings/finding_0_py_cookie-injection.json"
+  }
+}

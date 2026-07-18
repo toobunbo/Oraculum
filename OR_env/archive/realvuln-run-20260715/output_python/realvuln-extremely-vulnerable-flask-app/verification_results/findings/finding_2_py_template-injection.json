@@ -1,0 +1,69 @@
+{
+  "id": "2",
+  "rule_slug": "py_template-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-extremely-vulnerable-flask-app",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-extremely-vulnerable-flask-app",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-extremely-vulnerable-flask-app/verification_results/summary_realvuln-extremely-vulnerable-flask-app_20260714_150009.json"
+  },
+  "finding": {
+    "rule_id": "py/template-injection",
+    "message": "This template construction depends on a [user-provided value](1).",
+    "file": "app.py",
+    "start_line": 32,
+    "end_line": 32,
+    "repo_name": "realvuln-extremely-vulnerable-flask-app",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-extremely-vulnerable-flask-app/realvuln-extremely-vulnerable-flask-app.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 6: ControlFlowNode for ImportMember",
+      "line 6: ControlFlowNode for request",
+      "line 32: ControlFlowNode for request",
+      "line 32: ControlFlowNode for Fstring"
+    ],
+    "severity": "9.3",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-74"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "reasoning": "User-controlled input (`error` and `request.path`) is embedded directly into a template string via an f-string and passed to `render_template_string`, constituting a clear Server-Side Template Injection (SSTI) vulnerability with no mitigating defenses visible. The absence of caller information doesn't change the fact that both `error` (in Flask 404 handlers) and `request.path` are user-controllable.",
+    "iterations": 3,
+    "context_needed": [],
+    "timestamp": "2026-07-14T15:00:05.622388",
+    "cached_input_tokens": 0,
+    "output_tokens": 1172,
+    "data_flow": "request.path (line 32, via request import at line 6) → f-string template source (line 32) → render_template_string sink (line 31-32)",
+    "confidence_score": 0.9,
+    "verdict": "True Positive",
+    "elapsed_seconds": 21.06705904006958,
+    "answers": [
+      "The template-render sink is `render_template_string(f\"{error}. Requested URL was {request.path}\")` on line 32. The template-source string is the f-string: `f\"{error}. Requested URL was {request.path}\"`.",
+      "The template-source string is assigned directly as the argument to `render_template_string` on line 32. There are no prior assignments; this is the only assignment on the path.",
+      "The value of the template-source string derives from `error` (which is a parameter, potentially user-controlled as per Flask conventions for 404 handlers) and `request.path`, which is user-controlled input. The data-flow path shows `request` originates from line 6 (import) and flows to line 32. Even though we don't see the caller, in Flask applications `error` in a 404 handler can contain user-controlled data.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The template string is constructed directly from user-influenced values.",
+      "There is no defense preventing SSTI. The user-controlled values (`error` and `request.path`) are embedded directly into the template string via an f-string, which is then passed to `render_template_string`. This is a direct SSTI sink with no sanitization, sandboxing, or escaping.",
+      "The user-controlled data (`error` and `request.path`) reaches the template SOURCE on line 32 with no defenses present. This is a clear SSTI vulnerability."
+    ],
+    "input_tokens": 11569,
+    "tokens_used": 12741
+  },
+  "function": {
+    "name": "page_not_found",
+    "file": "app.py",
+    "start_line": 30,
+    "end_line": 34,
+    "scope": ""
+  },
+  "web_params": []
+}

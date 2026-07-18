@@ -1,0 +1,77 @@
+{
+  "id": "1",
+  "rule_slug": "py_url-redirection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-flask-xss",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-flask-xss",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-flask-xss/verification_results/summary_realvuln-flask-xss_20260714_150106.json"
+  },
+  "finding": {
+    "rule_id": "py/url-redirection",
+    "message": "Untrusted URL redirection depends on a [user-provided value](1).",
+    "file": "app/blueprints/xss_protection/views.py",
+    "start_line": 12,
+    "end_line": 12,
+    "repo_name": "realvuln-flask-xss",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-flask-xss/realvuln-flask-xss.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 11: ControlFlowNode for request",
+      "line 11: ControlFlowNode for Attribute",
+      "line 11: ControlFlowNode for Attribute()",
+      "line 11: ControlFlowNode for next",
+      "line 12: ControlFlowNode for next"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-601"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:01:06.800788",
+    "confidence": "High",
+    "tokens_used": 13764,
+    "reasoning": "The user-controlled 'next' parameter from the request is used directly in a redirect without any validation or sanitization, allowing potential open redirect vulnerabilities. The data flow is clear from the user input to the redirect sink with no defenses in place. The absence of caller information does not change the fact that the vulnerable path exists within the analyzed code.",
+    "iterations": 3,
+    "elapsed_seconds": 10.997231721878052,
+    "answers": [
+      "The EXACT flagged line is `return redirect(next)` on line 12, which lives in the `index` function.",
+      "The redirect sink is `return redirect(next)` on line 12. The URL/target value passed to it is the variable `next`.",
+      "The only assignment to the `next` variable is on line 11: `next = request.args.get('next', url_for('index'))`.",
+      "The value of `next` derives from user input via `request.args.get('next', ...)` which retrieves the 'next' query parameter from the URL. If the 'next' parameter is not provided, it defaults to `url_for('index')`, which is a safe internal route lookup. However, the user-provided value is used directly if present.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path. The value is either the user-provided 'next' parameter or the default safe URL, but the user-provided value is used as-is if present.",
+      "There is no specific defense mechanism in place to validate or sanitize the redirect URL. The code does not check the host, scheme, or path of the URL to ensure it's safe or internal. No allow-list, domain validation, or path restriction is applied."
+    ],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "data_flow": "request.args.get('next') (line 11) → next (line 11) → redirect(next) (line 12)",
+    "context_needed": [],
+    "output_tokens": 1249,
+    "verdict": "True Positive",
+    "input_tokens": 12515,
+    "cached_input_tokens": 0,
+    "confidence_score": 0.95
+  },
+  "function": {
+    "name": "index",
+    "file": "app/blueprints/xss_protection/views.py",
+    "start_line": 7,
+    "end_line": 12,
+    "scope": ""
+  },
+  "web_params": [
+    {
+      "name": "next",
+      "source": "args"
+    }
+  ]
+}

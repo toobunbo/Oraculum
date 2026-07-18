@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "strategy": "filesystem_state",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "Sink is outfile.write(api_key) to /tmp/supersecret.txt — a local file write, not network I/O, shell execution, DB write, or RCE."
+    },
+    "q2_observable_after_return": {
+      "answer": true,
+      "evidence": "The violation is cleartext API key stored in /tmp/supersecret.txt; the file persists after the function returns and can be read from disk."
+    },
+    "q3_result_in_memory": {
+      "answer": false,
+      "evidence": "Function returns False (returns.kind=value, exprs=[\"False\"]); the sensitive data is in the filesystem, not in the return value."
+    }
+  },
+  "mock_guidance": null,
+  "confidence": "high",
+  "warnings": []
+}

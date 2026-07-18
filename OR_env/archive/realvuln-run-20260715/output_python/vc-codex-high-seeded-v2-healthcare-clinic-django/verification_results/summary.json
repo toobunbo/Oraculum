@@ -1,0 +1,30 @@
+{
+  "stage": "ingest",
+  "repo": "vc-codex-high-seeded-v2-healthcare-clinic-django",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-healthcare-clinic-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-healthcare-clinic-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-healthcare-clinic-django/verification_results/summary_vc-codex-high-seeded-v2-healthcare-clinic-django_20260714_154322.json"
+  },
+  "counts": {
+    "total_verdicts": 9,
+    "selected": 1,
+    "enriched": 1,
+    "skipped": 8,
+    "failed": 0
+  },
+  "findings": [
+    {
+      "id": "1",
+      "rule_id": "py/cookie-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-codex-high-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_1_py_cookie-injection.json",
+      "function_name": "patient_crumb_lane_297"
+    }
+  ],
+  "errors": []
+}

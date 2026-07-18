@@ -1,0 +1,73 @@
+{
+  "id": "2",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-threatbyte",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte/verification_results/summary_realvuln-threatbyte_20260714_150915.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "server/routes.py",
+    "start_line": 364,
+    "end_line": 364,
+    "repo_name": "realvuln-threatbyte",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte/realvuln-threatbyte.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 341: ControlFlowNode for filename",
+      "line 342: ControlFlowNode for file_path",
+      "line 364: ControlFlowNode for file_path"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "The user-provided `filename` parameter from the URL route is directly used to construct a file path that is passed to `os.remove()`. There are no validation, sanitization, or security checks to prevent directory traversal attacks. An attacker could provide a filename like '../../../etc/passwd' to delete arbitrary files.",
+    "input_tokens": 16032,
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:08:38.714476",
+    "data_flow": "filename (line 341) → file_path (line 342) → os.remove(file_path) (line 364)",
+    "confidence_score": 0.95,
+    "answers": [
+      "The EXACT file-operation sink is `os.remove(file_path)` on line 364. The path value passed to it is `file_path`.",
+      "The assignment to `file_path` is on line 342: `file_path = os.path.join(UPLOAD_FOLDER, filename)`.",
+      "The value of `file_path` derives from user input. Specifically: - `filename` is a path parameter obtained from the route `/delete/<filename>` (line 341). - `file_path` is constructed using `os.path.join(UPLOAD_FOLDER, filename)` on line 342. Thus, `file_path` is directly derived from the user-provided `filename`.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The value of `file_path` is consistently derived from the user-provided `filename` without any sanitization or validation that would prevent path traversal.",
+      "There is no specific defense mechanism in place to prevent path traversal. The code does not use `werkzeug.utils.secure_filename`, `Path(base).resolve() / user_input` then `.is_relative_to(base)`, `os.path.commonpath([base, full]) == base`, or any similar defense.",
+      "The user-tainted value `filename` reaches the sink `os.remove(file_path)` on line 364 without any sanitization or validation. There is no defense mechanism to prevent path traversal."
+    ],
+    "cost_usd": 0.0,
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "confidence": "High",
+    "output_tokens": 1349,
+    "elapsed_seconds": 11.038115739822388,
+    "tokens_used": 17381
+  },
+  "function": {
+    "name": "delete_file",
+    "file": "server/routes.py",
+    "start_line": 341,
+    "end_line": 369,
+    "scope": ""
+  },
+  "web_params": []
+}

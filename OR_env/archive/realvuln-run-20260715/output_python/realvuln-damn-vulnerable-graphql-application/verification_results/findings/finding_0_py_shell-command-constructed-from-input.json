@@ -1,0 +1,100 @@
+{
+  "id": "0",
+  "rule_slug": "py_shell-command-constructed-from-input",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-damn-vulnerable-graphql-application",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-graphql-application",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-graphql-application/verification_results/summary_realvuln-damn-vulnerable-graphql-application_20260714_145154.json"
+  },
+  "finding": {
+    "rule_id": "py/shell-command-constructed-from-input",
+    "message": "This f-string which depends on [library input](1) is later used in a [shell command](2).\nThis f-string which depends on [library input](3) is later used in a [shell command](2).\nThis f-string which depends on [library input](4) is later used in a [shell command](2).\nThis f-string which depends on [library input](5) is later used in a [shell command](2).",
+    "file": "core/views.py",
+    "start_line": 211,
+    "end_line": 211,
+    "repo_name": "realvuln-damn-vulnerable-graphql-application",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-graphql-application/realvuln-damn-vulnerable-graphql-application.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 209: ControlFlowNode for host",
+      "line 210: ControlFlowNode for Fstring",
+      "line 41: ControlFlowNode for cmd",
+      "line 43: ControlFlowNode for cmd",
+      "line 210: ControlFlowNode for Attribute()",
+      "line 210: ControlFlowNode for url",
+      "line 211: ControlFlowNode for url",
+      "--- Flow 2 ---",
+      "line 209: ControlFlowNode for port",
+      "line 210: ControlFlowNode for Fstring",
+      "line 41: ControlFlowNode for cmd",
+      "line 43: ControlFlowNode for cmd",
+      "line 210: ControlFlowNode for Attribute()",
+      "line 210: ControlFlowNode for url",
+      "line 211: ControlFlowNode for url",
+      "--- Flow 3 ---",
+      "line 209: ControlFlowNode for path",
+      "line 210: ControlFlowNode for Fstring",
+      "line 41: ControlFlowNode for cmd",
+      "line 43: ControlFlowNode for cmd",
+      "line 210: ControlFlowNode for Attribute()",
+      "line 210: ControlFlowNode for url",
+      "line 211: ControlFlowNode for url",
+      "--- Flow 4 ---",
+      "line 209: ControlFlowNode for scheme",
+      "line 210: ControlFlowNode for Fstring",
+      "line 41: ControlFlowNode for cmd",
+      "line 43: ControlFlowNode for cmd",
+      "line 210: ControlFlowNode for Attribute()",
+      "line 210: ControlFlowNode for url",
+      "line 211: ControlFlowNode for url"
+    ],
+    "severity": "6.3",
+    "precision": "medium",
+    "cwe_ids": [
+      "CWE-73",
+      "CWE-78",
+      "CWE-88"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "iterations": 2,
+    "verdict": "True Positive",
+    "confidence": "High",
+    "input_tokens": 11051,
+    "context_needed": [],
+    "reasoning": "User-controlled inputs are used to construct a URL that is passed directly to a shell command via `helpers.run_cmd`. Without visibility into the implementations of `security.strip_dangerous_characters` and `helpers.run_cmd`, we cannot confirm adequate sanitization or safe command execution, making this a clear case of command injection vulnerability.",
+    "data_flow": "host (line 204) → f-string (line 210) → url (line 210) → sink (line 211)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "tokens_used": 12150,
+    "elapsed_seconds": 9.236101150512695,
+    "timestamp": "2026-07-14T14:51:53.992147",
+    "answers": [
+      "The sink is on line 211: `cmd = helpers.run_cmd(f'curl --insecure {url}')`. The path value passed to it is the `url` variable constructed via an f-string on line 210.",
+      "The `url` variable is assigned on line 210: `url = security.strip_dangerous_characters(f\"{scheme}://{host}:{port}{path}\")`. This is the LAST assignment on all dataflow paths reaching the sink.",
+      "The value of `url` derives from user inputs: `host` (line 204), `port` (line 205), `path` (line 206), and `scheme` (line 207), which are arguments to the `mutate` function. These inputs are used in the f-string on line 210 to construct the URL. The data flows directly from the user-provided inputs to the f-string, and then to the `url` variable.",
+      "There is no constant-time condition or reassignment that overrides the user-tainted value. The only transformation applied is `security.strip_dangerous_characters` on line 210, but its implementation is not shown, so we cannot confirm its effectiveness.",
+      "No specific defense can be confirmed. While `security.strip_dangerous_characters` is applied to the URL on line 210, its implementation is not visible. Similarly, the implementation of `helpers.run_cmd` is not visible, so we cannot determine if it uses safe practices like parameterized commands or shell escaping.",
+      "Since neither the `security.strip_dangerous_characters` function nor the `helpers.run_cmd` function implementations are visible, and the user-controlled inputs are directly used in constructing the URL that is passed to a shell command, we cannot confirm that the path is safe from exploitation."
+    ],
+    "confidence_score": 0.95,
+    "cached_input_tokens": 0,
+    "output_tokens": 1099,
+    "cost_usd": 0.0
+  },
+  "function": {
+    "name": "mutate",
+    "file": "core/views.py",
+    "start_line": 209,
+    "end_line": 223,
+    "scope": "ImportPaste"
+  },
+  "web_params": []
+}

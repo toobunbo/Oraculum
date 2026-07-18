@@ -1,0 +1,68 @@
+{
+  "id": "6",
+  "rule_slug": "py_xxe",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/summary_vc-codex-high-seeded-v2-education-lms-django_20260714_154006.json"
+  },
+  "finding": {
+    "rule_id": "py/xxe",
+    "message": "XML parsing depends on a [user-provided value](1) without guarding against external entity expansion.",
+    "file": "education_lms/course_operations.py",
+    "start_line": 158,
+    "end_line": 158,
+    "repo_name": "vc-codex-high-seeded-v2-education-lms-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/vc-codex-high-seeded-v2-education-lms-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 153: ControlFlowNode for request",
+      "line 158: ControlFlowNode for Attribute"
+    ],
+    "severity": "9.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-611",
+      "CWE-827"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:39:50.541189",
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "iterations": 3,
+    "tokens_used": 12813,
+    "cost_usd": 0.0,
+    "answers": [
+      "The EXACT XML-parse sink is `etree.fromstring(request.body, parser)` on line 158. The parser object is `parser` and the input bytes/text passed to it is `request.body`.",
+      "The XML input is assigned on line 158 as `request.body` which is directly passed to `etree.fromstring`.",
+      "The value `request.body` derives from user input as it is part of the request object, which is externally controlled. The data-flow chain is from line 153 (request parameter) to line 158 (request.body).",
+      "The parser configuration on line 157 is `etree.XMLParser(load_dtd=True, resolve_entities=True, no_network=False)`.",
+      "The parser configuration on line 157 ENABLES external entities (`resolve_entities=True`), DTD loading (`load_dtd=True`), and network access (`no_network=False`).",
+      "The parser ENABLES external entities with `resolve_entities=True` on line 157, and the input is user-controlled as `request.body` from line 158. The function appears to be a standalone handler that takes a request parameter, suggesting it's likely an HTTP endpoint."
+    ],
+    "context_needed": [],
+    "verdict": "True Positive",
+    "data_flow": "request (line 153) → request.body (line 158) → etree.fromstring (line 158)",
+    "elapsed_seconds": 9.394716501235962,
+    "reasoning": "The XML parser is explicitly configured to resolve external entities and load DTDs, and the input is directly from the user-provided request body. The function signature suggests it's an HTTP handler, making this a clear XXE vulnerability.",
+    "cached_input_tokens": 0,
+    "output_tokens": 1124,
+    "input_tokens": 11689,
+    "model": "ollama_chat/qwen3-coder:480b-cloud"
+  },
+  "function": {
+    "name": "course_xml_fold_616",
+    "file": "education_lms/course_operations.py",
+    "start_line": 153,
+    "end_line": 159,
+    "scope": ""
+  },
+  "web_params": []
+}

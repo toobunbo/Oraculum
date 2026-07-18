@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is etree.fromstring with parser configured as XMLParser(load_dtd=True, resolve_entities=True, no_network=False), enabling external entity resolution and network I/O during XML parsing."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; Q1 already selected recorded_call."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; Q1 already selected recorded_call."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock etree.fromstring (or the XMLParser constructor) so that the XXE-triggering parse does not actually execute with the vulnerable parser configuration on line 183.",
+    "capture": "Capture the first argument passed to etree.fromstring (request.body) and the parser keyword argument to verify the parser has load_dtd=True, resolve_entities=True, and no_network=False.",
+    "fake_behavior": "Return a minimal mock Element object with a .tag attribute (e.g., 'mockroot') so that the subsequent doc.tag access on the return path (JsonResponse({'root': doc.tag})) succeeds without error.",
+    "notes": [
+      "The oracle should assert that the parser passed to fromstring is configured with resolve_entities=True and no_network=False, which constitutes the XXE-enabling condition.",
+      "If mocking at the XMLParser level instead, return a dummy parser object and still mock fromstring to return a safe Element.",
+      "Do not let the real etree.fromstring run, as it would perform network requests or file reads for crafted XXE payloads."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

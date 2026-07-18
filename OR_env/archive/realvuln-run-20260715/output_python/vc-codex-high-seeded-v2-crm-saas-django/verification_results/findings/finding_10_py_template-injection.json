@@ -1,0 +1,70 @@
+{
+  "id": "10",
+  "rule_slug": "py_template-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/summary_vc-codex-high-seeded-v2-crm-saas-django_20260714_153817.json"
+  },
+  "finding": {
+    "rule_id": "py/template-injection",
+    "message": "This template construction depends on a [user-provided value](1).",
+    "file": "config/partner_console.py",
+    "start_line": 142,
+    "end_line": 142,
+    "repo_name": "vc-codex-high-seeded-v2-crm-saas-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django/vc-codex-high-seeded-v2-crm-saas-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 137: ControlFlowNode for request",
+      "line 141: ControlFlowNode for Attribute",
+      "line 141: ControlFlowNode for Attribute()",
+      "line 141: ControlFlowNode for fragment",
+      "line 142: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "9.3",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-74"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "verdict": "True Positive",
+    "answers": [
+      "The EXACT template-render sink is `Template(\"Result: \" + fragment).render()` on line 142. The template-source string passed to it is `\"Result: \" + fragment`.",
+      "The template-source string is assigned on line 142 via the expression `\"Result: \" + fragment`. The variable `fragment` is assigned on line 141 from `request.GET.get(\"fragment\", \"{{ 7 * 7 }}\")`.",
+      "The LAST assignment to the template SOURCE is on line 142 (`\"Result: \" + fragment`). The value of `fragment` derives from user input via `request.GET.get(\"fragment\", \"{{ 7 * 7 }}\")` on line 141. The data-flow chain is: `request` (line 137) → `request.GET.get(...)` (line 141) → `fragment` (line 141) → `\"Result: \" + fragment` (line 142).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense preventing SSTI. The user input is directly embedded into the template source string without any sanitization, sandboxing, or use of safe template variables. It is not using `jinja2.sandbox.SandboxedEnvironment`, nor is the input passed as a template variable via `render()`.",
+      "User-controlled data (`fragment`) reaches the template SOURCE (`\"Result: \" + fragment`) with concrete line numbers (141 → 142), and there is no defense such as sandboxing, escaping, or safe variable passing."
+    ],
+    "reasoning": "User input from `request.GET` flows directly into a Jinja2 template string via `fragment` (line 141) and is embedded in the template source (line 142). No sanitization, sandboxing, or safe rendering practices are applied. The function appears to be an HTTP endpoint (based on the request parameter), and no caller context changes this assessment.",
+    "elapsed_seconds": 16.300382137298584,
+    "context_needed": [],
+    "tokens_used": 18542,
+    "output_tokens": 1621,
+    "cached_input_tokens": 0,
+    "input_tokens": 16921,
+    "timestamp": "2026-07-14T15:38:12.965824",
+    "data_flow": "request (line 137) → request.GET.get(\"fragment\", ...) (line 141) → fragment (line 141) → \"Result: \" + fragment (line 142) → Template(...).render() (line 142)",
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence_score": 0.95
+  },
+  "function": {
+    "name": "acct_jinja_cast_585",
+    "file": "config/partner_console.py",
+    "start_line": 137,
+    "end_line": 143,
+    "scope": ""
+  },
+  "web_params": []
+}

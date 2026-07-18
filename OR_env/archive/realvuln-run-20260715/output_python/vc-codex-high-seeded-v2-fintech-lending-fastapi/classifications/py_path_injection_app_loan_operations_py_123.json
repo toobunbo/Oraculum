@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is target.write_bytes(body), a filesystem write operation that is an irreversible side effect and potentially dangerous via path traversal."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; decision made at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; decision made at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock pathlib.Path.write_bytes so that the filesystem write is intercepted.",
+    "capture": "Capture the target path (str(target)) and the body bytes passed to write_bytes. These are the key values needed to assert path traversal and verify the intended write location.",
+    "fake_behavior": "Make write_bytes a no-op that records its arguments instead of performing the actual write. Allow the function to continue and return its normal dictionary.",
+    "notes": [
+      "The function returns {'stored': str(target), 'bytes': len(body)}, which can be used alongside the captured mock arguments to verify both the path and payload.",
+      "Ensure the mock is scoped so other Path operations (e.g., the / join on line 121) are not affected."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

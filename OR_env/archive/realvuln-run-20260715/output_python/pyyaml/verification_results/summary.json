@@ -1,0 +1,30 @@
+{
+  "stage": "ingest",
+  "repo": "pyyaml",
+  "lang": "python",
+  "verdict_filter": "all",
+  "normalized_verdict_filter": "all",
+  "source": {
+    "vhx_root": "/home/trieudai/VULNHUNTER_CLONE/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VULNHUNTER_CLONE/VulnHunterX/repos/python/pyyaml",
+    "vhx_output_root": "/home/trieudai/VULNHUNTER_CLONE/VulnHunterX/output/python/pyyaml",
+    "summary_path": "/home/trieudai/VULNHUNTER_CLONE/VulnHunterX/output/python/pyyaml/verification_results/summary_pyyaml_20260522_024413.json"
+  },
+  "counts": {
+    "total_verdicts": 1,
+    "selected": 1,
+    "enriched": 0,
+    "skipped": 0,
+    "failed": 1
+  },
+  "findings": [],
+  "errors": [
+    {
+      "id": "0",
+      "rule_id": "py/overly-large-range",
+      "file": "lib/yaml/reader.py",
+      "start_line": 137,
+      "error": "No enclosing function found for finding 0: py/overly-large-range @ lib/yaml/reader.py:137"
+    }
+  ]
+}

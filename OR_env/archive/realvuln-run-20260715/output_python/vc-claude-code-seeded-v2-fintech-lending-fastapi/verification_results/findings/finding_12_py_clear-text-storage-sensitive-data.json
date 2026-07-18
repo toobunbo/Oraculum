@@ -1,0 +1,70 @@
+{
+  "id": "12",
+  "rule_slug": "py_clear-text-storage-sensitive-data",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-claude-code-seeded-v2-fintech-lending-fastapi_20260714_152421.json"
+  },
+  "finding": {
+    "rule_id": "py/clear-text-storage-sensitive-data",
+    "message": "This expression stores [sensitive data (password)](1) as clear text.",
+    "file": "backend/app/routers/users.py",
+    "start_line": 80,
+    "end_line": 80,
+    "repo_name": "vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/vc-claude-code-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 61: ControlFlowNode for Attribute",
+      "line 61: ControlFlowNode for initial_pw",
+      "line 80: ControlFlowNode for Fstring"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-312",
+      "CWE-315",
+      "CWE-359"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "confidence": "High",
+    "iterations": 1,
+    "answers": [
+      "The sensitive data is a password. Line 61 shows `initial_pw = body.password or secrets.token_urlsafe(16)`, where `initial_pw` is either the user-provided password or a generated token used as an initial password.",
+      "The data is stored in a file. Line 79 shows `with open(get_settings().upload_path.parent / \"password_reset_mailbox.log\", \"a\") as fh:`, indicating the data is written to a log file.",
+      "No, the data is not encrypted or hashed before storage. Line 80 writes the password directly into the file as cleartext: `fh.write(f\"NEW USER\\t{email}\\tinitial_password={initial_pw}\\n\")`.",
+      "Yes, an attacker with access to the file system or a backup containing the `password_reset_mailbox.log` file could read the sensitive data in cleartext.",
+      "This storage is likely reachable in production. The code does not appear to be test-specific, and the file is written to a path derived from application settings (`get_settings().upload_path.parent`), which suggests a production environment.",
+      "The blast radius is high. Exposure of initial passwords could lead to account compromise, especially if users do not change their initial passwords or reuse them across services."
+    ],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 4.0839080810546875,
+    "output_tokens": 401,
+    "context_needed": [],
+    "reasoning": "The code writes a cleartext password to a file (line 80) without any encryption or hashing. The data originates from user input or a generated token (line 61) and is stored in a log file accessible to anyone with file system access.",
+    "data_flow": "source (line 61) → transform (line 61) → sink (line 80)",
+    "confidence_score": 0.95,
+    "timestamp": "2026-07-14T15:23:51.952615",
+    "cost_usd": 0.0,
+    "input_tokens": 4622,
+    "cached_input_tokens": 0,
+    "tokens_used": 5023
+  },
+  "function": {
+    "name": "create_user",
+    "file": "backend/app/routers/users.py",
+    "start_line": 51,
+    "end_line": 84,
+    "scope": ""
+  },
+  "web_params": []
+}

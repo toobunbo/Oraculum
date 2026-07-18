@@ -1,0 +1,45 @@
+{
+  "stage": "classification",
+  "repo": "realvuln-pythonssti",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/classification.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/realvuln-pythonssti/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 2,
+    "generated": 2,
+    "skipped": 0,
+    "failed": 0
+  },
+  "classifications": [
+    {
+      "id": "0",
+      "target_id": "py_template_injection_main_py_14",
+      "rule_id": "py/template-injection",
+      "file": "main.py",
+      "start_line": "14",
+      "function_name": "read_root",
+      "finding_artifact": "output/python/realvuln-pythonssti/verification_results/findings/finding_0_py_template-injection.json",
+      "classification": "output/python/realvuln-pythonssti/classifications/py_template_injection_main_py_14.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "high"
+    },
+    {
+      "id": "1",
+      "target_id": "py_jinja2_autoescape_false_main_py_11",
+      "rule_id": "py/jinja2/autoescape-false",
+      "file": "main.py",
+      "start_line": "11",
+      "function_name": "read_root",
+      "finding_artifact": "output/python/realvuln-pythonssti/verification_results/findings/finding_1_py_jinja2_autoescape-false.json",
+      "classification": "output/python/realvuln-pythonssti/classifications/py_jinja2_autoescape_false_main_py_11.json",
+      "status": "generated",
+      "strategy": "return_value",
+      "confidence": "high"
+    }
+  ],
+  "errors": []
+}

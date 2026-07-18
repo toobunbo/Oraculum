@@ -1,0 +1,52 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "HttpResponse.content decoded to string from the return value of course_memo_badge_064",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "Any of the trigger patterns (XSS payloads like <script>, onerror=, onload=, javascript:, <svg) are found in the decoded HttpResponse.content, confirming that user input survived unsanitized into the HTML output.",
+    "trigger_patterns": [
+      "<script[\\s>]",
+      "onerror\\s*=",
+      "onload\\s*=",
+      "javascript\\s*:",
+      "<svg[\\s/]"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_REFLECTIVE_XSS: XSS payload survived in HttpResponse content — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "<script>alert(1)</script>",
+      "<img src=x onerror=alert(1)>",
+      "<svg onload=alert(1)>",
+      "\"><script>alert(1)</script>",
+      "<a href=javascript:alert(1)>click</a>",
+      "'onload='alert(1)"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "course_memo_badge_064",
+    "file": "education_lms/course_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def course_memo_badge_064(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "django.http.HttpRequest"
+      }
+    ],
+    "target_id": "py_reflective_xss_education_lms_course_operations_py_33",
+    "finding_id": "4",
+    "rule_id": "py/reflective-xss",
+    "rule_slug": "py_reflective-xss",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/findings/finding_4_py_reflective-xss.json"
+  }
+}

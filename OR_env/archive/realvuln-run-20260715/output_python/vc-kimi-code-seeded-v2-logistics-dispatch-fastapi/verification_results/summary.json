@@ -1,0 +1,22 @@
+{
+  "stage": "ingest",
+  "repo": "vc-kimi-code-seeded-v2-logistics-dispatch-fastapi",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-kimi-code-seeded-v2-logistics-dispatch-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-kimi-code-seeded-v2-logistics-dispatch-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-kimi-code-seeded-v2-logistics-dispatch-fastapi/verification_results/summary_vc-kimi-code-seeded-v2-logistics-dispatch-fastapi_20260714_161356.json"
+  },
+  "counts": {
+    "total_verdicts": 17,
+    "selected": 0,
+    "enriched": 0,
+    "skipped": 17,
+    "failed": 0
+  },
+  "findings": [],
+  "errors": []
+}

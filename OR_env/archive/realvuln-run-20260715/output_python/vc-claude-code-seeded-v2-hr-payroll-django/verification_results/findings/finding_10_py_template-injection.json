@@ -1,0 +1,70 @@
+{
+  "id": "10",
+  "rule_slug": "py_template-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/summary_vc-claude-code-seeded-v2-hr-payroll-django_20260714_152802.json"
+  },
+  "finding": {
+    "rule_id": "py/template-injection",
+    "message": "This template construction depends on a [user-provided value](1).",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 139,
+    "end_line": 139,
+    "repo_name": "vc-claude-code-seeded-v2-hr-payroll-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/vc-claude-code-seeded-v2-hr-payroll-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 134: ControlFlowNode for request",
+      "line 138: ControlFlowNode for Attribute",
+      "line 138: ControlFlowNode for Attribute()",
+      "line 138: ControlFlowNode for fragment",
+      "line 139: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "9.3",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-74"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "data_flow": "request (line 134) → request.GET.get(\"fragment\", \"{{ 7 * 7 }}\") (line 138) → fragment (line 138) → \"Result: \" + fragment (line 139) → Template(...).render() (line 139)",
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "tokens_used": 18066,
+    "timestamp": "2026-07-14T15:27:59.911817",
+    "input_tokens": 16611,
+    "output_tokens": 1455,
+    "confidence_score": 0.95,
+    "elapsed_seconds": 12.520729064941406,
+    "reasoning": "User-controlled input (`fragment`) is directly embedded into a Jinja2 template string without sanitization or sandboxing, creating a Server-Side Template Injection (SSTI) vulnerability. The data flow from the HTTP request parameter to the template source is clear and exploitable. The missing caller context does not change the fact that this function accepts user input directly through request.GET and uses it unsafely in a template.",
+    "cost_usd": 0.0,
+    "answers": [
+      "The EXACT template-render sink is: `Template(\"Result: \" + fragment).render()` on line 139. The template-source string passed to it is `\"Result: \" + fragment`.",
+      "The template-source string is assigned on line 139 as `\"Result: \" + fragment`. The variable `fragment` is assigned on line 138 from `request.GET.get(\"fragment\", \"{{ 7 * 7 }}\")`.",
+      "The LAST assignment to the template SOURCE is on line 139: `\"Result: \" + fragment`. The value of `fragment` derives from user input via `request.GET.get(\"fragment\", \"{{ 7 * 7 }}\")` on line 138. The data-flow chain is: `request` (line 134) → `request.GET.get` (line 138) → `fragment` (line 138) → `\"Result: \" + fragment` (line 139).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path. The value of `fragment` is directly used in the template construction without sanitization or validation.",
+      "There is no specific defense preventing SSTI. The user input is directly embedded into the template string without using sandboxing, auto-escaping, or restricting the template source to safe constants or files. The default Jinja2 environment is used, which allows arbitrary code execution if the template source is controlled.",
+      "User-controlled data (`fragment` from `request.GET`) reaches the template SOURCE (`\"Result: \" + fragment`) with no sanitization or defense mechanisms visible in the code."
+    ],
+    "cached_input_tokens": 0,
+    "context_needed": []
+  },
+  "function": {
+    "name": "payroll_jinja_cast_384",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 134,
+    "end_line": 140,
+    "scope": ""
+  },
+  "web_params": []
+}

@@ -1,0 +1,49 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of ticket_return_lane_148, specifically the Location header from the RedirectResponse object",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The returned RedirectResponse object has a Location header containing an external/untrusted URL scheme (http:// or https://) pointing to a non-localhost domain, confirming an open redirect bypass",
+    "trigger_patterns": [
+      "https?://(?!localhost[:/]|127\\.0\\.0\\.1[:/]|\\[::1\\][:/])[^/\\s]+",
+      "https?://evil\\.",
+      "https?://attacker\\."
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_URL-REDIRECTION: open redirect bypass detected — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "http://evil.com/steal",
+      "https://attacker.example.com/phish",
+      "http://malicious.site/redirect",
+      "https://evil.com",
+      "http://192.168.1.1/admin"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "ticket_return_lane_148",
+    "file": "backend/app/support_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def ticket_return_lane_148(lane: str, gate_ref: None)",
+    "tainted_params": [
+      {
+        "name": "lane",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_url_redirection_backend_app_support_operations_py_42",
+    "finding_id": "8",
+    "rule_id": "py/url-redirection",
+    "rule_slug": "py_url-redirection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_8_py_url-redirection.json"
+  }
+}

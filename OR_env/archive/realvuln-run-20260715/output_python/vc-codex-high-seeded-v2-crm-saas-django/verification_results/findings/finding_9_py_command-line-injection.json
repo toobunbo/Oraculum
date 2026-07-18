@@ -1,0 +1,72 @@
+{
+  "id": "9",
+  "rule_slug": "py_command-line-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/summary_vc-codex-high-seeded-v2-crm-saas-django_20260714_153817.json"
+  },
+  "finding": {
+    "rule_id": "py/command-line-injection",
+    "message": "This command line depends on a [user-provided value](1).",
+    "file": "config/partner_console.py",
+    "start_line": 185,
+    "end_line": 185,
+    "repo_name": "vc-codex-high-seeded-v2-crm-saas-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django/vc-codex-high-seeded-v2-crm-saas-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 180: ControlFlowNode for request",
+      "line 184: ControlFlowNode for Attribute",
+      "line 184: ControlFlowNode for Attribute()",
+      "line 184: ControlFlowNode for host",
+      "line 185: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-78",
+      "CWE-88"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "verdict": "True Positive",
+    "answers": [
+      "The EXACT sink is `_os.system(\"ping -c 1 \" + host)` on line 185. The value passed as the command argument is the string `\"ping -c 1 \" + host`.",
+      "The only assignment to `host` is on line 184: `host = request.GET.get(\"host\", \"127.0.0.1\")`. This is also the LAST assignment on the path to the sink.",
+      "The value of `host` derives from `request.GET.get(\"host\", \"127.0.0.1\")` on line 184. The `request` object is the source of user input as indicated by the dataflow path, meaning the `host` variable is user-controlled if the `host` parameter is provided in the GET request.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The value of `host` is directly used in the command string on line 185.",
+      "There is no specific defense sanitizing the value. No functions like `shlex.quote()` or safe subprocess execution methods are used. The code directly concatenates the user input into the command string.",
+      "The user-tainted value `host` reaches the sink `_os.system()` on line 185 without any sanitization. The command is constructed via string concatenation, which is vulnerable to command injection."
+    ],
+    "reasoning": "User-controlled input (`host`) is directly concatenated into a shell command via `_os.system()` without sanitization, creating a command injection vulnerability. The additional context confirms there are no callers or callees that might provide additional protection, and the data flow from the request to the sink is clear and unmitigated.",
+    "elapsed_seconds": 14.168582439422607,
+    "context_needed": [],
+    "tokens_used": 13597,
+    "output_tokens": 1420,
+    "cached_input_tokens": 0,
+    "input_tokens": 12177,
+    "timestamp": "2026-07-14T15:38:08.099451",
+    "data_flow": "request (line 180) → request.GET.get(\"host\", \"127.0.0.1\") (line 184) → \"ping -c 1 \" + host (line 185) → _os.system() (line 185)",
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence_score": 0.95
+  },
+  "function": {
+    "name": "acct_shell_probe_633",
+    "file": "config/partner_console.py",
+    "start_line": 180,
+    "end_line": 186,
+    "scope": ""
+  },
+  "web_params": []
+}

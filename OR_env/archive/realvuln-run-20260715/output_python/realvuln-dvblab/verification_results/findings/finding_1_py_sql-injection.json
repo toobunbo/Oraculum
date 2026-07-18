@@ -1,0 +1,74 @@
+{
+  "id": "1",
+  "rule_slug": "py_sql-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-dvblab",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab/verification_results/summary_realvuln-dvblab_20260714_145756.json"
+  },
+  "finding": {
+    "rule_id": "py/sql-injection",
+    "message": "This SQL query depends on a [user-provided value](1).",
+    "file": "backend/routes/auth_routes.py",
+    "start_line": 23,
+    "end_line": 23,
+    "repo_name": "realvuln-dvblab",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab/realvuln-dvblab.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 14: ControlFlowNode for request",
+      "line 14: ControlFlowNode for data",
+      "line 15: ControlFlowNode for data",
+      "line 15: ControlFlowNode for Attribute()",
+      "line 15: ControlFlowNode for username",
+      "line 22: ControlFlowNode for insert_query",
+      "line 23: ControlFlowNode for insert_query"
+    ],
+    "severity": "8.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-89"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "User-provided values (username and password) are directly interpolated into an SQL query string using an f-string on line 22, and executed via db.session.execute() on line 23 without any sanitization or parameterization. Even though the exact implementation of db.session.execute is not visible, passing a raw SQL string to an execute method in ORM contexts typically results in direct execution of that SQL, making this a clear SQL injection vulnerability.",
+    "elapsed_seconds": 11.073326349258423,
+    "answers": [
+      "The EXACT sink statement is: `db.session.execute(insert_query)` on line 23. The variable passed to it is `insert_query`.",
+      "The assignment to `insert_query` is on line 22: `insert_query = f\"INSERT INTO user (username, password_hash, balance) VALUES ('{username}', '{password_hash}', 0000.00)\"`.",
+      "The value of `insert_query` is derived from `username` (line 15) and `password_hash` (line 21). `username` is obtained from user input via `data.get('username')` on line 15, where `data = request.get_json()` on line 14. `password_hash` is derived from `password` (line 16), which is also user-provided via `data.get('password')`. Thus, the query string is built using unsanitized user input.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The assignment on line 22 is the final and only assignment to `insert_query` before it reaches the sink on line 23.",
+      "There is no specific defense sanitizing the value before the sink. The query is constructed using an f-string with direct interpolation of user-provided values, and executed via `db.session.execute(insert_query)` without parameterization or escaping. The implementation of `db.session.execute` is not available, but based on common ORM patterns and the fact that a raw SQL string is being passed, it is likely executing the raw SQL directly.",
+      "The user-tainted values (`username` and `password`) reach the SQL query string via line 22, and the query is executed directly on line 23 without any sanitization or parameterization."
+    ],
+    "cached_input_tokens": 0,
+    "tokens_used": 15724,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence_score": 0.95,
+    "timestamp": "2026-07-14T14:57:28.382691",
+    "context_needed": [],
+    "data_flow": "request.get_json() (line 14) → username (line 15) → insert_query (line 22) → db.session.execute(insert_query) (line 23)",
+    "output_tokens": 1295,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "iterations": 3,
+    "verdict": "True Positive",
+    "input_tokens": 14429
+  },
+  "function": {
+    "name": "register",
+    "file": "backend/routes/auth_routes.py",
+    "start_line": 13,
+    "end_line": 28,
+    "scope": ""
+  },
+  "web_params": []
+}

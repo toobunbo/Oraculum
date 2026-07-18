@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is _os.system(\"ping -c 1 \" + host) on line 127, which is direct shell execution with a user-controlled argument."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; decision terminated at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; decision terminated at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock _os.system (or os.system) to prevent actual shell execution.",
+    "capture": "Capture the full command string argument passed to os.system, specifically the \"ping -c 1 \" + host concatenation, so the test can assert the injected payload is present.",
+    "fake_behavior": "Return 0 to simulate a successful command exit status, allowing the function to continue and return {'status': 0} normally.",
+    "notes": [
+      "The function returns {'status': status}, where status is likely the return value of os.system, so the mock must return an integer.",
+      "Ensure the mock captures the argument before any execution; do not call the real os.system even with safe-looking inputs."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

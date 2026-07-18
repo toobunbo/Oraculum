@@ -1,0 +1,99 @@
+{
+  "stage": "harness",
+  "repo": "realvuln-damn-vulnerable-flask-application",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/harness.yaml",
+  "source": {
+    "oracle_status_path": "output/python/realvuln-damn-vulnerable-flask-application/fuzz_oracles/status.json"
+  },
+  "counts": {
+    "selected": 5,
+    "generated": 5,
+    "skipped": 0,
+    "failed": 0
+  },
+  "harnesses": [
+    {
+      "id": "0",
+      "target_id": "py_code_injection_app_py_120",
+      "rule_id": "py/code-injection",
+      "file": "app.py",
+      "start_line": "120",
+      "function_name": "evaluate",
+      "harness": "output/python/realvuln-damn-vulnerable-flask-application/fuzz_targets/py_code_injection_app_py_120.py",
+      "oracle": "output/python/realvuln-damn-vulnerable-flask-application/fuzz_oracles/py_code_injection_app_py_120.json",
+      "finding_artifact": "output/python/realvuln-damn-vulnerable-flask-application/verification_results/findings/finding_0_py_code-injection.json",
+      "corpus": "output/python/realvuln-damn-vulnerable-flask-application/fuzz_corpus/py_code_injection_app_py_120",
+      "strategy": "recorded_call",
+      "status": "generated",
+      "seed_count": 5,
+      "errors": ""
+    },
+    {
+      "id": "1",
+      "target_id": "py_reflective_xss_app_py_163",
+      "rule_id": "py/reflective-xss",
+      "file": "app.py",
+      "start_line": "163",
+      "function_name": "xml",
+      "harness": "output/python/realvuln-damn-vulnerable-flask-application/fuzz_targets/py_reflective_xss_app_py_163.py",
+      "oracle": "output/python/realvuln-damn-vulnerable-flask-application/fuzz_oracles/py_reflective_xss_app_py_163.json",
+      "finding_artifact": "output/python/realvuln-damn-vulnerable-flask-application/verification_results/findings/finding_1_py_reflective-xss.json",
+      "corpus": "output/python/realvuln-damn-vulnerable-flask-application/fuzz_corpus/py_reflective_xss_app_py_163",
+      "strategy": "return_value",
+      "status": "generated",
+      "seed_count": 5,
+      "errors": ""
+    },
+    {
+      "id": "2",
+      "target_id": "py_reflective_xss_app_py_205",
+      "rule_id": "py/reflective-xss",
+      "file": "app.py",
+      "start_line": "205",
+      "function_name": "sayhi",
+      "harness": "output/python/realvuln-damn-vulnerable-flask-application/fuzz_targets/py_reflective_xss_app_py_205.py",
+      "oracle": "output/python/realvuln-damn-vulnerable-flask-application/fuzz_oracles/py_reflective_xss_app_py_205.json",
+      "finding_artifact": "output/python/realvuln-damn-vulnerable-flask-application/verification_results/findings/finding_2_py_reflective-xss.json",
+      "corpus": "output/python/realvuln-damn-vulnerable-flask-application/fuzz_corpus/py_reflective_xss_app_py_205",
+      "strategy": "return_value",
+      "status": "generated",
+      "seed_count": 5,
+      "errors": ""
+    },
+    {
+      "id": "3",
+      "target_id": "py_xxe_app_py_159",
+      "rule_id": "py/xxe",
+      "file": "app.py",
+      "start_line": "159",
+      "function_name": "xml",
+      "harness": "output/python/realvuln-damn-vulnerable-flask-application/fuzz_targets/py_xxe_app_py_159.py",
+      "oracle": "output/python/realvuln-damn-vulnerable-flask-application/fuzz_oracles/py_xxe_app_py_159.json",
+      "finding_artifact": "output/python/realvuln-damn-vulnerable-flask-application/verification_results/findings/finding_3_py_xxe.json",
+      "corpus": "output/python/realvuln-damn-vulnerable-flask-application/fuzz_corpus/py_xxe_app_py_159",
+      "strategy": "recorded_call",
+      "status": "generated",
+      "seed_count": 5,
+      "errors": ""
+    },
+    {
+      "id": "4",
+      "target_id": "py_template_injection_app_py_205",
+      "rule_id": "py/template-injection",
+      "file": "app.py",
+      "start_line": "205",
+      "function_name": "sayhi",
+      "harness": "output/python/realvuln-damn-vulnerable-flask-application/fuzz_targets/py_template_injection_app_py_205.py",
+      "oracle": "output/python/realvuln-damn-vulnerable-flask-application/fuzz_oracles/py_template_injection_app_py_205.json",
+      "finding_artifact": "output/python/realvuln-damn-vulnerable-flask-application/verification_results/findings/finding_4_py_template-injection.json",
+      "corpus": "output/python/realvuln-damn-vulnerable-flask-application/fuzz_corpus/py_template_injection_app_py_205",
+      "strategy": "return_value",
+      "status": "generated",
+      "seed_count": 5,
+      "errors": ""
+    }
+  ],
+  "errors": []
+}

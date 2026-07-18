@@ -1,0 +1,76 @@
+{
+  "id": "4",
+  "rule_slug": "py_reflective-xss",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulnpy",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnpy",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnpy/verification_results/summary_realvuln-vulnpy_20260714_151715.json"
+  },
+  "finding": {
+    "rule_id": "py/reflective-xss",
+    "message": "Cross-site scripting vulnerability due to a [user-provided value](1).",
+    "file": "src/vulnpy/aiohttp/vulnerable_routes.py",
+    "start_line": 31,
+    "end_line": 31,
+    "repo_name": "realvuln-vulnpy",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnpy/realvuln-vulnpy.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 19: ControlFlowNode for request",
+      "line 20: ControlFlowNode for request",
+      "line 6: ControlFlowNode for request",
+      "line 7: ControlFlowNode for Attribute",
+      "line 7: ControlFlowNode for Attribute()",
+      "line 20: ControlFlowNode for _get_user_input()",
+      "line 20: ControlFlowNode for user_input",
+      "line 29: ControlFlowNode for template",
+      "line 31: ControlFlowNode for template"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "elapsed_seconds": 12.799822092056274,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "timestamp": "2026-07-14T15:17:14.229399",
+    "output_tokens": 1621,
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "iterations": 3,
+    "tokens_used": 16441,
+    "cost_usd": 0.0,
+    "data_flow": "request (line 19) → _get_user_input(request) (line 20) → user_input (line 20) → template += \"<p>XSS: \" + user_input + \"</p>\" (line 29) → web.Response(text=template, content_type=\"text/html\") (line 31)",
+    "answers": [
+      "The EXACT sink is `web.Response(text=template, content_type=\"text/html\")` on line 31. The value being rendered is `template`.",
+      "Assignments to `template` reaching the sink: Line 26: `template = get_template(\"{}.html\".format(name))`. Line 29: `template += \"<p>XSS: \" + user_input + \"</p>\"` (LAST assignment).",
+      "The LAST assignment on line 29 derives from user input. Data-flow chain: `request` (line 19) → `_get_user_input(request)` (line 20) → `user_input` (line 20) → `template += \"<p>XSS: \" + user_input + \"</p>\"` (line 29).",
+      "No constant-time conditions or reassignments override the user-tainted value on the reaching path.",
+      "There is no specific defense escaping the value at the sink. The `get_template` function implementation is not visible, but even if it did escaping, the direct string concatenation on line 29 would bypass it. No calls to `html.escape()`, `markupsafe.escape()`, or `bleach.clean(...)` are present in the visible code. The aiohttp `web.Response` does not perform auto-escaping.",
+      "No, `|safe` / `{% autoescape false %}` / `Markup(...)` / `mark_safe(...)` is NOT used to disable escaping because no escaping is applied in the first place.",
+      "The user-tainted value (`user_input`) reaches the sink (`template` on line 31) with no escaping or sanitization applied. The value is directly concatenated into HTML and returned as a response."
+    ],
+    "context_needed": [],
+    "input_tokens": 14820,
+    "verdict": "True Positive",
+    "reasoning": "User-controlled input (`user_input`) is directly concatenated into an HTML string (`template`) on line 29 and rendered in an HTML response on line 31 without any visible escaping or sanitization, constituting a reflective XSS vulnerability. The unknown `get_template` implementation does not change this as the vulnerability occurs after the template is retrieved.",
+    "cached_input_tokens": 0
+  },
+  "function": {
+    "name": "get_trigger_view",
+    "file": "src/vulnpy/aiohttp/vulnerable_routes.py",
+    "start_line": 18,
+    "end_line": 33,
+    "scope": ""
+  },
+  "web_params": []
+}

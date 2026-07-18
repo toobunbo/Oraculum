@@ -1,0 +1,75 @@
+{
+  "id": "2",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-lets-be-bad-guys",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-lets-be-bad-guys",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-lets-be-bad-guys/verification_results/summary_realvuln-lets-be-bad-guys_20260714_150402.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "badguys/vulnerable/views.py",
+    "start_line": 42,
+    "end_line": 42,
+    "repo_name": "realvuln-lets-be-bad-guys",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-lets-be-bad-guys/realvuln-lets-be-bad-guys.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 35: ControlFlowNode for request",
+      "line 39: ControlFlowNode for Attribute",
+      "line 39: ControlFlowNode for Attribute()",
+      "line 39: ControlFlowNode for filename",
+      "line 42: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "answers": [
+      "The exact file-operation sink is `open(os.path.join(base_path, filename), 'rb')` on line 42. The path value passed to it is `os.path.join(base_path, filename)`.",
+      "The path value `os.path.join(base_path, filename)` is derived from: - Line 38: `base_path = os.path.join(os.path.dirname(__file__), '../../badguys/static/images')` - Line 39: `filename = request.GET.get('p')` - Line 42 (sink): `os.path.join(base_path, filename)` The LAST assignment to the path components before the sink is on line 39 for `filename` and line 38 for `base_path`.",
+      "The `base_path` is constructed from a fixed string and `__file__`, so it is not user-controlled. However, `filename` on line 39 is assigned directly from user input via `request.GET.get('p')`. The data flow is: `request` (line 35) → `request.GET.get('p')` (line 39) → `filename` (line 39) → `os.path.join(base_path, filename)` (line 42).",
+      "There are no constant-time conditions or reassignments that override the user-tainted `filename` value before it reaches the sink on line 42. The only checks are in the `except` block (lines 43–49), which occur AFTER the vulnerable operation and do not prevent the initial file access.",
+      "There is no specific defense applied to the path. No functions like `secure_filename`, `Path.resolve().is_relative_to()`, or path validation are used. The code directly uses the user-provided `filename` in `os.path.join()` without sanitization or validation.",
+      "The user-tainted value (`filename`) clearly reaches the sink (`open(...)`) on line 42. No defenses are present to prevent directory traversal. The absence of any path sanitization or validation confirms the vulnerability."
+    ],
+    "reasoning": "User-controlled input (`filename` from `request.GET.get('p')`) is directly used in a file path without sanitization or validation, allowing directory traversal. The sink `open(...)` on line 42 is reached with a tainted path, and no defenses are present.",
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "verdict": "True Positive",
+    "elapsed_seconds": 13.284119129180908,
+    "timestamp": "2026-07-14T15:04:01.004685",
+    "iterations": 3,
+    "cost_usd": 0.0,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "input_tokens": 13135,
+    "output_tokens": 1488,
+    "confidence": "High",
+    "data_flow": "request (line 35) → request.GET.get('p') (line 39) → filename (line 39) → os.path.join(base_path, filename) (line 42) → open(...) (line 42)",
+    "tokens_used": 14623,
+    "cached_input_tokens": 0
+  },
+  "function": {
+    "name": "user_pic",
+    "file": "badguys/vulnerable/views.py",
+    "start_line": 35,
+    "end_line": 53,
+    "scope": ""
+  },
+  "web_params": []
+}

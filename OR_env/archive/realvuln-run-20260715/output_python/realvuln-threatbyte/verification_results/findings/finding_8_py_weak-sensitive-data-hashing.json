@@ -1,0 +1,70 @@
+{
+  "id": "8",
+  "rule_slug": "py_weak-sensitive-data-hashing",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-threatbyte",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte/verification_results/summary_realvuln-threatbyte_20260714_150915.json"
+  },
+  "finding": {
+    "rule_id": "py/weak-sensitive-data-hashing",
+    "message": "[Sensitive data (password)](1) is used in a hashing algorithm (MD5) that is insecure for password hashing, since it is not a computationally expensive hash function.",
+    "file": "db/create_dummy_data.py",
+    "start_line": 8,
+    "end_line": 8,
+    "repo_name": "realvuln-threatbyte",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte/realvuln-threatbyte.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 7: ControlFlowNode for password",
+      "line 8: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-327",
+      "CWE-328",
+      "CWE-916"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "The code uses MD5 for password hashing, which is insecure. The data flow shows the password directly reaching the MD5 hash function without any computationally expensive hashing or salting. Even though the caller is not visible, the function name and implementation clearly indicate it's for password hashing, making it a true positive for CWE-327, CWE-328, and CWE-916.",
+    "input_tokens": 12970,
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:08:56.197902",
+    "data_flow": "password (line 7) → hashlib.md5(password.encode()).hexdigest() (line 8) → return (line 8)",
+    "confidence_score": 0.95,
+    "answers": [
+      "The EXACT crypto call is `hashlib.md5(password.encode()).hexdigest()` on line 8, and the algorithm is MD5.",
+      "The algorithm name is specified via a hardcoded method call `hashlib.md5`, which is an enum/constant import. Quote from line 8: `hashlib.md5(password.encode()).hexdigest()`.",
+      "The output of the MD5 hash is returned directly from the function `hash_password`. The caller context is not available, but the function name and context imply it is intended for password hashing, which is a SECURITY use-case (a).",
+      "Yes, collision resistance is required for password hashing. MD5 is broken for collision resistance and is insecure for this use-case.",
+      "The specific defense required for password hashing is to use a computationally expensive function such as `bcrypt`, `argon2-cffi`, `hashlib.scrypt`, or `hashlib.pbkdf2_hmac` with sufficient iterations. None of these are present in the code.",
+      "There is no evidence in the provided code that this is for backward-compatibility with an external system.",
+      "The use-case is SECURITY (password hashing), and there is no adequate defense present. MD5 is insecure for password hashing."
+    ],
+    "cost_usd": 0.0,
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "confidence": "High",
+    "output_tokens": 1228,
+    "elapsed_seconds": 9.335175514221191,
+    "tokens_used": 14198
+  },
+  "function": {
+    "name": "hash_password",
+    "file": "db/create_dummy_data.py",
+    "start_line": 7,
+    "end_line": 8,
+    "scope": ""
+  },
+  "web_params": []
+}

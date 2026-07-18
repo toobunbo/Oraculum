@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "c.execute performs a DB write (UPDATE users SET password)"
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "N/A - decision made at Q1"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "N/A - decision made at Q1"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "The database cursor's `execute` method called on line 53",
+    "capture": "The fully formatted SQL query string containing the tainted `password` and `username` arguments",
+    "fake_behavior": "Skip the actual database execution and return a mock object (e.g., a fake cursor or None) so the function can successfully proceed and return `True`",
+    "notes": [
+      "Mocking the cursor prevents irreversible database state changes during testing.",
+      "The captured query string can be asserted against to verify the SQL injection payload reaches the sink."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

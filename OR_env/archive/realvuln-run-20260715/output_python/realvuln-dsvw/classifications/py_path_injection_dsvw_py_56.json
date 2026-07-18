@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "Sink is open(params['include'], 'rb') — a file read operation with no network I/O, shell execution, or irreversible side effects."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "returns.kind is 'none' with no exprs; do_GET sends response over socket during execution, leaving no in-memory or filesystem artifact to inspect after return."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; Q2 answered NO."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the built-in open() call at line 56 to intercept the path argument.",
+    "capture": "Capture the first argument to open() — the resolved file path string — so the oracle can assert it does not contain directory-traversal sequences (e.g., '..' segments) or fall outside an expected allowlist.",
+    "fake_behavior": "Return a fake file-like object (e.g., io.BytesIO(b'')) so that the subsequent read/write logic in do_GET proceeds without error while preventing actual filesystem access.",
+    "notes": [
+      "Since do_GET likely writes the file contents to self.wfile, the fake object should support .read() and optionally .close().",
+      "Ensure the mock is scoped narrowly to this specific open call to avoid interfering with other file operations in the handler."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

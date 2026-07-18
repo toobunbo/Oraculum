@@ -1,0 +1,74 @@
+{
+  "id": "7",
+  "rule_slug": "py_command-line-injection",
+  "source": {
+    "vhx_root": "/home/tuonglnc/repo/VulnHunterX",
+    "vhx_repo_root": "/home/tuonglnc/repo/VulnHunterX/repos/python/benchmark-python",
+    "vhx_output_root": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python",
+    "summary_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/verification_results/summary_benchmark-python_filtered_20260610_105228.json"
+  },
+  "finding": {
+    "rule_id": "py/command-line-injection",
+    "message": "This command line depends on a [user-provided value](1).",
+    "file": "testcode/BenchmarkTest00167.py",
+    "start_line": 53,
+    "end_line": 53,
+    "repo_name": "benchmark-python",
+    "lang": "python",
+    "sarif_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/benchmark-python.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 31: ControlFlowNode for request",
+      "line 31: ControlFlowNode for Attribute",
+      "line 31: ControlFlowNode for Attribute()",
+      "line 31: ControlFlowNode for param",
+      "line 39: ControlFlowNode for bar",
+      "line 50: ControlFlowNode for argStr",
+      "line 53: ControlFlowNode for argStr"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [],
+    "tags": [
+      "correctness",
+      "security",
+      "external/cwe/cwe-078",
+      "external/cwe/cwe-088"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-06-10T10:43:23.219073",
+    "context_needed": [],
+    "data_flow": "request.form.get(\"BenchmarkTest00167\") (line 5) → param (line 5) → bar (line 13) → argStr (line 50) → subprocess execution (implied by context)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "answers": [
+      "The exact sink is not explicitly shown in the provided code snippet, but based on the context of command-line injection and the construction of argStr, it would be a subprocess call that executes shell commands. The argStr variable is constructed to be executed as a shell command.",
+      "The assignments to the value reaching the sink (argStr) are: line 5 (param = request.form.get(\"BenchmarkTest00167\")), line 13 (bar = param), and line 50 (argStr += f\"echo {bar}\"). The last assignment is on line 50.",
+      "The value derives from user input through request.form.get(\"BenchmarkTest00167\") on line 5, which is assigned to param, then to bar on line 13, and finally embedded in argStr on line 50.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The flow goes directly from user input to the command string construction.",
+      "No specific defense sanitizes the value. There is no use of shlex.quote(), subprocess.run([...], shell=False), or any allow-list. The code directly embeds user input into a shell command string using an f-string.",
+      "The user-tainted value clearly reaches the command string construction point without any sanitization, and the context shows this is intended for subprocess execution."
+    ],
+    "confidence_score": 0.95,
+    "iterations": 2,
+    "input_tokens": 4755,
+    "elapsed_seconds": 27.089967966079712,
+    "confidence": "High",
+    "cached_input_tokens": 0,
+    "tokens_used": 5638,
+    "reasoning": "User input flows directly into a shell command string via f-string formatting without any sanitization or validation, creating a clear command injection vulnerability when argStr is executed.",
+    "verdict": "True Positive",
+    "output_tokens": 883
+  },
+  "function": {
+    "name": "BenchmarkTest00167_post",
+    "file": "testcode/BenchmarkTest00167.py",
+    "start_line": 28,
+    "end_line": 63,
+    "scope": "Function init"
+  }
+}

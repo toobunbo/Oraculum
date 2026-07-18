@@ -1,0 +1,20 @@
+==============================================
+MASTER EXPERIMENT — Wed Jul 15 11:48:12 UTC 2026
+==============================================
+
+LLM_MODEL=glm-5
+OPENAI_API_BASE=https://api.z.ai/api/coding/paas/v4
+
+==============================================
+PHASE 1: Oriculum Pipeline — Wed Jul 15 11:48:12 UTC 2026
+==============================================
+[Respawn 0] Starting pipeline at Wed Jul 15 11:48:12 UTC 2026
+=== Env ===
+LLM_MODEL=glm-5  OPENAI_API_BASE=https://api.z.ai/api/coding/paas/v4
+Found 62 repos to process
+Start: Wed Jul 15 11:48:15 UTC 2026
+
+[1/62] ===== realvuln-damn-vulnerable-flask-application =====
+  TP findings: 5
+  [INGEST] Wed Jul 15 11:48:15 UTC 2026
+  [CLASSIFY] Wed Jul 15 11:48:16 UTC 2026

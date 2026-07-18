@@ -1,0 +1,58 @@
+{
+  "stage": "classification",
+  "repo": "realvuln-extremely-vulnerable-flask-app",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/classification.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/realvuln-extremely-vulnerable-flask-app/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 3,
+    "generated": 3,
+    "skipped": 0,
+    "failed": 0
+  },
+  "classifications": [
+    {
+      "id": "0",
+      "target_id": "py_sql_injection_routes_account_py_33",
+      "rule_id": "py/sql-injection",
+      "file": "routes/account.py",
+      "start_line": "33",
+      "function_name": "search",
+      "finding_artifact": "output/python/realvuln-extremely-vulnerable-flask-app/verification_results/findings/finding_0_py_sql-injection.json",
+      "classification": "output/python/realvuln-extremely-vulnerable-flask-app/classifications/py_sql_injection_routes_account_py_33.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "medium"
+    },
+    {
+      "id": "1",
+      "target_id": "py_unsafe_deserialization_routes_account_py_118",
+      "rule_id": "py/unsafe-deserialization",
+      "file": "routes/account.py",
+      "start_line": "118",
+      "function_name": "before_request",
+      "finding_artifact": "output/python/realvuln-extremely-vulnerable-flask-app/verification_results/findings/finding_1_py_unsafe-deserialization.json",
+      "classification": "output/python/realvuln-extremely-vulnerable-flask-app/classifications/py_unsafe_deserialization_routes_account_py_118.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "high"
+    },
+    {
+      "id": "2",
+      "target_id": "py_template_injection_app_py_32",
+      "rule_id": "py/template-injection",
+      "file": "app.py",
+      "start_line": "32",
+      "function_name": "page_not_found",
+      "finding_artifact": "output/python/realvuln-extremely-vulnerable-flask-app/verification_results/findings/finding_2_py_template-injection.json",
+      "classification": "output/python/realvuln-extremely-vulnerable-flask-app/classifications/py_template_injection_app_py_32.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "high"
+    }
+  ],
+  "errors": []
+}

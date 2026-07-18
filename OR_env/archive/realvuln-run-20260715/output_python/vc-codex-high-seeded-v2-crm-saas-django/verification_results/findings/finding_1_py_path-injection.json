@@ -1,0 +1,76 @@
+{
+  "id": "1",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/summary_vc-codex-high-seeded-v2-crm-saas-django_20260714_153817.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "config/partner_console.py",
+    "start_line": 42,
+    "end_line": 42,
+    "repo_name": "vc-codex-high-seeded-v2-crm-saas-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django/vc-codex-high-seeded-v2-crm-saas-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 36: ControlFlowNode for request",
+      "line 39: ControlFlowNode for Attribute",
+      "line 39: ControlFlowNode for Attribute()",
+      "line 39: ControlFlowNode for packet_ref",
+      "line 40: ControlFlowNode for parcel_path",
+      "line 42: ControlFlowNode for parcel_path"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "cost_usd": 0.0,
+    "confidence": "Medium",
+    "verdict": "True Positive",
+    "answers": [
+      "The EXACT file-operation sink is `parcel_path.read_text()` on line 42. The path value passed to it is `parcel_path`.",
+      "The assignments to `parcel_path` are: line 40: `parcel_path = BASE_EXPORT_DIR / packet_ref`.",
+      "The value of `parcel_path` derives from `packet_ref` which is assigned on line 39: `packet_ref = request.GET.get(\"packet_ref\", \"account-summary.csv\")`. This derives from user input via `request.GET`.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense containing the path. No use of `secure_filename`, `resolve()`, `is_relative_to()`, `commonpath`, or `relative_to` is visible. The `BASE_EXPORT_DIR` global variable context is not available to determine if it provides any protection.",
+      "The user-tainted value `packet_ref` from `request.GET` reaches the sink `parcel_path.read_text()` on line 42 without clear sanitization or defense mechanism. The definition and value of `BASE_EXPORT_DIR` is not visible, which could potentially provide some path restriction."
+    ],
+    "reasoning": "User-controlled input `packet_ref` from `request.GET` is used to construct a file path `parcel_path` which is then read via `read_text()`. Even though `BASE_EXPORT_DIR` is used as a base path, without seeing its definition we cannot confirm it provides adequate protection. The absence of any explicit path sanitization makes this a path traversal vulnerability.",
+    "elapsed_seconds": 12.16556692123413,
+    "context_needed": [],
+    "tokens_used": 19054,
+    "output_tokens": 1439,
+    "cached_input_tokens": 0,
+    "input_tokens": 17615,
+    "timestamp": "2026-07-14T15:37:45.371468",
+    "data_flow": "request.GET (line 39) → packet_ref (line 39) → parcel_path (line 40) → parcel_path.read_text() (line 42)",
+    "iterations": 4,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence_score": 0.75
+  },
+  "function": {
+    "name": "acct_vaultlet_pull_062",
+    "file": "config/partner_console.py",
+    "start_line": 36,
+    "end_line": 45,
+    "scope": ""
+  },
+  "web_params": []
+}

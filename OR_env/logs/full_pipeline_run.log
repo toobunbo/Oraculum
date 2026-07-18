@@ -1,0 +1,8 @@
+Found 62 repos to process
+Start time: Wed Jul 15 08:04:05 UTC 2026
+Output dir: /home/trieudai/Oraculum/output/python
+
+[1/62] ===== realvuln-damn-vulnerable-flask-application =====
+  TP findings: 5
+  [INGEST] Wed Jul 15 08:04:05 UTC 2026
+  [CLASSIFY] Wed Jul 15 08:04:05 UTC 2026

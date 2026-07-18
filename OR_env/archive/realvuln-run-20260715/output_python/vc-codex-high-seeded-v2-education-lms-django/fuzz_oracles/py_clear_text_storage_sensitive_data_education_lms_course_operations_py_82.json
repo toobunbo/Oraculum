@@ -1,0 +1,46 @@
+{
+  "monitor": {
+    "strategy": "filesystem_state",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "files created in BASE_EXPORT_DIR containing SSN or credit card number patterns in cleartext JSON format",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "a file was written to the filesystem whose contents contain unencrypted SSN patterns (e.g. \\d{3}-\\d{2}-\\d{4}) or credit card number patterns in plain JSON, confirming clear-text storage of sensitive PII",
+    "trigger_patterns": [],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_CLEAR-TEXT-STORAGE-SENSITIVE-DATA: sensitive data written as cleartext to filesystem — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "123-45-6789",
+      "987-65-4321",
+      "000-00-0000",
+      "555-66-7777",
+      "4111111111111111",
+      "4532012345678901"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "course_vault_stash_245",
+    "file": "education_lms/course_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def course_vault_stash_245(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "HttpRequest"
+      }
+    ],
+    "target_id": "py_clear_text_storage_sensitive_data_education_lms_course_operations_py_82",
+    "finding_id": "5",
+    "rule_id": "py/clear-text-storage-sensitive-data",
+    "rule_slug": "py_clear-text-storage-sensitive-data",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/findings/finding_5_py_clear-text-storage-sensitive-data.json"
+  }
+}

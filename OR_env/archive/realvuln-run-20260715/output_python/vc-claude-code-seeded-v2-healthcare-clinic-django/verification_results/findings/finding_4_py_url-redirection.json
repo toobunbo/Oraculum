@@ -1,0 +1,70 @@
+{
+  "id": "4",
+  "rule_slug": "py_url-redirection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/summary_vc-claude-code-seeded-v2-healthcare-clinic-django_20260714_152609.json"
+  },
+  "finding": {
+    "rule_id": "py/url-redirection",
+    "message": "Untrusted URL redirection depends on a [user-provided value](1).",
+    "file": "clinic_portal/patient_operations.py",
+    "start_line": 58,
+    "end_line": 58,
+    "repo_name": "vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/vc-claude-code-seeded-v2-healthcare-clinic-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 54: ControlFlowNode for request",
+      "line 57: ControlFlowNode for Attribute",
+      "line 57: ControlFlowNode for Attribute()",
+      "line 57: ControlFlowNode for lane",
+      "line 58: ControlFlowNode for lane"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-601"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "The user-controlled input `lane` is directly used in a redirect call without any validation or sanitization, leading to an open redirect vulnerability. The data flow from the request to the redirect sink is clear and exploitable. The absence of callers confirms this is likely a web-accessible endpoint.",
+    "cost_usd": 0.0,
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 1185,
+    "tokens_used": 14051,
+    "elapsed_seconds": 10.252723455429077,
+    "cached_input_tokens": 0,
+    "timestamp": "2026-07-14T15:25:45.225088",
+    "iterations": 3,
+    "input_tokens": 12866,
+    "context_needed": [],
+    "data_flow": "request (line 54) → request.GET.get(\"lane\") or request.POST.get(\"lane\") (line 57) → lane (line 57) → redirect(lane) (line 58)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "answers": [
+      "The EXACT redirect sink is `return redirect(lane)` on line 58. The URL/target value passed to it is the variable `lane`.",
+      "The only assignment to `lane` is on line 57: `lane = request.GET.get(\"lane\") or request.POST.get(\"lane\") or \"/\"`.",
+      "The value of `lane` on line 57 derives from user input. Specifically, it comes from `request.GET.get(\"lane\")` or `request.POST.get(\"lane\")`, which are query parameters or form data from the HTTP request. The data-flow chain is: request (line 54) → request.GET/request.POST (line 57) → lane (line 57). The additional context shows no callers were found, meaning this function is likely a view/handler that's directly accessible via URL routing.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path. The value of `lane` is directly derived from user input without any subsequent sanitization or override.",
+      "There is no specific defense mechanism in place to contain the redirect. No validation, sanitization, or allow-list check is performed on the `lane` variable before it is passed to the `redirect` function. No domain validation or safe URL checking is visible.",
+      "The user-tainted value `lane` reaches the sink on line 58 without any adequate defense mechanism to prevent open redirection. The fact that no callers were found confirms this is likely a web endpoint directly accessible to users."
+    ]
+  },
+  "function": {
+    "name": "patient_return_lane_145",
+    "file": "clinic_portal/patient_operations.py",
+    "start_line": 54,
+    "end_line": 58,
+    "scope": ""
+  },
+  "web_params": []
+}

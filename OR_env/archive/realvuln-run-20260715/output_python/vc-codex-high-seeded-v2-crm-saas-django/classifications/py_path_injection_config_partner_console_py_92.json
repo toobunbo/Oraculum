@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is target.write_text on line 92, a filesystem write with path traversal vulnerability — irreversible side effect in test environment."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock pathlib.Path.write_text on the target object at line 92.",
+    "capture": "Capture the resolved target path (str(target)) and the JSON string argument passed to write_text. Store both so the oracle can assert path traversal is present (e.g., '..' segments or absolute escape) in the path.",
+    "fake_behavior": "Return None or a no-op; do not perform any filesystem write. Optionally raise an exception after capturing if you need to halt further execution, but returning normally is sufficient since the function also returns a JsonResponse.",
+    "notes": [
+      "The target is a Path object constructed as BASE_EXPORT_DIR / f\"{ref}.json\", so mock at the Path instance level or patch pathlib.Path.write_text globally.",
+      "Since BASE_EXPORT_DIR is unknown, focus the oracle assertion on the ref-derived portion of the path rather than the full absolute path.",
+      "The function returns a JsonResponse containing str(target), which can also be used for observation, but the write itself must still be mocked to avoid side effects."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

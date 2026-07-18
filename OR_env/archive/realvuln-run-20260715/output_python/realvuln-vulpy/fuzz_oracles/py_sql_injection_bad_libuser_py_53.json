@@ -1,0 +1,58 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "bad.libuser.c.execute",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "Fully formatted SQL query string containing tainted password and username",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured SQL query string contains a single-quote break followed by SQL metacharacters or keywords, indicating user-controlled input escaped the string literal context",
+    "trigger_patterns": [
+      "'\\s*(OR|AND)\\s+1\\s*=\\s*1",
+      "'\\s*;\\s*(DROP|DELETE|UPDATE|INSERT|ALTER)",
+      "'\\s*(OR|AND)\\s+'[^']*'\\s*=\\s*'[^']*'",
+      "'\\s*--",
+      "'\\s*;\\s*--",
+      "'\\s*UNION\\s+(ALL\\s+)?SELECT"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_SQL_INJECTION: SQL injection payload detected in cursor.execute — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "' OR 1=1--",
+      "admin'--",
+      "' ; DROP TABLE users--",
+      "' OR 'a'='a",
+      "pass' UNION SELECT * FROM users--",
+      "x' AND 1=2 UNION SELECT password FROM users WHERE '1'='1"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "password_change",
+    "file": "bad/libuser.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def password_change(username, password)",
+    "tainted_params": [
+      {
+        "name": "username",
+        "index": 0,
+        "type": "str"
+      },
+      {
+        "name": "password",
+        "index": 1,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_sql_injection_bad_libuser_py_53",
+    "finding_id": "4",
+    "rule_id": "py/sql-injection",
+    "rule_slug": "py_sql-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-vulpy/verification_results/findings/finding_4_py_sql-injection.json"
+  }
+}

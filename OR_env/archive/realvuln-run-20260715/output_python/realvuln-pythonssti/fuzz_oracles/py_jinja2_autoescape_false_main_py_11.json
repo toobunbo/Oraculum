@@ -1,0 +1,53 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of read_root containing the rendered Jinja2 template output",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The rendered return value contains unescaped HTML/JavaScript XSS payloads such as script tags or event handlers, confirming that autoescape=False allows injection to survive rendering.",
+    "trigger_patterns": [
+      "<script[^>]*>",
+      "onerror\\s*=",
+      "onload\\s*=",
+      "onclick\\s*=",
+      "javascript\\s*:",
+      "<img[^>]+onerror",
+      "<svg[^>]+onload"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_JINJA2_AUTOESCAPE_FALSE: XSS payload survived Jinja2 render without autoescape — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "<script>alert(1)</script>",
+      "<img src=x onerror=alert(1)>",
+      "<svg onload=alert(1)>",
+      "<a href=\"javascript:alert(1)\">click</a>",
+      "normaluser<script>alert('xss')</script>"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "read_root",
+    "file": "main.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def read_root(username)",
+    "tainted_params": [
+      {
+        "name": "username",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_jinja2_autoescape_false_main_py_11",
+    "finding_id": "1",
+    "rule_id": "py/jinja2/autoescape-false",
+    "rule_slug": "py_jinja2_autoescape-false",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-pythonssti/verification_results/findings/finding_1_py_jinja2_autoescape-false.json"
+  }
+}

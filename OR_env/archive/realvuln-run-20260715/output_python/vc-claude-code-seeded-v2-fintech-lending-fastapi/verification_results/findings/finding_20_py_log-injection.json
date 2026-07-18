@@ -1,0 +1,68 @@
+{
+  "id": "20",
+  "rule_slug": "py_log-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-claude-code-seeded-v2-fintech-lending-fastapi_20260714_152421.json"
+  },
+  "finding": {
+    "rule_id": "py/log-injection",
+    "message": "This log entry depends on a [user-provided value](1).",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 33,
+    "end_line": 33,
+    "repo_name": "vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/vc-claude-code-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 31: ControlFlowNode for request",
+      "line 32: ControlFlowNode for wire_text",
+      "line 33: ControlFlowNode for wire_text"
+    ],
+    "severity": "7.8",
+    "precision": "medium",
+    "cwe_ids": [
+      "CWE-117"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "confidence": "High",
+    "iterations": 1,
+    "answers": [
+      "The log data originates from the request body (line 32: `wire_text = (await request.body()).decode(\"utf-8\", errors=\"replace\")`) which is user-supplied input.",
+      "Yes, the data (`wire_text`) is written to a log using `logger.warning` without any sanitization (line 33: `logger.warning(\"underwriting intake body=%s auth=%s\", wire_text, request.headers.get(\"authorization\"))`).",
+      "Yes, an attacker could embed newline characters (\\n, \\r) in the request body, which would be stored in `wire_text` and then logged directly, allowing for log forging.",
+      "Yes, injected entries could mask real security events or mislead incident responders by creating fake log lines that appear legitimate.",
+      "It is likely that the log is consumed by a log aggregation system, as this is a common practice, making such systems vulnerable to confusion by crafted entries.",
+      "Yes, stripping or encoding newlines and control characters from `wire_text` before logging would prevent this vulnerability."
+    ],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 3.1272714138031006,
+    "output_tokens": 337,
+    "context_needed": [],
+    "reasoning": "User-controlled input from the request body flows directly into a log message without sanitization, enabling log injection. All questions confirm the exploitability and impact of this issue.",
+    "data_flow": "request.body() (line 32) → wire_text (line 32) → logger.warning (line 33)",
+    "confidence_score": 0.95,
+    "timestamp": "2026-07-14T15:24:11.150589",
+    "cost_usd": 0.0,
+    "input_tokens": 4510,
+    "cached_input_tokens": 0,
+    "tokens_used": 4847
+  },
+  "function": {
+    "name": "loan_wire_tally_008",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 31,
+    "end_line": 34,
+    "scope": ""
+  },
+  "web_params": []
+}

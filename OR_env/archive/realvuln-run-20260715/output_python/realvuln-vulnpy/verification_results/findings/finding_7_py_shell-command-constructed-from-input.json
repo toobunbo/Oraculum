@@ -1,0 +1,70 @@
+{
+  "id": "7",
+  "rule_slug": "py_shell-command-constructed-from-input",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulnpy",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnpy",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnpy/verification_results/summary_realvuln-vulnpy_20260714_151715.json"
+  },
+  "finding": {
+    "rule_id": "py/shell-command-constructed-from-input",
+    "message": "This string concatenation which depends on [library input](1) is later used in a [shell command](2).",
+    "file": "apps/falcon_app.py",
+    "start_line": 63,
+    "end_line": 63,
+    "repo_name": "realvuln-vulnpy",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnpy/realvuln-vulnpy.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 35: ControlFlowNode for user_input",
+      "line 63: ControlFlowNode for str()"
+    ],
+    "severity": "6.3",
+    "precision": "medium",
+    "cwe_ids": [
+      "CWE-73",
+      "CWE-78",
+      "CWE-88"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "elapsed_seconds": 8.896382093429565,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "timestamp": "2026-07-14T15:17:10.987845",
+    "output_tokens": 1085,
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "iterations": 3,
+    "tokens_used": 13984,
+    "cost_usd": 0.0,
+    "data_flow": "user_input (line 35) → str(user_input) (line 63) → cmd (line 63) → os.system(cmd) (line 64)",
+    "answers": [
+      "The exact sink is `os.system(cmd)` on line 64, where `cmd` is the command string constructed on line 63.",
+      "The only assignment to `cmd` is on line 63: `cmd = \"echo \" + str(user_input)`.",
+      "The value of `cmd` derives directly from `user_input` which is passed as a parameter to the function on line 35. The data flow is: `user_input` (line 35) → `str(user_input)` (line 63) → `cmd` (line 63).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The value of `cmd` is directly constructed from `user_input` without any checks or sanitization.",
+      "There is no specific defense mechanism in place to prevent shell injection or command execution. The code directly concatenates user input into a shell command without any sanitization or validation.",
+      "The user-tainted value `user_input` reaches the sink `os.system(cmd)` on line 64 without any sanitization or defense mechanisms. The construction of the command on line 63 is vulnerable to shell injection."
+    ],
+    "context_needed": [],
+    "input_tokens": 12899,
+    "verdict": "True Positive",
+    "reasoning": "The user input is directly concatenated into a shell command without any sanitization or validation, creating a shell injection vulnerability. The absence of callers in the analysis scope does not change the fact that the data flow from user input to the dangerous shell execution is clearly present and exploitable.",
+    "cached_input_tokens": 0
+  },
+  "function": {
+    "name": "thread_function",
+    "file": "apps/falcon_app.py",
+    "start_line": 35,
+    "end_line": 67,
+    "scope": ""
+  },
+  "web_params": []
+}

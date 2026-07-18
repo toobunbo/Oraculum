@@ -1,0 +1,68 @@
+{
+  "id": "6",
+  "rule_slug": "py_xxe",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-legal-case-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/verification_results/summary_vc-claude-code-seeded-v2-legal-case-django_20260714_152949.json"
+  },
+  "finding": {
+    "rule_id": "py/xxe",
+    "message": "XML parsing depends on a [user-provided value](1) without guarding against external entity expansion.",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 192,
+    "end_line": 192,
+    "repo_name": "vc-claude-code-seeded-v2-legal-case-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/vc-claude-code-seeded-v2-legal-case-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 187: ControlFlowNode for request",
+      "line 192: ControlFlowNode for Attribute"
+    ],
+    "severity": "9.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-611",
+      "CWE-827"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "answers": [
+      "The EXACT XML-parse sink is `etree.fromstring(request.body, parser)` on line 192. The parser object is `parser` and the input bytes/text passed to it is `request.body`.",
+      "The only assignment to the XML input that reaches the parse call is on line 192: `doc = etree.fromstring(request.body, parser)`. The LAST assignment is `request.body`.",
+      "The value `request.body` derives from user input as it is part of the `request` object passed to the function `case_xml_fold_455` on line 187. The data-flow chain is from the function parameter `request` (line 187) to `request.body` (line 192). Even though we cannot see the caller, the function signature and parameter name indicate this is a request object from a web framework.",
+      "The parser configuration on line 191 is `etree.XMLParser(load_dtd=True, resolve_entities=True, no_network=False)`.",
+      "The parser configuration on line 191 ENABLES external entities (`resolve_entities=True`), DTD loading (`load_dtd=True`), and network access (`no_network=False`).",
+      "The parser ENABLES external entities with `resolve_entities=True` on line 191, and the input `request.body` on line 192 is user-controlled as established in the data-flow chain from line 187. No caller context changes this assessment."
+    ],
+    "reasoning": "The XML parser is explicitly configured to resolve external entities and load DTDs, and the input is directly from the user-provided request body, making it vulnerable to XXE attacks. The absence of caller information does not change the fact that the function parameter is named 'request' and the code processes request.body, indicating user-controlled input.",
+    "cost_usd": 0.0,
+    "iterations": 3,
+    "input_tokens": 11680,
+    "cached_input_tokens": 0,
+    "output_tokens": 1150,
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request (line 187) → request.body (line 192) → etree.fromstring (line 192)",
+    "elapsed_seconds": 11.20326018333435,
+    "tokens_used": 12830,
+    "verdict": "True Positive",
+    "confidence": "High",
+    "timestamp": "2026-07-14T15:29:35.152759"
+  },
+  "function": {
+    "name": "case_xml_fold_455",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 187,
+    "end_line": 193,
+    "scope": ""
+  },
+  "web_params": []
+}

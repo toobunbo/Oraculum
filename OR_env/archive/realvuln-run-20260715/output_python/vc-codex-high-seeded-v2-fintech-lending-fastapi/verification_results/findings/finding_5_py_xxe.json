@@ -1,0 +1,68 @@
+{
+  "id": "5",
+  "rule_slug": "py_xxe",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-codex-high-seeded-v2-fintech-lending-fastapi_20260714_154154.json"
+  },
+  "finding": {
+    "rule_id": "py/xxe",
+    "message": "XML parsing depends on a [user-provided value](1) without guarding against external entity expansion.",
+    "file": "app/loan_operations.py",
+    "start_line": 137,
+    "end_line": 137,
+    "repo_name": "vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/vc-codex-high-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 134: ControlFlowNode for request",
+      "line 137: ControlFlowNode for Await"
+    ],
+    "severity": "9.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-611",
+      "CWE-827"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "elapsed_seconds": 9.648445844650269,
+    "answers": [
+      "The EXACT XML-parse sink is `etree.fromstring(await request.body(), parser)` on line 137. The parser object is `parser` and the input bytes/text passed to it is `await request.body()`.",
+      "The only assignment to the XML input on the path that reaches the parse call is on line 137: `doc = etree.fromstring(await request.body(), parser)`. The LAST assignment is also on line 137.",
+      "The value derives from user input (request body). The data-flow chain is: request (line 134) -> request.body() (line 137) -> await request.body() (line 137). The caller context shows this is a FastAPI endpoint, confirming the request is externally controlled.",
+      "The parser configuration is on line 136: `parser = etree.XMLParser(load_dtd=True, resolve_entities=True, no_network=False)`.",
+      "The parser is NOT safe-by-default. It ENABLES external entities (`resolve_entities=True`), DTD loading (`load_dtd=True`), and network access (`no_network=False`). This is configured on line 136.",
+      "The parser ENABLES external entities (line 136: `resolve_entities=True`) AND the input is user-controlled (line 137: `await request.body()`). The caller context confirms this is a reachable HTTP endpoint."
+    ],
+    "tokens_used": 16511,
+    "data_flow": "request (line 134) → request.body() (line 137) → await request.body() (line 137) → etree.fromstring(input, parser) (line 137)",
+    "output_tokens": 1166,
+    "iterations": 3,
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "input_tokens": 15345,
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "timestamp": "2026-07-14T15:41:26.787351",
+    "reasoning": "The XML parser is explicitly configured to resolve external entities and load DTDs (line 136), and the input is directly from the user-provided request body (line 137) via a reachable FastAPI endpoint. This creates a clear XXE vulnerability.",
+    "cached_input_tokens": 0,
+    "confidence": "High"
+  },
+  "function": {
+    "name": "loan_xml_fold_614",
+    "file": "app/loan_operations.py",
+    "start_line": 134,
+    "end_line": 138,
+    "scope": ""
+  },
+  "web_params": []
+}

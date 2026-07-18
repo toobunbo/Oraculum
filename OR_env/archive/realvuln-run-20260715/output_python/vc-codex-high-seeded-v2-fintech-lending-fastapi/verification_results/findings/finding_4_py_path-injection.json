@@ -1,0 +1,73 @@
+{
+  "id": "4",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-codex-high-seeded-v2-fintech-lending-fastapi_20260714_154154.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "app/loan_operations.py",
+    "start_line": 123,
+    "end_line": 123,
+    "repo_name": "vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/vc-codex-high-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 119: ControlFlowNode for name",
+      "line 121: ControlFlowNode for target",
+      "line 123: ControlFlowNode for target"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "elapsed_seconds": 21.929080724716187,
+    "answers": [
+      "The exact file-operation sink is `target.write_bytes(body)` on line 123, where `target` is the path value passed to it.",
+      "The assignments to `target` are: line 121: `target = BASE_EXPORT_DIR / name`",
+      "The value of `target` derives from user input. Specifically: 1. `name` is a user-provided string via the `name` parameter on line 119. 2. `target` is constructed as `BASE_EXPORT_DIR / name` on line 121. 3. This means `target` directly incorporates user input (`name`) into the file path without sanitization or validation.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The value of `target` is directly derived from the user input `name` and is used immediately in the sink.",
+      "There is no specific defense present. The code does not use any path sanitization or validation mechanisms such as `secure_filename`, `Path.resolve()`, or checks to ensure the path remains within a designated base directory. The value of `BASE_EXPORT_DIR` is not visible, so we cannot determine if it provides any protection.",
+      "The user-tainted value (`name`) reaches the sink (`target.write_bytes(body)`) directly, and there is no visible defense mechanism to prevent path traversal. The absence of `BASE_EXPORT_DIR` definition means we cannot verify if it provides any path restrictions."
+    ],
+    "tokens_used": 17678,
+    "data_flow": "name (line 119) → target = BASE_EXPORT_DIR / name (line 121) → target.write_bytes(body) (line 123)",
+    "output_tokens": 1154,
+    "iterations": 3,
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "input_tokens": 16524,
+    "confidence_score": 0.9,
+    "context_needed": [],
+    "timestamp": "2026-07-14T15:41:37.853111",
+    "reasoning": "User-provided input `name` is directly used to construct a file path without sanitization or validation, allowing potential directory traversal. The path is then used in a file write operation. Although `BASE_EXPORT_DIR` is used, its value is not visible and cannot be relied upon for protection.",
+    "cached_input_tokens": 0,
+    "confidence": "High"
+  },
+  "function": {
+    "name": "loan_dock_shelf_594",
+    "file": "app/loan_operations.py",
+    "start_line": 119,
+    "end_line": 124,
+    "scope": ""
+  },
+  "web_params": []
+}

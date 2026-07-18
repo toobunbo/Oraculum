@@ -1,0 +1,11 @@
+evaluating 33 harnesses × N=3 × -runs=10000
+
+=== HONEST METRIC (oracle_violation only) ===
+precision: 78.6% ± 0.0%
+recall:    64.7% ± 0.0%
+F1:        71.0% ± 0.0%
+
+run-0 breakdown: {'incidental_crash': 9, 'no_trigger': 9, 'oracle_violation': 14, 'timeout': 1}
+(incidental_crash reported separately, NOT in oracle metric)
+
+wrote benchmark-results/fuzz-eval.json

@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is _os.system(...) which executes a shell command, a form of shell execution explicitly listed as dangerous."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock _os.system to prevent actual shell execution during the test.",
+    "capture": "Capture the exact command string argument passed to _os.system, specifically the value of \"ping -c 1 \" + host, so the test can assert that unsanitized user input reached the sink.",
+    "fake_behavior": "Return 0 to simulate a successful command execution without performing any real OS-level side effects.",
+    "notes": [
+      "The _os module alias must be resolved correctly in the mock setup; patch the system call where it is referenced in the target module.",
+      "Ensure the mock does not suppress exceptions if the test intends to verify the call was reached."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

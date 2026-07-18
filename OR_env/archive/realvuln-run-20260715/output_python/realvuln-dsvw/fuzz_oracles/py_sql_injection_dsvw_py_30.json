@@ -1,0 +1,52 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "dsvw.ReqHandler.do_GET.cursor.execute",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "SQL query string passed to execute",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "SQL query contains user-injected SQL fragments like ' OR 1=1-- or UNION SELECT",
+    "trigger_patterns": [
+      "OR\\s+1\\s*=\\s*1",
+      "UNION\\s+SELECT",
+      "\\-\\-\\s*$",
+      "['\"]\\s*(OR|AND)\\s*[\\w\\d]+\\s*=\\s*[\\w\\d]+",
+      "(DROP|DELETE|UPDATE|INSERT)\\s+"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_SQL-INJECTION: SQL injection detected in query — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "?id=1' OR '1'='1",
+      "?id=1'; DROP TABLE users; --",
+      "?id=1' UNION SELECT username,password FROM admins--",
+      "?id=1' AND 1=2 UNION SELECT database(),user()--",
+      "?id=1' OR 1=1#",
+      "?id=1'; INSERT INTO users (admin) VALUES (1)--"
+    ],
+    "skip_condition": "not ('id' in query and 'SELECT' in query)"
+  },
+  "_meta": {
+    "function": "do_GET",
+    "file": "dsvw.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def do_GET(self)",
+    "tainted_params": [
+      {
+        "name": "self.path",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_sql_injection_dsvw_py_30",
+    "finding_id": "7",
+    "rule_id": "py/sql-injection",
+    "rule_slug": "py_sql-injection",
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_7_py_sql-injection.json"
+  }
+}

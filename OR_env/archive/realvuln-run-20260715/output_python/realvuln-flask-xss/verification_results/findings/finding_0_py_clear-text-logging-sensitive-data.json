@@ -1,0 +1,85 @@
+{
+  "id": "0",
+  "rule_slug": "py_clear-text-logging-sensitive-data",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-flask-xss",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-flask-xss",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-flask-xss/verification_results/summary_realvuln-flask-xss_20260714_150106.json"
+  },
+  "finding": {
+    "rule_id": "py/clear-text-logging-sensitive-data",
+    "message": "This expression logs [sensitive data (password)](1) as clear text.\nThis expression logs [sensitive data (password)](2) as clear text.",
+    "file": "manage.py",
+    "start_line": 21,
+    "end_line": 21,
+    "repo_name": "realvuln-flask-xss",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-flask-xss/realvuln-flask-xss.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 14: ControlFlowNode for password",
+      "line 18: ControlFlowNode for password",
+      "line 21: ControlFlowNode for Attribute()",
+      "--- Flow 2 ---",
+      "line 14: ControlFlowNode for password",
+      "line 21: ControlFlowNode for password",
+      "line 21: ControlFlowNode for Attribute()",
+      "--- Flow 3 ---",
+      "line 14: ControlFlowNode for StringLiteral",
+      "line 14: ControlFlowNode for password",
+      "line 18: ControlFlowNode for password",
+      "line 21: ControlFlowNode for Attribute()",
+      "--- Flow 4 ---",
+      "line 14: ControlFlowNode for StringLiteral",
+      "line 14: ControlFlowNode for password",
+      "line 21: ControlFlowNode for password",
+      "line 21: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-312",
+      "CWE-359",
+      "CWE-532"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:01:02.989009",
+    "confidence": "High",
+    "tokens_used": 7799,
+    "reasoning": "The password is stored in the database without any visible hashing or encryption (lines 18-20) and is also logged in cleartext (line 21), making it accessible to anyone with database access or log access.",
+    "iterations": 1,
+    "elapsed_seconds": 7.873718500137329,
+    "answers": [
+      "The sensitive data is a password, as indicated by the variable name 'password' on line 18 and the log message on line 21.",
+      "The data is stored in a database via 'db.session.add(admin_user)' on line 19 and 'db.session.commit()' on line 20. The database type is not specified but is likely SQLAlchemy based on the session usage.",
+      "The code does not show any encryption or hashing of the password before storage. Line 18 directly passes the 'password' variable to the User constructor without any visible transformation.",
+      "Yes, an attacker with access to the database could read the password in cleartext since it's not hashed or encrypted before storage.",
+      "Not visible in provided context. However, the function name 'create_and_add_admin' and the print statements suggest this might be part of a setup or initialization script, which could potentially run in production.",
+      "If exposed, this would allow account compromise of the admin user, which could lead to full system access depending on the application's privileges."
+    ],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "data_flow": "password (line 14) → User object (line 18) → database storage (lines 19-20) and log output (line 21)",
+    "context_needed": [],
+    "output_tokens": 921,
+    "verdict": "True Positive",
+    "input_tokens": 6878,
+    "cached_input_tokens": 0,
+    "confidence_score": 0.95
+  },
+  "function": {
+    "name": "add_admin",
+    "file": "manage.py",
+    "start_line": 14,
+    "end_line": 34,
+    "scope": ""
+  },
+  "web_params": []
+}

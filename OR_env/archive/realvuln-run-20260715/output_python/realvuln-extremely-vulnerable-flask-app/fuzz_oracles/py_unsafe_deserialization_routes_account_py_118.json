@@ -1,0 +1,51 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "routes.account.loads",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "raw bytes passed to loads() after base64 decoding of the user-controlled preferences cookie",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The bytes passed to loads() contain pickle GLOBAL opcodes referencing dangerous modules (os, subprocess, eval, __builtin__) or __reduce__ attribute, confirming an unsafe deserialization exploit payload reached the sink without sanitization.",
+    "trigger_patterns": [
+      "__reduce__",
+      "cos\\nsystem",
+      "csubprocess\\n",
+      "ceval\\n",
+      "c__builtin__\\n"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_UNSAFE_DESERIALIZATION: unsafe pickle payload reached loads() sink — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "Y29zCnN5c3RlbQooUydpZCcKdEuALg==",
+      "Y3N1YnByb2Nlc3MKY2FsbAooUydpZCcKdEuALg==",
+      "Y19fYnVpbHRpbl9fCmV2YWwKKFMnMStvJywpdEuALg==",
+      "X19yZWR1Y2VfXwooUydvcy5zeXN0ZW0nLFMoJ2lkJyksTnR0Uncu",
+      "gASVCAAAAAAAAABLAQuw"
+    ],
+    "skip_condition": "len(preferences) < 2"
+  },
+  "_meta": {
+    "function": "before_request",
+    "file": "routes/account.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def before_request()",
+    "tainted_params": [
+      {
+        "name": "preferences",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_unsafe_deserialization_routes_account_py_118",
+    "finding_id": "1",
+    "rule_id": "py/unsafe-deserialization",
+    "rule_slug": "py_unsafe-deserialization",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-extremely-vulnerable-flask-app/verification_results/findings/finding_1_py_unsafe-deserialization.json"
+  }
+}

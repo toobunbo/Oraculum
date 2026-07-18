@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "etree.fromstring is called with a parser configured with no_network=False, load_dtd=True, resolve_entities=True, which enables network I/O and external entity resolution during XML parsing."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; Q1 answered YES."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; Q1 answered YES."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the etree.fromstring call on line 192, or mock the etree.XMLParser constructor to strip dangerous options and return a safe parser.",
+    "capture": "Capture the raw request.body bytes passed to etree.fromstring so the test can assert the malicious XML payload reaches the sink. Also capture the parser configuration arguments.",
+    "fake_behavior": "Return a fake lxml Element object with a .tag property set to a benign string so that the return expression JsonResponse({'root': doc.tag}) succeeds without executing the real parser.",
+    "notes": [
+      "The function returns doc.tag, so the mock element must provide a .tag attribute.",
+      "Alternatively, patch etree.XMLParser to always override resolve_entities=False, load_dtd=False, no_network=True, then let parsing proceed on benign test inputs."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

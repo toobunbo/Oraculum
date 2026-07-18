@@ -1,0 +1,72 @@
+{
+  "id": "20",
+  "rule_slug": "py_unsafe-deserialization",
+  "source": {
+    "vhx_root": "/home/trieudai/",
+    "vhx_repo_root": "/home/trieudai/bench-src",
+    "vhx_output_root": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python",
+    "summary_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/verification_results/summary_benchmark-python_filtered_20260610_105228.json"
+  },
+  "finding": {
+    "rule_id": "py/unsafe-deserialization",
+    "message": "Unsafe deserialization depends on a [user-provided value](1).",
+    "file": "testcode/BenchmarkTest00078.py",
+    "start_line": 53,
+    "end_line": 53,
+    "repo_name": "benchmark-python",
+    "lang": "python",
+    "sarif_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/benchmark-python.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 39: ControlFlowNode for request",
+      "line 39: ControlFlowNode for Attribute",
+      "line 39: ControlFlowNode for Attribute()",
+      "line 39: ControlFlowNode for Attribute()",
+      "line 39: ControlFlowNode for param",
+      "line 42: ControlFlowNode for string9895",
+      "line 43: ControlFlowNode for string9895",
+      "line 44: ControlFlowNode for bar",
+      "line 53: ControlFlowNode for Attribute()"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [],
+    "tags": [
+      "external/cwe/cwe-502",
+      "security",
+      "serialization"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-06-10T10:45:21.525029",
+    "context_needed": [],
+    "data_flow": "request.cookies.get (line 39) → param (line 39) → string9895 (lines 41-43) → bar (line 44) → pickle.loads (line 53)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "answers": [
+      "The EXACT deserialization sink is `pickle.loads(base64.urlsafe_b64decode(bar))` on line 53 in function `BenchmarkTest00078_post`.",
+      "The chain is: cookie value retrieved via `request.cookies.get(\"BenchmarkTest00078\", \"noCookieValueSupplied\")` on line 39 → assigned to `param` → incorporated into `string9895` via concatenation on lines 42-43 → sliced to produce `bar` on line 44 → passed to `pickle.loads()` on line 53.",
+      "The caller context is not needed to determine the vulnerability as the entire data flow from source to sink is contained within the provided function. The function directly uses user-controlled cookie data in unsafe deserialization."
+    ],
+    "confidence_score": 0.3,
+    "iterations": 3,
+    "input_tokens": 8443,
+    "elapsed_seconds": 29.222719192504883,
+    "confidence": "Low",
+    "cached_input_tokens": 0,
+    "tokens_used": 9727,
+    "reasoning": "User-controlled cookie data flows directly to `pickle.loads()` without any sanitization or validation. The complete data flow is visible within the function, making this a clear case of unsafe deserialization. [confidence downgraded: pattern-matching language without specific file:line citation]",
+    "verdict": "True Positive",
+    "output_tokens": 1284
+  },
+  "function": {
+    "name": "BenchmarkTest00078_post",
+    "file": "testcode/BenchmarkTest00078.py",
+    "start_line": 35,
+    "end_line": 64,
+    "scope": "Function init"
+  }
+}

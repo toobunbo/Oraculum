@@ -1,0 +1,49 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "config.partner_console.Template",
+    "target_arg_index": 0,
+    "target_arg_name": "source",
+    "capture_what": "Template-source string passed to Jinja2 Template constructor, which is 'Result: ' + fragment",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured template-source string contains Jinja2 expression delimiters ({{ or {%) that originate from user-controlled fragment input, confirming SSTI",
+    "trigger_patterns": [
+      "\\{\\{.+?\\}\\}",
+      "\\{%.+?%\\}"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_TEMPLATE_INJECTION: SSTI detected in Template() source — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "{{ 7 * 7 }}",
+      "{{ config }}",
+      "{{ ''.__class__.__mro__ }}",
+      "{% for x in ().__class__.__bases__ %}{{ x }}{% endfor %}",
+      "{{ request.application.__globals__ }}",
+      "{{ lipsum.__globals__['os'].popen('id').read() }}"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "acct_jinja_cast_585",
+    "file": "config/partner_console.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def acct_jinja_cast_585(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "HttpRequest"
+      }
+    ],
+    "target_id": "py_template_injection_config_partner_console_py_142",
+    "finding_id": "10",
+    "rule_id": "py/template-injection",
+    "rule_slug": "py_template-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_10_py_template-injection.json"
+  }
+}

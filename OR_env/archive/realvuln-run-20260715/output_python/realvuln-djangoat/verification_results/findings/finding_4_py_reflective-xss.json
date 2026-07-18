@@ -1,0 +1,69 @@
+{
+  "id": "4",
+  "rule_slug": "py_reflective-xss",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-djangoat",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/verification_results/summary_realvuln-djangoat_20260714_145404.json"
+  },
+  "finding": {
+    "rule_id": "py/reflective-xss",
+    "message": "Cross-site scripting vulnerability due to a [user-provided value](1).",
+    "file": "app/views/users/pay/views.py",
+    "start_line": 75,
+    "end_line": 76,
+    "repo_name": "realvuln-djangoat",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/realvuln-djangoat.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 70: ControlFlowNode for pay_id",
+      "line 75: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 11896,
+    "output_tokens": 1368,
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "data_flow": "user_id, pay_id (line 70) → string concatenation (line 75-76) → HttpResponse sink (line 75)",
+    "cost_usd": 0.0,
+    "confidence_score": 0.95,
+    "reasoning": "User-controlled values `user_id` and `pay_id` are directly embedded into an HTML response without escaping, creating a reflective XSS vulnerability. No sanitization or escaping is applied, and the HttpResponse directly outputs user input as part of the response body. The missing caller context does not change the fact that these are externally controlled parameters reaching an unsafe sink.",
+    "confidence": "High",
+    "answers": [
+      "The EXACT sink is: `HttpResponse(\"Pay for user \" + str(user_id) + \" for pay with id \" + str(pay_id))` on line 75. The values being rendered are `user_id` and `pay_id`.",
+      "The assignments to these values are parameter inputs to the function on line 70: `def user_pay(request, user_id, pay_id):`. These are the LAST assignments on the path to the sink.",
+      "Both `user_id` and `pay_id` derive from user input as part of the URL path parameters, as indicated by the dataflow path from line 70. They are externally controlled values.",
+      "There are no constant-time conditions or reassignments that override the user-tainted values on the path to the sink.",
+      "There is NO specific defense escaping the values at the sink. No escaping function like `html.escape()`, `markupsafe.escape()`, or framework-specific escaping is applied. The values are directly concatenated into the response string.",
+      "There is no use of `|safe`, `{% autoescape false %}`, `Markup(...)`, or `mark_safe(...)` to disable escaping, because no templating or escaping mechanism is involved at all — the code directly constructs an HTML string.",
+      "The user-tainted values `user_id` and `pay_id` reach the HttpResponse sink without any escaping or sanitization. The additional context shows no caller was found, but the dataflow analysis already established that these are user-controlled parameters reaching the sink."
+    ],
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 12.027498245239258,
+    "timestamp": "2026-07-14T14:53:27.398444",
+    "iterations": 3,
+    "tokens_used": 13264
+  },
+  "function": {
+    "name": "user_pay",
+    "file": "app/views/users/pay/views.py",
+    "start_line": 70,
+    "end_line": 76,
+    "scope": ""
+  },
+  "web_params": []
+}

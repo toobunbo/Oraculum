@@ -1,0 +1,74 @@
+{
+  "id": "1",
+  "rule_slug": "py_cookie-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/summary_vc-claude-code-seeded-v2-healthcare-clinic-django_20260714_152609.json"
+  },
+  "finding": {
+    "rule_id": "py/cookie-injection",
+    "message": "Cookie is constructed from a [user-supplied input](1).",
+    "file": "clinic_portal/patient_operations.py",
+    "start_line": 96,
+    "end_line": 96,
+    "repo_name": "vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/vc-claude-code-seeded-v2-healthcare-clinic-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 91: ControlFlowNode for request",
+      "line 94: ControlFlowNode for Attribute",
+      "line 94: ControlFlowNode for Attribute()",
+      "line 94: ControlFlowNode for marker",
+      "line 96: ControlFlowNode for marker"
+    ],
+    "severity": "5.0",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-20"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "User-controlled input from request.GET['marker'] flows directly to response.set_cookie without any sanitization or validation, creating a cookie injection vulnerability. The data flow is clear: line 94 retrieves the marker value, and line 96 uses it directly in set_cookie. No framework protections are visible in the code.",
+    "cost_usd": 0.0,
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 541,
+    "tokens_used": 5490,
+    "elapsed_seconds": 4.258826017379761,
+    "cached_input_tokens": 0,
+    "timestamp": "2026-07-14T15:25:33.098170",
+    "iterations": 1,
+    "input_tokens": 4949,
+    "context_needed": [],
+    "data_flow": "request.GET.get(\"marker\", \"portal\") (line 94) → marker → response.set_cookie(\"portal_crumb\", marker) (line 96)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "answers": [
+      "Step 1: The potentially dangerous data originates from user input via the HTTP request GET parameter 'marker' on line 94.",
+      "Step 2: The data flows through the following variables with line numbers: request.GET.get(\"marker\", \"portal\") on line 94 assigns to 'marker', which is then used in response.set_cookie on line 96.",
+      "Step 3: No validation, sanitization, or encoding is applied to the 'marker' variable between its retrieval from the request and its use in setting the cookie.",
+      "Step 4: The sink is the response.set_cookie(\"portal_crumb\", marker) call on line 96. The specific operation that makes it dangerous is setting a cookie value directly from user input without sanitization, which could lead to cookie injection or manipulation.",
+      "Step 5: There are no intermediate transformations between the source and sink that would affect the data.",
+      "Step 6: Not visible in provided context. The code does not show any framework-level protections being applied to cookie setting.",
+      "Step 7: The function patient_crumb_lane_289 requires _wrk_gate authentication (lines 92-93), so an attacker would need to be authenticated to trigger this code path.",
+      "Step 8: This code does not appear to be in a test file or debug path. It's a regular view function that would execute in production.",
+      "Step 9: The concrete security impact if an attacker controls this data could be cookie injection, leading to session fixation or other cookie-based attacks, depending on how the cookie is used elsewhere.",
+      "Step 10: The weakest link in the defense chain is the lack of any sanitization or validation of the user-supplied 'marker' value before using it as a cookie value. There are no automatic protections visible in the code."
+    ]
+  },
+  "function": {
+    "name": "patient_crumb_lane_289",
+    "file": "clinic_portal/patient_operations.py",
+    "start_line": 91,
+    "end_line": 97,
+    "scope": ""
+  },
+  "web_params": []
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is _os.system(\"ping -c 1 \" + host) on line 174, which executes a shell command."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "N/A - decision stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "N/A - decision stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock or record _os.system.",
+    "capture": "Capture the exact string argument passed to _os.system, which is \"ping -c 1 \" + host, to verify the unsanitized concatenation.",
+    "fake_behavior": "Return 0 to simulate a successful ping execution and allow the function to continue without invoking a real shell.",
+    "notes": [
+      "Prevents actual command injection during testing while verifying that user-controlled input reaches the shell execution sink."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

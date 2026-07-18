@@ -1,0 +1,54 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "urllib.request.urlopen",
+    "target_arg_index": 0,
+    "target_arg_name": "url",
+    "capture_what": "URL passed to urlopen from params[\"include\"]",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "Captured URL matches known SSRF attack patterns (e.g., internal IPs, metadata URLs)",
+    "trigger_patterns": [
+      "http://169\\.254\\.169\\.254.*",
+      "http://127\\.0\\.0\\.1.*",
+      "http://\\[::1\\].*",
+      "https://169\\.254\\.169\\.254.*",
+      "https://127\\.0\\.0\\.1.*",
+      "https://\\[::1\\].*",
+      "http://localhost.*",
+      "https://localhost.*"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_FULL-SSRF: SSRF attempt detected - captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "http://169.254.169.254/latest/meta-data/",
+      "http://127.0.0.1:22",
+      "https://localhost:8080/admin",
+      "http://[::1]/test",
+      "https://169.254.169.254/metadata"
+    ],
+    "skip_condition": "not ('://' in include_param)"
+  },
+  "_meta": {
+    "function": "do_GET",
+    "file": "dsvw.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def do_GET(self)",
+    "tainted_params": [
+      {
+        "name": "include_param",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_full_ssrf_dsvw_py_56",
+    "finding_id": "2",
+    "rule_id": "py/full-ssrf",
+    "rule_slug": "py_full-ssrf",
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_2_py_full-ssrf.json"
+  }
+}

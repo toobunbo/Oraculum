@@ -1,0 +1,77 @@
+{
+  "id": "7",
+  "rule_slug": "py_unsafe-deserialization",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-legal-case-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/verification_results/summary_vc-claude-code-seeded-v2-legal-case-django_20260714_152949.json"
+  },
+  "finding": {
+    "rule_id": "py/unsafe-deserialization",
+    "message": "Unsafe deserialization depends on a [user-provided value](1).",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 73,
+    "end_line": 73,
+    "repo_name": "vc-claude-code-seeded-v2-legal-case-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/vc-claude-code-seeded-v2-legal-case-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 63: ControlFlowNode for request",
+      "line 68: ControlFlowNode for raw",
+      "line 73: ControlFlowNode for raw",
+      "--- Flow 2 ---",
+      "line 63: ControlFlowNode for request",
+      "line 68: ControlFlowNode for Attribute",
+      "line 68: ControlFlowNode for Attribute()",
+      "line 68: ControlFlowNode for raw",
+      "line 70: ControlFlowNode for raw",
+      "line 73: ControlFlowNode for raw"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-502"
+    ],
+    "tags": [
+      "security",
+      "serialization"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "answers": [
+      "The EXACT deserialization sink is `pickle.loads(raw)` on line 73. This line lives in the function `case_bundle_thaw_171`.",
+      "The assignments to `raw` are: line 68: `raw = request.body or request.GET.get(\"blob\", \"\").encode(\"utf-8\")`, line 70: `raw = base64.b64decode(raw)`, and line 72: `raw = b\"\\x80\\x04}q\\x00.\"` (if `raw` is falsy after line 70). The last assignment on the path where `raw` is user-controlled is line 70. If `raw` is falsy, the last assignment is line 72, which overrides it with a constant.",
+      "On the path through lines 68 and 70, `raw` derives from user input: `request.body` or `request.GET.get(\"blob\", \"\")` on line 68, which is then optionally base64-decoded on line 70. The data-flow chain is: `request` (line 63) → `raw` (line 68) → `raw` (line 70) → `pickle.loads` (line 73).",
+      "Yes, there is a condition on line 71: `if not raw:` and a reassignment on line 72: `raw = b\"\\x80\\x04}q\\x00.\"`. This overrides the user-tainted value with a constant if `raw` is falsy.",
+      "There is no specific defense preventing code execution. The code uses `pickle.loads()` directly on data that can be user-controlled (unless overridden by the constant on line 72). `pickle.loads()` is inherently unsafe for untrusted data.",
+      "The user-controlled data can reach the unsafe sink `pickle.loads()` on line 73 if the `raw` value is not falsy (thus bypassing the override on line 72). There is no defense like `yaml.safe_load()`, `json.loads()`, or HMAC verification."
+    ],
+    "reasoning": "User-controlled data from `request.body` or `request.GET.get('blob')` flows through `raw` to `pickle.loads()` on line 73. Although there is a fallback constant assignment on line 72, it only applies if `raw` is falsy, which is not guaranteed. Since `pickle.loads()` is used directly without any defense, this is a clear deserialization vulnerability when user data reaches the sink. The additional context does not change this analysis as the vulnerability exists within the function itself.",
+    "cost_usd": 0.0,
+    "iterations": 3,
+    "input_tokens": 13075,
+    "cached_input_tokens": 0,
+    "output_tokens": 1867,
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request (line 63) → raw (line 68) → raw (line 70) → pickle.loads (line 73)",
+    "elapsed_seconds": 13.819838285446167,
+    "tokens_used": 14942,
+    "verdict": "True Positive",
+    "confidence": "High",
+    "timestamp": "2026-07-14T15:29:38.267594"
+  },
+  "function": {
+    "name": "case_bundle_thaw_171",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 63,
+    "end_line": 74,
+    "scope": ""
+  },
+  "web_params": []
+}

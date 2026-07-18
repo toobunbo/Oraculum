@@ -1,0 +1,84 @@
+{
+  "stage": "classification",
+  "repo": "realvuln-damn-vulnerable-flask-application",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/classification.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/realvuln-damn-vulnerable-flask-application/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 5,
+    "generated": 5,
+    "skipped": 0,
+    "failed": 0
+  },
+  "classifications": [
+    {
+      "id": "0",
+      "target_id": "py_code_injection_app_py_120",
+      "rule_id": "py/code-injection",
+      "file": "app.py",
+      "start_line": "120",
+      "function_name": "evaluate",
+      "finding_artifact": "output/python/realvuln-damn-vulnerable-flask-application/verification_results/findings/finding_0_py_code-injection.json",
+      "classification": "output/python/realvuln-damn-vulnerable-flask-application/classifications/py_code_injection_app_py_120.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "high"
+    },
+    {
+      "id": "1",
+      "target_id": "py_reflective_xss_app_py_163",
+      "rule_id": "py/reflective-xss",
+      "file": "app.py",
+      "start_line": "163",
+      "function_name": "xml",
+      "finding_artifact": "output/python/realvuln-damn-vulnerable-flask-application/verification_results/findings/finding_1_py_reflective-xss.json",
+      "classification": "output/python/realvuln-damn-vulnerable-flask-application/classifications/py_reflective_xss_app_py_163.json",
+      "status": "generated",
+      "strategy": "return_value",
+      "confidence": "high"
+    },
+    {
+      "id": "2",
+      "target_id": "py_reflective_xss_app_py_205",
+      "rule_id": "py/reflective-xss",
+      "file": "app.py",
+      "start_line": "205",
+      "function_name": "sayhi",
+      "finding_artifact": "output/python/realvuln-damn-vulnerable-flask-application/verification_results/findings/finding_2_py_reflective-xss.json",
+      "classification": "output/python/realvuln-damn-vulnerable-flask-application/classifications/py_reflective_xss_app_py_205.json",
+      "status": "generated",
+      "strategy": "return_value",
+      "confidence": "high"
+    },
+    {
+      "id": "3",
+      "target_id": "py_xxe_app_py_159",
+      "rule_id": "py/xxe",
+      "file": "app.py",
+      "start_line": "159",
+      "function_name": "xml",
+      "finding_artifact": "output/python/realvuln-damn-vulnerable-flask-application/verification_results/findings/finding_3_py_xxe.json",
+      "classification": "output/python/realvuln-damn-vulnerable-flask-application/classifications/py_xxe_app_py_159.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "high"
+    },
+    {
+      "id": "4",
+      "target_id": "py_template_injection_app_py_205",
+      "rule_id": "py/template-injection",
+      "file": "app.py",
+      "start_line": "205",
+      "function_name": "sayhi",
+      "finding_artifact": "output/python/realvuln-damn-vulnerable-flask-application/verification_results/findings/finding_4_py_template-injection.json",
+      "classification": "output/python/realvuln-damn-vulnerable-flask-application/classifications/py_template_injection_app_py_205.json",
+      "status": "generated",
+      "strategy": "return_value",
+      "confidence": "high"
+    }
+  ],
+  "errors": []
+}

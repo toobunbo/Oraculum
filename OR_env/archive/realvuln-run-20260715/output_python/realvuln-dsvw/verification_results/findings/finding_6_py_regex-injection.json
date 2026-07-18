@@ -1,0 +1,99 @@
+{
+  "id": "6",
+  "rule_slug": "py_regex-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-dsvw",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvw",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvw/verification_results/summary_realvuln-dsvw_20260714_141916.json"
+  },
+  "finding": {
+    "rule_id": "py/regex-injection",
+    "message": "This regular expression depends on a [user-provided value](1) and is executed by [re.findall](2).",
+    "file": "dsvw.py",
+    "start_line": 26,
+    "end_line": 26,
+    "repo_name": "realvuln-dsvw",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvw/realvuln-dsvw.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 24: ControlFlowNode for self",
+      "line 25: ControlFlowNode for query",
+      "line 26: ControlFlowNode for query",
+      "line 26: ControlFlowNode for Attribute() [List element, Attribute string]",
+      "line 26: ControlFlowNode for .0 [List element, Attribute string]",
+      "line 26: ControlFlowNode for match [Attribute string]",
+      "line 26: ControlFlowNode for match [Attribute string]",
+      "line 26: ControlFlowNode for Attribute()",
+      "line 26: ControlFlowNode for BinaryExpr",
+      "--- Flow 2 ---",
+      "line 24: ControlFlowNode for self",
+      "line 25: ControlFlowNode for Tuple",
+      "line 25: ControlFlowNode for query",
+      "line 26: ControlFlowNode for query",
+      "line 26: ControlFlowNode for Attribute() [List element, Attribute string]",
+      "line 26: ControlFlowNode for .0 [List element, Attribute string]",
+      "line 26: ControlFlowNode for match [Attribute string]",
+      "line 26: ControlFlowNode for match [Attribute string]",
+      "line 26: ControlFlowNode for Attribute()",
+      "line 26: ControlFlowNode for BinaryExpr",
+      "--- Flow 3 ---",
+      "line 24: ControlFlowNode for self",
+      "line 25: IterableElement",
+      "line 25: ControlFlowNode for Tuple [Tuple element at index 1]",
+      "line 25: ControlFlowNode for query",
+      "line 26: ControlFlowNode for query",
+      "line 26: ControlFlowNode for Attribute() [List element, Attribute string]",
+      "line 26: ControlFlowNode for .0 [List element, Attribute string]",
+      "line 26: ControlFlowNode for match [Attribute string]",
+      "line 26: ControlFlowNode for match [Attribute string]",
+      "line 26: ControlFlowNode for Attribute()",
+      "line 26: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-400",
+      "CWE-730"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "context_needed": [],
+    "input_tokens": 4727,
+    "reasoning": "User-controlled input from query parameters is directly interpolated into a regex pattern without escaping (line 26), creating a ReDoS vulnerability. The data flows from self.path → query → match.group(\"parameter\") → regex pattern → re.findall().",
+    "confidence": "High",
+    "cost_usd": 0.0,
+    "confidence_score": 0.95,
+    "cached_input_tokens": 0,
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "iterations": 1,
+    "data_flow": "self.path (line 25) → query (line 25) → match.group(\"parameter\") (line 26) → regex pattern (line 26) → re.findall() (line 26)",
+    "timestamp": "2026-07-14T14:18:43.118842",
+    "answers": [
+      "Yes, user-controlled input is passed directly as the PATTERN argument to re.findall(). The pattern is constructed using string formatting with user-provided parameter names from the query string (line 26).",
+      "No, re.escape() is not applied to the user input before using it in the regex pattern (line 26).",
+      "Yes, an attacker could craft a malicious regex pattern to cause catastrophic backtracking (ReDoS) because the user-controlled parameter names are directly interpolated into the regex pattern without sanitization (line 26).",
+      "Yes, an attacker could potentially use regex features to extract data or cause unexpected matches since the pattern is built from user input without escaping (line 26).",
+      "No, there is no timeout configured on the regex operation to limit execution time (line 26).",
+      "The intent appears to be parsing query parameters, but the use of regex with user-controlled patterns makes it vulnerable. A safer approach would be to use urllib.parse.parse_qs() instead of custom regex (line 26)."
+    ],
+    "tokens_used": 5100,
+    "elapsed_seconds": 72.74618744850159,
+    "output_tokens": 373
+  },
+  "function": {
+    "name": "do_GET",
+    "file": "dsvw.py",
+    "start_line": 24,
+    "end_line": 81,
+    "scope": "ReqHandler"
+  },
+  "web_params": []
+}

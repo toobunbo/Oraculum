@@ -1,0 +1,69 @@
+{
+  "id": "16",
+  "rule_slug": "py_command-line-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-claude-code-seeded-v2-fintech-lending-fastapi_20260714_152421.json"
+  },
+  "finding": {
+    "rule_id": "py/command-line-injection",
+    "message": "This command line depends on a [user-provided value](1).",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 127,
+    "end_line": 127,
+    "repo_name": "vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/vc-claude-code-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 125: ControlFlowNode for host",
+      "line 127: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-78",
+      "CWE-88"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "confidence": "High",
+    "iterations": 3,
+    "answers": [
+      "The EXACT sink is `_os.system(\"ping -c 1 \" + host)` on line 127. The value passed as the command argument is the string expression `\"ping -c 1 \" + host`.",
+      "The only assignment to `host` is its default parameter value `\"127.0.0.1\"` on line 125, and its value as a function parameter derived from user input via the HTTP request query parameter `host`. The LAST assignment is the implicit assignment from the query parameter.",
+      "The value of `host` derives from user input via the query parameter `host` on line 125. The data-flow chain is: [SOURCE] line 125 (host parameter) → line 127 (used in string concatenation).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense sanitizing the value. No functions like `shlex.quote()` are used, and the command is executed via `os.system()` with a dynamically constructed string.",
+      "The user-tainted value `host` reaches the sink at line 127 via line 125, and there is no visible sanitization or defense mechanism."
+    ],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 10.657043695449829,
+    "output_tokens": 1133,
+    "context_needed": [],
+    "reasoning": "The user-controlled `host` parameter is directly concatenated into a shell command string and executed via `os.system()`, with no sanitization or escaping, making it a clear case of OS command injection. The additional context confirms the function is not called internally, suggesting it's likely exposed as an HTTP endpoint.",
+    "data_flow": "source (line 125) → sink (line 127)",
+    "confidence_score": 0.95,
+    "timestamp": "2026-07-14T15:24:07.753477",
+    "cost_usd": 0.0,
+    "input_tokens": 16387,
+    "cached_input_tokens": 0,
+    "tokens_used": 17520
+  },
+  "function": {
+    "name": "loan_shell_probe_401",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 125,
+    "end_line": 128,
+    "scope": ""
+  },
+  "web_params": []
+}

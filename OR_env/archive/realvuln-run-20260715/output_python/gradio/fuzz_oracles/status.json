@@ -1,0 +1,31 @@
+{
+  "stage": "oracle",
+  "repo": "gradio",
+  "lang": "python",
+  "model": "ollama/qwen3-coder:480b-cloud",
+  "config": "config/oracle.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/gradio/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 1,
+    "generated": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "oracles": [
+    {
+      "id": "1",
+      "target_id": "py_full_ssrf_gradio_image_utils_py_252",
+      "rule_id": "py/full-ssrf",
+      "file": "gradio/image_utils.py",
+      "start_line": "252",
+      "function_name": "extract_svg_content",
+      "finding_artifact": "output/python/gradio/verification_results/findings/finding_1_py_full-ssrf.json",
+      "oracle": "output/python/gradio/fuzz_oracles/py_full_ssrf_gradio_image_utils_py_252.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    }
+  ],
+  "errors": []
+}

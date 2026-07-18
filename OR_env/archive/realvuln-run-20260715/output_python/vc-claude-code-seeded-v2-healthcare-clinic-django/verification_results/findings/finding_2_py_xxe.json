@@ -1,0 +1,68 @@
+{
+  "id": "2",
+  "rule_slug": "py_xxe",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/summary_vc-claude-code-seeded-v2-healthcare-clinic-django_20260714_152609.json"
+  },
+  "finding": {
+    "rule_id": "py/xxe",
+    "message": "XML parsing depends on a [user-provided value](1) without guarding against external entity expansion.",
+    "file": "clinic_portal/patient_operations.py",
+    "start_line": 188,
+    "end_line": 188,
+    "repo_name": "vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/vc-claude-code-seeded-v2-healthcare-clinic-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 183: ControlFlowNode for request",
+      "line 188: ControlFlowNode for Attribute"
+    ],
+    "severity": "9.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-611",
+      "CWE-827"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "The XML parser is explicitly configured to resolve external entities and load DTDs, and the input is directly from the user-provided request body. No caller context is available to suggest additional protections, confirming this is exploitable.",
+    "cost_usd": 0.0,
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 1116,
+    "tokens_used": 12813,
+    "elapsed_seconds": 10.358039140701294,
+    "cached_input_tokens": 0,
+    "timestamp": "2026-07-14T15:25:44.980710",
+    "iterations": 3,
+    "input_tokens": 11697,
+    "context_needed": [],
+    "data_flow": "request (line 183) → request.body (line 188) → etree.fromstring (line 188)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "answers": [
+      "The EXACT XML-parse sink is `etree.fromstring(request.body, parser)` on line 188. The parser object is `parser` and the input bytes/text passed to it is `request.body`.",
+      "The XML input is assigned on line 188 as `request.body` which is directly passed to `etree.fromstring`.",
+      "The value `request.body` derives from user input as it is part of the request object, which is externally controlled. The data-flow chain is from line 183 (request parameter) to line 188 (request.body).",
+      "The parser configuration on line 187 is `etree.XMLParser(load_dtd=True, resolve_entities=True, no_network=False)`.",
+      "The parser configuration on line 187 ENABLES external entities (`resolve_entities=True`), DTD loading (`load_dtd=True`), and network access (`no_network=False`).",
+      "The parser ENABLES external entities with `resolve_entities=True` on line 187, and the input is user-controlled as `request.body` from line 188 which originates from the request parameter on line 183."
+    ]
+  },
+  "function": {
+    "name": "patient_xml_fold_453",
+    "file": "clinic_portal/patient_operations.py",
+    "start_line": 183,
+    "end_line": 189,
+    "scope": ""
+  },
+  "web_params": []
+}

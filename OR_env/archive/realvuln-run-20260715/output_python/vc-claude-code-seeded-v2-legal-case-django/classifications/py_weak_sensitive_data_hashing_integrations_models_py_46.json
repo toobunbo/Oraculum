@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "Sink is hashlib.sha256, a local pure computation with no network, shell, or I/O side effects."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "Violation is the choice of weak algorithm (SHA256 vs bcrypt/scrypt/Argon2), which cannot be determined from the return values (None or key) after the function completes."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "N/A - decision terminated at Q2."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock or wrap hashlib.sha256 to intercept calls during the authenticate function.",
+    "capture": "Capture the argument passed to sha256 (the encoded token) and record that hashlib.sha256 was called instead of a slow KDF like bcrypt or argon2.",
+    "fake_behavior": "Allow the original sha256 computation to proceed normally so that hmac.compare_digest on line 48 can still evaluate correctly, but log or flag the algorithm usage for the oracle to assert against.",
+    "notes": [
+      "The core violation is the algorithm selection itself, not the output value.",
+      "Recording the hashlib.sha256 call is necessary because the return type (None/key) does not expose which hashing algorithm was used."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

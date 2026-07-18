@@ -1,0 +1,88 @@
+{
+  "id": "1",
+  "rule_slug": "py_reflective-xss",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-damn-vulnerable-flask-application",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-flask-application",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-flask-application/verification_results/summary_realvuln-damn-vulnerable-flask-application_20260714_145037.json"
+  },
+  "finding": {
+    "rule_id": "py/reflective-xss",
+    "message": "Cross-site scripting vulnerability due to a [user-provided value](1).",
+    "file": "app.py",
+    "start_line": 163,
+    "end_line": 181,
+    "repo_name": "realvuln-damn-vulnerable-flask-application",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-flask-application/realvuln-damn-vulnerable-flask-application.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 11: ControlFlowNode for ImportMember",
+      "line 11: ControlFlowNode for request",
+      "line 155: ControlFlowNode for request",
+      "line 156: ControlFlowNode for xml",
+      "line 159: ControlFlowNode for doc",
+      "line 160: ControlFlowNode for parsed_xml",
+      "line 163: ControlFlowNode for IfExp",
+      "--- Flow 2 ---",
+      "line 11: ControlFlowNode for ImportMember",
+      "line 11: ControlFlowNode for request",
+      "line 156: ControlFlowNode for request",
+      "line 156: ControlFlowNode for xml",
+      "line 159: ControlFlowNode for doc",
+      "line 160: ControlFlowNode for parsed_xml",
+      "line 163: ControlFlowNode for IfExp"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "timestamp": "2026-07-14T14:50:22.370003",
+    "reasoning": "The user-controlled XML input is parsed and converted to a string which is then directly embedded into an HTML response without any escaping or sanitization, creating a cross-site scripting vulnerability. The XML parsing does not provide protection against XSS as it can still contain HTML/JavaScript content that gets rendered.",
+    "data_flow": "user input (line 156) → etree.fromstring (line 159) → etree.tostring (line 160) → parsed_xml (line 160) → HTML response (line 163)",
+    "verdict": "True Positive",
+    "tokens_used": 15284,
+    "output_tokens": 1453,
+    "cached_input_tokens": 0,
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "answers": [
+      "The sink is the string concatenation and return statement on line 163 which renders HTML. The value being rendered is `parsed_xml`.",
+      "The assignments to `parsed_xml` are: line 154 (initialization to None), line 160 (assigned the result of `etree.tostring(doc)`). The last assignment is on line 160.",
+      "The value `parsed_xml` on line 160 derives from user input `xml` on line 156 through `etree.fromstring(str(xml), parser)` on line 159 and then `etree.tostring(doc)` on line 160. The data-flow chain is: user input (line 156) → parsed XML (line 159) → string representation (line 160).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense that escapes the value at the sink. No explicit escaping functions like `html.escape()` or `markupsafe.escape()` are used. The XML parsing does not provide HTML escaping.",
+      "The `|safe` / `{% autoescape false %}` / `Markup(...)` / `mark_safe(...)` constructs are not used to disable escaping on the user-tainted path.",
+      "The user-tainted value `parsed_xml` reaches the sink on line 163 through concatenation in the returned HTML string. There is no escaping or sanitization applied to `parsed_xml` before it is rendered in the HTML response."
+    ],
+    "elapsed_seconds": 14.762743949890137,
+    "input_tokens": 13831,
+    "iterations": 3
+  },
+  "function": {
+    "name": "xml",
+    "file": "app.py",
+    "start_line": 153,
+    "end_line": 181,
+    "scope": ""
+  },
+  "web_params": [
+    {
+      "name": "xml",
+      "source": "form"
+    }
+  ]
+}

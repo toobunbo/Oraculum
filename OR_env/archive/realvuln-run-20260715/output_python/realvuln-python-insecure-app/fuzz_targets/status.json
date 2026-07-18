@@ -1,0 +1,51 @@
+{
+  "stage": "harness",
+  "repo": "realvuln-python-insecure-app",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/harness.yaml",
+  "source": {
+    "oracle_status_path": "output/python/realvuln-python-insecure-app/fuzz_oracles/status.json"
+  },
+  "counts": {
+    "selected": 2,
+    "generated": 2,
+    "skipped": 0,
+    "failed": 0
+  },
+  "harnesses": [
+    {
+      "id": "0",
+      "target_id": "py_template_injection_app_main_py_41",
+      "rule_id": "py/template-injection",
+      "file": "app/main.py",
+      "start_line": "41",
+      "function_name": "try_hack_me",
+      "harness": "output/python/realvuln-python-insecure-app/fuzz_targets/py_template_injection_app_main_py_41.py",
+      "oracle": "output/python/realvuln-python-insecure-app/fuzz_oracles/py_template_injection_app_main_py_41.json",
+      "finding_artifact": "output/python/realvuln-python-insecure-app/verification_results/findings/finding_0_py_template-injection.json",
+      "corpus": "output/python/realvuln-python-insecure-app/fuzz_corpus/py_template_injection_app_main_py_41",
+      "strategy": "recorded_call",
+      "status": "generated",
+      "seed_count": 6,
+      "errors": ""
+    },
+    {
+      "id": "1",
+      "target_id": "py_jinja2_autoescape_false_app_main_py_41",
+      "rule_id": "py/jinja2/autoescape-false",
+      "file": "app/main.py",
+      "start_line": "41",
+      "function_name": "try_hack_me",
+      "harness": "output/python/realvuln-python-insecure-app/fuzz_targets/py_jinja2_autoescape_false_app_main_py_41.py",
+      "oracle": "output/python/realvuln-python-insecure-app/fuzz_oracles/py_jinja2_autoescape_false_app_main_py_41.json",
+      "finding_artifact": "output/python/realvuln-python-insecure-app/verification_results/findings/finding_1_py_jinja2_autoescape-false.json",
+      "corpus": "output/python/realvuln-python-insecure-app/fuzz_corpus/py_jinja2_autoescape_false_app_main_py_41",
+      "strategy": "return_value",
+      "status": "generated",
+      "seed_count": 6,
+      "errors": ""
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,78 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "target": "subprocess.run",
+    "module": "subprocess",
+    "capture_args": {
+      "args": {
+        "index": 0,
+        "name": "args"
+      }
+    },
+    "patch_target": "subprocess.subprocess.run",
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "captured value",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "predicate": {
+      "type": "regex",
+      "pattern": "echo.*BenchmarkTest00165",
+      "match_against": "captured_args[0]"
+    },
+    "condition_description": "{'type': 'regex', 'pattern': 'echo.*BenchmarkTest00165', 'match_against': 'captured_args[0]'}",
+    "trigger_patterns": [
+      "[\\s\\S]+"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "ORACULUM_VIOLATION: captured={captured}"
+  },
+  "fuzz_guidance": {
+    "sink_description": "subprocess.run() executing a shell command with user-controlled input",
+    "payload_trigger": "Provide a 'BenchmarkTest00165' form parameter containing tainted data",
+    "expected_effect": "The tainted data should appear in the captured subprocess args list",
+    "seed_corpus": [],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "aliasing_risks": [
+      "Check if subprocess.Popen is used instead of subprocess.run",
+      "Verify the exact module path (e.g., from subprocess import run)"
+    ],
+    "import_risks": [
+      "The subprocess module may be aliased or imported as a different name"
+    ],
+    "async_risks": null,
+    "classification_strategy": "recorded_call",
+    "classification_confidence": "high",
+    "mock_guidance": {
+      "required": true,
+      "target": "subprocess call on line 57",
+      "capture": "the command argument `argList` and its construction via f-string from user input `bar`",
+      "fake_behavior": "stub the subprocess call to prevent actual shell execution while capturing the attempted command",
+      "notes": [
+        "Ensure the subprocess call is mocked to avoid actual command execution during testing.",
+        "Capture the full `argList` to verify the tainted input reached the sink.",
+        "Consider mocking `subprocess.run` or `subprocess.Popen` depending on the exact API used."
+      ]
+    },
+    "target_id": "py_command_line_injection_testcode_BenchmarkTest00165_py_57",
+    "finding_id": "5",
+    "rule_id": "py/command-line-injection",
+    "rule_slug": "py_command-line-injection",
+    "file": "testcode/BenchmarkTest00165.py",
+    "function": "BenchmarkTest00165_post",
+    "input_strategy": "flask_view",
+    "function_signature": "def BenchmarkTest00165_post()",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": -1,
+        "type": "flask_request"
+      }
+    ],
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "output/python/benchmark-python/verification_results/findings/finding_5_py_command-line-injection.json"
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "target": "flask.Response.__init__",
+    "capture": {
+      "argument_index": 0,
+      "argument_name": "response",
+      "type": "string"
+    },
+    "patch_target": "flask.Response.__init__",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "captured value",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "predicate": "contains_xss_pattern",
+    "regex": "(<script[^>]*>.*?</script>|on\\w+\\s*=\\s*['\"].*?['\"]|javascript:\\s*[^\\s]+|<iframe[^>]*>.*?</iframe>)",
+    "flags": "re.IGNORECASE | re.DOTALL",
+    "condition_description": "contains_xss_pattern",
+    "trigger_patterns": [
+      "(<script[^>]*>.*?</script>|on\\w+\\s*=\\s*['\"].*?['\"]|javascript:\\s*[^\\s]+|<iframe[^>]*>.*?</iframe>)"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "ORACULUM_VIOLATION: captured={captured}"
+  },
+  "fuzz_guidance": {
+    "sink_mock": {
+      "behavior": "record_and_continue",
+      "fake_return": "MockedResponseObject()",
+      "notes": [
+        "Intercept the response content before it's rendered to prevent XSS execution.",
+        "Capture the raw response string to check for unsanitized user input."
+      ]
+    },
+    "payload_strategy": {
+      "taint_source": "form_data",
+      "key": "BenchmarkTest00257",
+      "initial_payloads": [
+        "<script>alert(1)</script>",
+        "javascript:alert(1)",
+        "<img src=x onerror=alert(1)>"
+      ]
+    },
+    "seed_corpus": [],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "aliasing_risk": "Low - Flask response construction is explicit",
+    "import_risk": "Ensure flask.Response is patched if imported as alias",
+    "async_risk": "Not applicable - Flask views are synchronous in this context",
+    "sink_context": "The XSS sink is in the HTML response rendering, likely via Flask's response handling",
+    "classification_strategy": "recorded_call",
+    "classification_confidence": "medium",
+    "mock_guidance": {
+      "required": true,
+      "target": "HTML response generation or output context where `superstring` is used",
+      "capture": "The value of `superstring` or the final response content that includes the unsanitized user input",
+      "fake_behavior": "Stub the response rendering to capture the output without actually sending it, preventing XSS execution in test environments",
+      "notes": [
+        "The actual XSS trigger depends on how the response is consumed by the client; mocking should focus on intercepting the unsafe output.",
+        "Ensure the test does not render the malicious script in a real browser context."
+      ]
+    },
+    "target_id": "py_reflective_xss_testcode_BenchmarkTest00257_py_44",
+    "finding_id": "17",
+    "rule_id": "py/reflective-xss",
+    "rule_slug": "py_reflective-xss",
+    "file": "testcode/BenchmarkTest00257.py",
+    "function": "BenchmarkTest00257_post",
+    "input_strategy": "flask_view",
+    "function_signature": "def BenchmarkTest00257_post()",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": -1,
+        "type": "flask_request"
+      }
+    ],
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "output/python/benchmark-python/verification_results/findings/finding_17_py_reflective-xss.json"
+  }
+}

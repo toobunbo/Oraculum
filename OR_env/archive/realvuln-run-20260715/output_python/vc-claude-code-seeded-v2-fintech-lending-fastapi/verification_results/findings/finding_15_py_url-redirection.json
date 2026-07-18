@@ -1,0 +1,67 @@
+{
+  "id": "15",
+  "rule_slug": "py_url-redirection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-claude-code-seeded-v2-fintech-lending-fastapi_20260714_152421.json"
+  },
+  "finding": {
+    "rule_id": "py/url-redirection",
+    "message": "Untrusted URL redirection depends on a [user-provided value](1).",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 39,
+    "end_line": 39,
+    "repo_name": "vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/vc-claude-code-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 38: ControlFlowNode for lane",
+      "line 39: ControlFlowNode for lane"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-601"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "confidence": "High",
+    "iterations": 3,
+    "answers": [
+      "The redirect sink is `RedirectResponse(lane)` on line 39. The URL/target value passed to it is the `lane` parameter.",
+      "The `lane` parameter is assigned as a query parameter in the function signature on line 38: `async def loan_return_lane_009(lane: str = \"/\", gate_ref: None = Depends(_wrk_gate)):`. This is the only assignment to `lane`.",
+      "The value of `lane` derives from user input as a query parameter. The data-flow chain is: user-provided query parameter `lane` (line 38) → `lane` variable (line 38) → `RedirectResponse(lane)` (line 39).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path. The value of `lane` is directly used in the `RedirectResponse` without any modifications or checks.",
+      "There is no specific defense that contains the redirect. No validation or sanitization is performed on the `lane` parameter before it is used in the `RedirectResponse`. There is no check to ensure the URL is safe or restricted to relative paths.",
+      "The user-tainted value `lane` reaches the sink directly without any sanitization or validation. There is no defense mechanism in place to prevent redirection to an arbitrary URL."
+    ],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 11.069146156311035,
+    "output_tokens": 1320,
+    "context_needed": [],
+    "reasoning": "The `lane` parameter is directly sourced from user input via a query parameter and is used in `RedirectResponse` without any validation or sanitization, leading to an untrusted URL redirection vulnerability. The function is a FastAPI route handler that can be directly accessed via HTTP requests.",
+    "data_flow": "user-provided query parameter `lane` (line 38) → `lane` variable (line 38) → `RedirectResponse(lane)` (line 39)",
+    "confidence_score": 0.95,
+    "timestamp": "2026-07-14T15:24:08.016867",
+    "cost_usd": 0.0,
+    "input_tokens": 16548,
+    "cached_input_tokens": 0,
+    "tokens_used": 17868
+  },
+  "function": {
+    "name": "loan_return_lane_009",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 38,
+    "end_line": 39,
+    "scope": ""
+  },
+  "web_params": []
+}

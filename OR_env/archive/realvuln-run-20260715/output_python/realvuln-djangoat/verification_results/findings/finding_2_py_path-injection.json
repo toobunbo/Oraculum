@@ -1,0 +1,77 @@
+{
+  "id": "2",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-djangoat",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/verification_results/summary_realvuln-djangoat_20260714_145404.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "app/models/Benefits/benefits.py",
+    "start_line": 68,
+    "end_line": 68,
+    "repo_name": "realvuln-djangoat",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/realvuln-djangoat.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 40: ControlFlowNode for request",
+      "line 43: ControlFlowNode for Subscript",
+      "line 31: ControlFlowNode for uploaded_file",
+      "line 33: ControlFlowNode for full_file_name",
+      "line 41: ControlFlowNode for full_file_name",
+      "line 67: ControlFlowNode for full_file_name",
+      "line 68: ControlFlowNode for full_file_name"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 12632,
+    "output_tokens": 1401,
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "data_flow": "request.form['filename'] (line 40) → full_file_name (line 41, 67) → os.path.isfile(full_file_name) (line 68)",
+    "cost_usd": 0.0,
+    "confidence_score": 0.95,
+    "reasoning": "User-controlled input flows directly to a file path check without sanitization, enabling directory traversal. No defensive measures are present, and the additional context confirms no external protections.",
+    "confidence": "High",
+    "answers": [
+      "The EXACT file-operation sink is `os.path.isfile(full_file_name)` on line 68. The path value passed to it is `full_file_name`.",
+      "The assignments to `full_file_name` on the path reaching the sink are: line 33 (from `uploaded_file`), line 41 (from `request.form['filename']`), and line 67 (parameter of `make_backup`). The LAST assignment is line 67.",
+      "The value of `full_file_name` on line 67 derives from user input. The data-flow chain is: line 40 (request) → line 43 (Subscript accessing `request.form['filename']`) → line 31 (`uploaded_file` assignment) → line 33 (`full_file_name` assignment) → line 41 (reassignment of `full_file_name` from `request.form['filename']`) → line 67 (parameter `full_file_name` in `make_backup`).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path. No defensive code is present between the source and the sink.",
+      "There is no specific defense containing the path. No sanitization or validation functions like `secure_filename`, `Path.resolve().is_relative_to()`, or similar are applied to `full_file_name` before it reaches the sink.",
+      "The user-tainted value `full_file_name` reaches the sink `os.path.isfile(full_file_name)` on line 68. There is no visible defense mechanism to prevent directory traversal. The additional context shows no callers or callees, confirming the analysis must be based solely on the provided code."
+    ],
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 14.929019212722778,
+    "timestamp": "2026-07-14T14:53:20.689305",
+    "iterations": 3,
+    "tokens_used": 14033
+  },
+  "function": {
+    "name": "make_backup",
+    "file": "app/models/Benefits/benefits.py",
+    "start_line": 67,
+    "end_line": 74,
+    "scope": "Benefits"
+  },
+  "web_params": []
+}

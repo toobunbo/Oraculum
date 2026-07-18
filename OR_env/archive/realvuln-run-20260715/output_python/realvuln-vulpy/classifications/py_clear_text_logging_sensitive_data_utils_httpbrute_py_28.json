@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "Sink is a print statement to stdout, which is not network I/O, shell execution, DB write, or irreversible"
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "Violation is transient stdout output with no persistent storage; answers confirm 'no persistent storage' and data is 'temporarily held in memory and printed'"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not reached; returns.kind is none with empty exprs"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the print call at line 28 that outputs the password in cleartext to stdout",
+    "capture": "Capture the arguments passed to the print statement, specifically looking for password values leaked in cleartext",
+    "fake_behavior": "Suppress actual stdout output; record call arguments for assertion that sensitive data was passed to print",
+    "notes": [
+      "The violation is the act of printing passwords to stdout, so the print call itself must be intercepted",
+      "Verify captured arguments contain the password values read from the file"
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

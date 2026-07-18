@@ -1,0 +1,47 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of patient_return_lane_145 (Django HttpResponseRedirect object)",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The returned redirect response contains an absolute external URL (http:// or https://) in its Location header / string representation, confirming that user-controlled input was passed unsanitized to redirect().",
+    "trigger_patterns": [
+      "https?://[^/\\s]+"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_URL-REDIRECTION: open redirect bypass confirmed — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "https://evil.com",
+      "http://attacker.net/steal",
+      "https://malicious.site/phish?token=123",
+      "http://localhost:9000/admin",
+      "https://evil.com/path?next=login"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "patient_return_lane_145",
+    "file": "clinic_portal/patient_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def patient_return_lane_145(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "HttpRequest"
+      }
+    ],
+    "target_id": "py_url_redirection_clinic_portal_patient_operations_py_58",
+    "finding_id": "4",
+    "rule_id": "py/url-redirection",
+    "rule_slug": "py_url-redirection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_4_py_url-redirection.json"
+  }
+}

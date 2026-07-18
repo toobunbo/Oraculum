@@ -1,0 +1,50 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "pathlib.Path.mkdir",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "The pathlib.Path object (self) representing target.parent, which is the directory path to be created, derived from user-controlled 'name' via BASE_EXPORT_DIR / name",
+    "additional_imports": [
+      "pathlib"
+    ]
+  },
+  "oracle_check": {
+    "condition_description": "The string representation of the Path object passed as self to mkdir contains directory traversal sequences (.. followed by a path separator or at end of string), confirming that user input 'name' with '..' fragments reached the sink unsanitized.",
+    "trigger_patterns": [
+      "\\.{2}[/\\\\]",
+      "\\.{2}$"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_PATH_INJECTION: directory traversal in mkdir path — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "../../etc/passwd",
+      "foo/../../../tmp/data",
+      "..\\..\\windows\\system32",
+      "subdir/../../config/settings.py",
+      "../../../var/log"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "acct_dock_shelf_592",
+    "file": "config/partner_console.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def acct_dock_shelf_592(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "django.http.HttpRequest"
+      }
+    ],
+    "target_id": "py_path_injection_config_partner_console_py_150",
+    "finding_id": "4",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_4_py_path-injection.json"
+  }
+}

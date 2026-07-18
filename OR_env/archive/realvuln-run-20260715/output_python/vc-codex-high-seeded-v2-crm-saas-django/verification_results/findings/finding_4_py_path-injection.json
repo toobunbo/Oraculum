@@ -1,0 +1,76 @@
+{
+  "id": "4",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/summary_vc-codex-high-seeded-v2-crm-saas-django_20260714_153817.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "config/partner_console.py",
+    "start_line": 150,
+    "end_line": 150,
+    "repo_name": "vc-codex-high-seeded-v2-crm-saas-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django/vc-codex-high-seeded-v2-crm-saas-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 145: ControlFlowNode for request",
+      "line 148: ControlFlowNode for Attribute",
+      "line 148: ControlFlowNode for Attribute()",
+      "line 148: ControlFlowNode for name",
+      "line 149: ControlFlowNode for target",
+      "line 150: ControlFlowNode for Attribute"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "verdict": "True Positive",
+    "answers": [
+      "The EXACT flagged line is: `target.parent.mkdir(parents=True, exist_ok=True)` on line 150. This line lives in the function `acct_dock_shelf_592`.",
+      "The path value `target` is assigned on line 149: `target = BASE_EXPORT_DIR / name`. The variable `name` is assigned on line 148: `name = request.GET.get(\"name\", \"packet.bin\")`.",
+      "The value of `name` derives from user input via `request.GET.get(\"name\", \"packet.bin\")` on line 148. This means `target` is derived from user input as `BASE_EXPORT_DIR / name` on line 149.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path. No defensive code is present to neutralize the user input before it is used in the path construction.",
+      "There is no specific defense mechanism applied to contain the path. No use of `secure_filename`, `resolve()`, `is_relative_to()`, or any other explicit path sanitization or validation is visible.",
+      "The user-tainted value `name` is used to construct the path `target` which directly flows to `target.parent.mkdir()` on line 150. No sanitization or validation is applied to prevent directory traversal."
+    ],
+    "reasoning": "User-controlled input `name` is used to construct a file path which is then used in a directory creation operation without any sanitization or validation, allowing potential directory traversal. The missing context about BASE_EXPORT_DIR and caller does not change the fact that user input directly influences the path construction.",
+    "elapsed_seconds": 10.215938568115234,
+    "context_needed": [],
+    "tokens_used": 13510,
+    "output_tokens": 1162,
+    "cached_input_tokens": 0,
+    "input_tokens": 12348,
+    "timestamp": "2026-07-14T15:37:53.927151",
+    "data_flow": "request.GET (line 148) → name (line 148) → target (line 149) → target.parent (line 150) → mkdir() (line 150)",
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence_score": 0.9
+  },
+  "function": {
+    "name": "acct_dock_shelf_592",
+    "file": "config/partner_console.py",
+    "start_line": 145,
+    "end_line": 152,
+    "scope": ""
+  },
+  "web_params": []
+}

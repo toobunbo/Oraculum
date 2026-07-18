@@ -1,0 +1,6 @@
+
+━━ prepare: realvuln-djangoat
+─────────────────────────────
+
+━━ analyze: tool=both profile=standard
+──────────────────────────────────────

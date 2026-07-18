@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "target.write_text(...) performs an irreversible filesystem write with a user-controlled path, constituting a dangerous side effect in a test environment."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "not evaluated"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "not evaluated"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the pathlib.Path.write_text method on the 'target' object.",
+    "capture": "Capture the exact string argument passed to write_text (the JSON payload) and the full resolved path of 'target' (BASE_EXPORT_DIR / f\"{ref}.json\").",
+    "fake_behavior": "Make write_text a no-op that returns None, allowing execution to continue and return the path dict.",
+    "notes": [
+      "The returned dict {'path': str(target)} still uses the tainted path, so the return value alone does not reveal the write side effect.",
+      "Asserting that write_text was called with the expected JSON content validates the function's logic without touching the filesystem."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

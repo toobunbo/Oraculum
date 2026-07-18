@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "urllib.request.urlopen(url) on line 15 is network I/O and an SSRF sink that contacts a user-controlled URL."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; decision stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; decision stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock or patch urllib.request.urlopen to intercept the outbound HTTP request triggered by the user-supplied URL argument.",
+    "capture": "Capture the full url string passed to urlopen to verify it matches the malicious payload that bypasses the startswith('https://insecurewebapp.com') check (e.g., contains redirect or subdomain tricks).",
+    "fake_behavior": "Return a mock HTTP response object with a .read() method returning a fixed byte string and a .status attribute (e.g., 200) so that the calling code can proceed to the html variable assignment without error.",
+    "notes": [
+      "The vulnerability is in the prefix-only sanitization on line 14; the mock must allow execution to reach urlopen but prevent actual network activity.",
+      "Use unittest.mock.patch on urllib.request.urlopen or patch the function's module-level reference."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

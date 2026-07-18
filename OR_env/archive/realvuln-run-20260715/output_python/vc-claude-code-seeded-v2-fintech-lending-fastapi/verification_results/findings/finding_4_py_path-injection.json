@@ -1,0 +1,73 @@
+{
+  "id": "4",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-claude-code-seeded-v2-fintech-lending-fastapi_20260714_152421.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 120,
+    "end_line": 120,
+    "repo_name": "vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/vc-claude-code-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 117: ControlFlowNode for name",
+      "line 119: ControlFlowNode for target",
+      "line 120: ControlFlowNode for Attribute"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "confidence": "High",
+    "iterations": 3,
+    "answers": [
+      "The EXACT flagged line is: `target.parent.mkdir(parents=True, exist_ok=True)` on line 120. This line is located in the function `loan_dock_shelf_390` which starts at line 116.",
+      "The path value passed to the sink is `target.parent`, where `target` is constructed as `BASE_EXPORT_DIR / name` on line 119. This is the only assignment to `target` on the path to the sink.",
+      "The value of `target` derives from `BASE_EXPORT_DIR / name`. The variable `name` is a user-provided query parameter obtained from the request: `async def loan_dock_shelf_390(request: Request, name: str = \"packet.bin\", gate_ref: None = Depends(_wrk_gate))` (line 117). The data flow is: `name` (line 117, source) → `target = BASE_EXPORT_DIR / name` (line 119) → `target.parent.mkdir(...)` (line 120, sink).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value `name` before it reaches the sink. The value flows directly from the function parameter to the path construction.",
+      "There is no specific defense applied to the path. No sanitization, validation, or path resolution checks (e.g., `secure_filename`, `resolve()`, `is_relative_to()`) are present. The code directly uses the user-provided `name` to construct a file path. The definition of `BASE_EXPORT_DIR` is not available, but even if it were, the use of user-controlled `name` in path construction without validation is inherently dangerous.",
+      "The user-tainted value `name` reaches the sink at line 120 without any sanitization or validation. The absence of any defense mechanism confirms the vulnerability. Even without knowing `BASE_EXPORT_DIR`, the pattern of using unsanitized user input in path operations is a clear path traversal risk."
+    ],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 17.58170747756958,
+    "output_tokens": 1622,
+    "context_needed": [],
+    "reasoning": "The user-provided `name` parameter is used directly in a file path construction without any sanitization or validation, leading to a directory traversal vulnerability when `target.parent.mkdir(...)` is called. No defenses are present to mitigate this, and the missing `BASE_EXPORT_DIR` definition does not change the fact that user-controlled input is being used in a path operation.",
+    "data_flow": "name (line 117) → target = BASE_EXPORT_DIR / name (line 119) → target.parent.mkdir(...) (line 120)",
+    "confidence_score": 0.9,
+    "timestamp": "2026-07-14T15:23:43.702186",
+    "cost_usd": 0.0,
+    "input_tokens": 17490,
+    "cached_input_tokens": 0,
+    "tokens_used": 19112
+  },
+  "function": {
+    "name": "loan_dock_shelf_390",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 117,
+    "end_line": 122,
+    "scope": ""
+  },
+  "web_params": []
+}

@@ -1,0 +1,74 @@
+{
+  "id": "1",
+  "rule_slug": "py_reflective-xss",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-insecure-web",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-insecure-web",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-insecure-web/verification_results/summary_realvuln-insecure-web_20260714_144146.json"
+  },
+  "finding": {
+    "rule_id": "py/reflective-xss",
+    "message": "Cross-site scripting vulnerability due to a [user-provided value](1).",
+    "file": "app/app.py",
+    "start_line": 47,
+    "end_line": 47,
+    "repo_name": "realvuln-insecure-web",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-insecure-web/realvuln-insecure-web.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 46: ControlFlowNode for request",
+      "line 46: ControlFlowNode for Attribute",
+      "line 46: ControlFlowNode for Attribute()",
+      "line 46: ControlFlowNode for user",
+      "line 47: ControlFlowNode for Fstring"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "The user-controlled value `user` is directly interpolated into an HTML response via an f-string on line 47 without any escaping or sanitization. The function appears to be a web endpoint that can be accessed directly, making this a reflective XSS vulnerability.",
+    "context_needed": [],
+    "confidence": "High",
+    "data_flow": "request.cookies.get(\"session\", \"guest\") (line 46) → user (line 46) → f-string sink (line 47)",
+    "output_tokens": 1310,
+    "elapsed_seconds": 12.97581934928894,
+    "timestamp": "2026-07-14T14:41:46.306333",
+    "iterations": 3,
+    "answers": [
+      "The exact sink is the f-string on line 47: `return f\"<h1>Welcome, {user}!</h1> <script>alert('XSS Vulnerability!')</script>\"`. The value being rendered is `user`.",
+      "The only assignment to `user` is on line 46: `user = request.cookies.get(\"session\", \"guest\")`.",
+      "The value of `user` derives from user input via `request.cookies.get(\"session\", \"guest\")` on line 46. The data-flow chain shows that `user` originates from `request` (line 46), which is tainted by the CodeQL source at line 1.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The value flows directly from line 46 to the sink on line 47.",
+      "No specific defense is present. There is no call to `html.escape()`, `markupsafe.escape()`, or any framework-specific escaping helper. The f-string directly interpolates the user-provided value into the HTML response.",
+      "The code does not explicitly disable escaping using `|safe`, `{% autoescape false %}`, `Markup(...)`, or `mark_safe(...)`. However, the lack of escaping is still a vulnerability.",
+      "The user-tainted value `user` reaches the sink on line 47 without any escaping or sanitization. No defense is visible in the provided code."
+    ],
+    "cached_input_tokens": 0,
+    "cost_usd": 0.0,
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "input_tokens": 11967,
+    "confidence_score": 0.95,
+    "tokens_used": 13277
+  },
+  "function": {
+    "name": "dashboard",
+    "file": "app/app.py",
+    "start_line": 44,
+    "end_line": 47,
+    "scope": ""
+  },
+  "web_params": []
+}

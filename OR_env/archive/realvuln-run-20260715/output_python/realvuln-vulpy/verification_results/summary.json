@@ -1,0 +1,129 @@
+{
+  "stage": "ingest",
+  "repo": "realvuln-vulpy",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulpy",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulpy",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulpy/verification_results/summary_realvuln-vulpy_20260714_151852.json"
+  },
+  "counts": {
+    "total_verdicts": 17,
+    "selected": 15,
+    "enriched": 9,
+    "skipped": 2,
+    "failed": 6
+  },
+  "findings": [
+    {
+      "id": "0",
+      "rule_id": "py/cookie-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-vulpy/verification_results/findings/finding_0_py_cookie-injection.json",
+      "function_name": "create"
+    },
+    {
+      "id": "2",
+      "rule_id": "py/sql-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-vulpy/verification_results/findings/finding_2_py_sql-injection.json",
+      "function_name": "login"
+    },
+    {
+      "id": "3",
+      "rule_id": "py/sql-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-vulpy/verification_results/findings/finding_3_py_sql-injection.json",
+      "function_name": "create"
+    },
+    {
+      "id": "4",
+      "rule_id": "py/sql-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-vulpy/verification_results/findings/finding_4_py_sql-injection.json",
+      "function_name": "password_change"
+    },
+    {
+      "id": "5",
+      "rule_id": "py/clear-text-logging-sensitive-data",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-vulpy/verification_results/findings/finding_5_py_clear-text-logging-sensitive-data.json",
+      "function_name": "cmd_api_client"
+    },
+    {
+      "id": "7",
+      "rule_id": "py/clear-text-logging-sensitive-data",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-vulpy/verification_results/findings/finding_7_py_clear-text-logging-sensitive-data.json",
+      "function_name": "crack_cvv"
+    },
+    {
+      "id": "10",
+      "rule_id": "py/clear-text-logging-sensitive-data",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-vulpy/verification_results/findings/finding_10_py_clear-text-logging-sensitive-data.json",
+      "function_name": "http_brute"
+    },
+    {
+      "id": "11",
+      "rule_id": "py/clear-text-logging-sensitive-data",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-vulpy/verification_results/findings/finding_11_py_clear-text-logging-sensitive-data.json",
+      "function_name": "http_brute"
+    },
+    {
+      "id": "12",
+      "rule_id": "py/clear-text-storage-sensitive-data",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-vulpy/verification_results/findings/finding_12_py_clear-text-storage-sensitive-data.json",
+      "function_name": "cmd_api_client"
+    }
+  ],
+  "errors": [
+    {
+      "id": "8",
+      "rule_id": "py/clear-text-logging-sensitive-data",
+      "file": "good/cutpasswd.py",
+      "start_line": 20,
+      "error": "No enclosing function found for finding 8: py/clear-text-logging-sensitive-data @ good/cutpasswd.py:20"
+    },
+    {
+      "id": "9",
+      "rule_id": "py/clear-text-logging-sensitive-data",
+      "file": "good/httpbrute.py",
+      "start_line": 24,
+      "error": "No enclosing function found for finding 9: py/clear-text-logging-sensitive-data @ good/httpbrute.py:24"
+    },
+    {
+      "id": "13",
+      "rule_id": "py/flask-debug",
+      "file": "bad/vulpy-ssl.py",
+      "start_line": 29,
+      "error": "No enclosing function found for finding 13: py/flask-debug @ bad/vulpy-ssl.py:29"
+    },
+    {
+      "id": "14",
+      "rule_id": "py/flask-debug",
+      "file": "good/vulpy-ssl.py",
+      "start_line": 29,
+      "error": "No enclosing function found for finding 14: py/flask-debug @ good/vulpy-ssl.py:29"
+    },
+    {
+      "id": "15",
+      "rule_id": "py/flask-debug",
+      "file": "good/vulpy.py",
+      "start_line": 53,
+      "error": "No enclosing function found for finding 15: py/flask-debug @ good/vulpy.py:53"
+    },
+    {
+      "id": "16",
+      "rule_id": "py/flask-debug",
+      "file": "bad/vulpy.py",
+      "start_line": 55,
+      "error": "No enclosing function found for finding 16: py/flask-debug @ bad/vulpy.py:55"
+    }
+  ]
+}

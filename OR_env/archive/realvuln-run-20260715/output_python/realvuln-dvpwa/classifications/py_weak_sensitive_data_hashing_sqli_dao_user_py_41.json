@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "Sink is md5(password.encode('utf-8')).hexdigest(), a CPU-only cryptographic hash computation with no network, shell, or irreversible side effects."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "Function returns a boolean equality check (self.pwd_hash == md5(...)). The return value does not expose which hashing algorithm was used."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated because Q2 is false."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the md5 function or hashlib.md5 constructor.",
+    "capture": "Capture the input argument (the encoded password bytes) passed to md5 to verify the sensitive data flow.",
+    "fake_behavior": "Return a mock object with a hexdigest() method that returns a predictable string (e.g., matching self.pwd_hash) to allow execution to continue.",
+    "notes": [
+      "Recording this call is necessary because the boolean return value obscures the use of the weak MD5 algorithm.",
+      "Asserting that md5 was called directly proves the weak-sensitive-data-hashing violation."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is MongoClient.find_one with user-controlled query; reasoning notes $where expressions can execute JavaScript on the MongoDB server causing DoS or RCE, making it dangerous to execute in a test environment."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; decision stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; decision stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the MongoClient find_one method on the ops.records collection (line 169).",
+    "capture": "Capture the 'query' argument passed to find_one to inspect it for NoSQL injection operators such as $gt, $where, $ne, $or, or other $-prefixed keys indicating operator injection.",
+    "fake_behavior": "Return a benign empty dict or None so the function proceeds to the JsonResponse branch, allowing the harness to complete without hitting a real database.",
+    "notes": [
+      "The mock must intercept before any query reaches a real MongoDB instance to prevent $where JavaScript execution.",
+      "If validating the query, recursively check all nested dicts for keys starting with '$'.",
+      "Consider testing both safe scalar queries and dangerous operator-injected queries to verify detection."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

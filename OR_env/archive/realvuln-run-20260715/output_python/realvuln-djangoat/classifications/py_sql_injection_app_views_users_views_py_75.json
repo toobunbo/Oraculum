@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink constructs a SQL query via string interpolation on line 75, which is DB I/O and unsafe parser external resolution."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the database cursor execute call (or ORM equivalent) that consumes the SQL string constructed on line 75.",
+    "capture": "Capture the fully interpolated SQL query string passed to the execute method, specifically to verify that user_id_form is injected unsanitized into the WHERE clause.",
+    "fake_behavior": "Return an empty result set or a single dummy row so that the function's subsequent branching (e.g., user-not-found vs. user-found paths) can continue without a real DB.",
+    "notes": [
+      "The finding identifies the query *construction* as the sink on line 75; the actual dangerous execution is wherever that string is passed to a cursor.",
+      "Ensure the mock records the raw query string before any parameterized rewrites, so the injection is observable.",
+      "Consider stubbing request.POST to inject a malicious payload (e.g., \"' OR 1=1--\") to confirm the vulnerability triggers."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

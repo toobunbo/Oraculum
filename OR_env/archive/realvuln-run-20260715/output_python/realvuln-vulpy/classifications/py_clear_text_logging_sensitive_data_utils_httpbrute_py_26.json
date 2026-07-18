@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "Sink is logging.info, which writes to stdout/stderr and is not dangerous in a test environment."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "Violation is the act of logging the password in cleartext at line 26; function returns nothing (kind: none) and no post-return state reveals the violation."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; Q2 was NO."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the logging.info call invoked at line 26 within the http_brute function.",
+    "capture": "Capture the arguments passed to logging.info, specifically checking whether the formatted string contains the password variable in cleartext.",
+    "fake_behavior": "Allow the mock to consume the call without writing to any real output stream, so execution continues through the loop.",
+    "notes": [
+      "The violation occurs inside a loop over passwords; the mock should capture each invocation to confirm that every password is logged in cleartext.",
+      "Optionally mock the HTTP request (requests.get) to avoid real network calls while still testing the logging behavior."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

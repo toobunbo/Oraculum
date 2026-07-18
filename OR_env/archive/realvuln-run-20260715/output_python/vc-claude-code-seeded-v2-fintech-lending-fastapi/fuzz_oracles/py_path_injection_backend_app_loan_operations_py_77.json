@@ -1,0 +1,47 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "pathlib.Path.mkdir",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "path string of the Path object (self) on which mkdir is called",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured Path object's string representation contains directory traversal sequences (../) indicating user-controlled ref escaped BASE_EXPORT_DIR",
+    "trigger_patterns": [
+      "\\.\\./"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_PATH_INJECTION: directory traversal in mkdir path — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "../../etc",
+      "../tmp",
+      "....//....//var",
+      "../secret",
+      "../../home/user"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "loan_vault_stash_235",
+    "file": "backend/app/loan_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def loan_vault_stash_235(request: Request, gate_ref: None)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "Request"
+      }
+    ],
+    "target_id": "py_path_injection_backend_app_loan_operations_py_77",
+    "finding_id": "2",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_2_py_path-injection.json"
+  }
+}

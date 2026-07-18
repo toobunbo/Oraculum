@@ -1,0 +1,72 @@
+{
+  "id": "1",
+  "rule_slug": "py_code-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-djangoat",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/verification_results/summary_realvuln-djangoat_20260714_145404.json"
+  },
+  "finding": {
+    "rule_id": "py/code-injection",
+    "message": "This code execution depends on a [user-provided value](1).",
+    "file": "app/views/api/mobile/views.py",
+    "start_line": 27,
+    "end_line": 27,
+    "repo_name": "realvuln-djangoat",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/realvuln-djangoat.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 24: ControlFlowNode for request",
+      "line 26: ControlFlowNode for Attribute",
+      "line 26: ControlFlowNode for Attribute()",
+      "line 26: ControlFlowNode for classname",
+      "line 27: ControlFlowNode for classname"
+    ],
+    "severity": "9.3",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-94",
+      "CWE-95"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 11678,
+    "output_tokens": 1019,
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "data_flow": "request (line 24) → request.GET.get(\"class\") (line 26) → classname (line 26) → eval(classname) (line 27)",
+    "cost_usd": 0.0,
+    "confidence_score": 0.95,
+    "reasoning": "User-controlled input `classname` from `request.GET` is passed directly to the dangerous `eval()` function on line 27 with no sanitization or guards. The function signature indicates HTTP request handling, confirming external reachability.",
+    "confidence": "High",
+    "answers": [
+      "The EXACT sink is `eval(classname)` on line 27. The value passed to it is `classname`.",
+      "The value `classname` is assigned on line 26: `classname = request.GET.get(\"class\")`.",
+      "The LAST assignment to `classname` on line 26 derives from user input via `request.GET.get(\"class\")`, which retrieves a value from the HTTP GET parameters. This is confirmed by the data-flow path: SOURCE line 24 (`request`) → TRANSFORM line 26 (`request.GET`) → TRANSFORM line 26 (`classname`) → SINK line 27 (`eval(classname)`).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value `classname` before it reaches the sink on line 27.",
+      "There is no specific defense preventing arbitrary code execution. No use of `ast.literal_eval`, allow-lists, or restricted globals is visible. The code directly passes user input to `eval()`.",
+      "The user-tainted value `classname` clearly reaches the `eval()` sink on line 27 with no sanitization or defense. The additional context shows no callers, but the function signature indicates it's designed to handle HTTP requests, making it externally reachable."
+    ],
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 21.007016897201538,
+    "timestamp": "2026-07-14T14:53:26.803835",
+    "iterations": 3,
+    "tokens_used": 12697
+  },
+  "function": {
+    "name": "api_id",
+    "file": "app/views/api/mobile/views.py",
+    "start_line": 24,
+    "end_line": 31,
+    "scope": ""
+  },
+  "web_params": []
+}

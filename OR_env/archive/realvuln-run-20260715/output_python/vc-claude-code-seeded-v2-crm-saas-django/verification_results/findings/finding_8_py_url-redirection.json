@@ -1,0 +1,70 @@
+{
+  "id": "8",
+  "rule_slug": "py_url-redirection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/summary_vc-claude-code-seeded-v2-crm-saas-django_20260714_152015.json"
+  },
+  "finding": {
+    "rule_id": "py/url-redirection",
+    "message": "Untrusted URL redirection depends on a [user-provided value](1).",
+    "file": "crm_project/partner_console.py",
+    "start_line": 73,
+    "end_line": 73,
+    "repo_name": "vc-claude-code-seeded-v2-crm-saas-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/vc-claude-code-seeded-v2-crm-saas-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 69: ControlFlowNode for request",
+      "line 72: ControlFlowNode for Attribute",
+      "line 72: ControlFlowNode for Attribute()",
+      "line 72: ControlFlowNode for lane",
+      "line 73: ControlFlowNode for lane"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-601"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 12687,
+    "confidence": "High",
+    "iterations": 3,
+    "output_tokens": 1305,
+    "context_needed": [],
+    "reasoning": "The user-controlled input `lane` is directly used in the `redirect` function without any validation or sanitization, leading to an open redirection vulnerability. The data flow from the user input to the sink is clear and exploitable. The absence of callers does not provide any additional protection.",
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:20:07.495275",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request (line 69) → Attribute (line 72) → Attribute() (line 72) → lane (line 72) → redirect(lane) (line 73)",
+    "cost_usd": 0.0,
+    "cached_input_tokens": 0,
+    "tokens_used": 13992,
+    "elapsed_seconds": 10.172992944717407,
+    "confidence_score": 0.9,
+    "answers": [
+      "The EXACT flagged line is `return redirect(lane)` on line 73, which lives in the function `acct_return_lane_149`.",
+      "The redirect sink is `redirect(lane)` on line 73. The URL/target value passed to it is `lane`.",
+      "The assignments to `lane` are on line 72: `lane = request.GET.get(\"lane\") or request.POST.get(\"lane\") or \"/\"`. This is the only assignment.",
+      "The value of `lane` derives from user input. Specifically, it comes from `request.GET.get(\"lane\")` or `request.POST.get(\"lane\")`, which are user-provided values from the query parameters or form data. The data-flow chain is: request (line 69) → Attribute (line 72) → Attribute() (line 72) → lane (line 72).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The value of `lane` is determined by user input or defaults to \"/\" if no input is provided.",
+      "There is no specific defense that contains the redirect. No validation or sanitization is performed on the `lane` variable before it is passed to the `redirect` function. The additional context shows no callers were found, meaning we cannot determine if there are any external protections."
+    ]
+  },
+  "function": {
+    "name": "acct_return_lane_149",
+    "file": "crm_project/partner_console.py",
+    "start_line": 69,
+    "end_line": 73,
+    "scope": ""
+  },
+  "web_params": []
+}

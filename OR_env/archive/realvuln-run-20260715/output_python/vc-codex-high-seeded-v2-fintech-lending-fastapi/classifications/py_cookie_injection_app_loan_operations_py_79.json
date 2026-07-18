@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "strategy": "return_value",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "set_cookie modifies the response object in-memory; it does not perform network I/O, shell execution, DB writes, or other dangerous side effects in a test environment"
+    },
+    "q2_observable_after_return": {
+      "answer": true,
+      "evidence": "The function returns a 'response' object (returns.kind='value') that contains the cookie set by the sink, making the injected value inspectable after return"
+    },
+    "q3_result_in_memory": {
+      "answer": true,
+      "evidence": "returns.kind is 'value' with exprs=['response'], so the response object with its set-cookie header is directly accessible in memory"
+    }
+  },
+  "mock_guidance": null,
+  "confidence": "high",
+  "warnings": []
+}

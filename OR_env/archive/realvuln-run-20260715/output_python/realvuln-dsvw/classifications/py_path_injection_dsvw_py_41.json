@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "lxml.etree.parse is called with XMLParser(load_dtd=True, resolve_entities=True, no_network=False), enabling XXE with network I/O and local file reads"
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "not evaluated"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "not evaluated"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock lxml.etree.parse to intercept the call on line 41",
+    "capture": "Capture the first argument (the BytesIO object) to inspect the raw XML string derived from params[\"xml\"]",
+    "fake_behavior": "Return a safe, minimal lxml.etree.ElementTree (e.g., parsed from '<root/>') so that subsequent code using the result does not crash",
+    "notes": [
+      "The XMLParser constructor arguments (load_dtd=True, resolve_entities=True, no_network=False) should also be captured or asserted on to confirm the dangerous configuration.",
+      "Ensure the mock prevents any actual network requests or filesystem reads that the real parser would attempt."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

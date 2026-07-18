@@ -1,0 +1,70 @@
+{
+  "id": "12",
+  "rule_slug": "py_clear-text-storage-sensitive-data",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulpy",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulpy",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulpy/verification_results/summary_realvuln-vulpy_20260714_151852.json"
+  },
+  "finding": {
+    "rule_id": "py/clear-text-storage-sensitive-data",
+    "message": "This expression stores [sensitive data (password)](1) as clear text.",
+    "file": "bad/api_post.py",
+    "start_line": 27,
+    "end_line": 27,
+    "repo_name": "realvuln-vulpy",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulpy/realvuln-vulpy.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 23: ControlFlowNode for Subscript",
+      "line 23: ControlFlowNode for api_key",
+      "line 27: ControlFlowNode for api_key"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-312",
+      "CWE-315",
+      "CWE-359"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "confidence_score": 0.95,
+    "reasoning": "The code retrieves an API key from a response (line 23) and stores it in cleartext to a file (line 27) without any encryption or hashing, making it accessible to anyone with file system access. This represents a clear case of sensitive data being stored insecurely.",
+    "confidence": "High",
+    "context_needed": [],
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:18:48.460469",
+    "iterations": 1,
+    "data_flow": "api_key from API response (line 23) → api_key variable (line 23) → outfile.write(api_key) (line 27)",
+    "cost_usd": 0.0,
+    "elapsed_seconds": 3.133425712585449,
+    "cached_input_tokens": 0,
+    "answers": [
+      "The sensitive data being stored is an API key, as seen on line 23 where `api_key = r.json()['key']` retrieves the key from the API response.",
+      "The data is stored in a file, specifically `/tmp/supersecret.txt` as defined on line 6 with `api_key_file = Path('/tmp/supersecret.txt')` and written to on line 27.",
+      "No, the data is not encrypted or hashed before storage. Line 27 shows `outfile.write(api_key)` which writes the API key directly to the file without any encryption or hashing.",
+      "Yes, an attacker with access to the storage medium (the file `/tmp/supersecret.txt`) could read the sensitive data, as it is stored in cleartext without any protection.",
+      "This storage is likely used in production as it's part of a command-line tool that appears to be a client application for an API, not specifically marked as test/development code.",
+      "The blast radius if this data is exposed is significant as it could lead to account compromise and unauthorized access to the API services that this key authenticates."
+    ],
+    "tokens_used": 3967,
+    "input_tokens": 3583,
+    "output_tokens": 384,
+    "model": "ollama_chat/qwen3-coder:480b-cloud"
+  },
+  "function": {
+    "name": "cmd_api_client",
+    "file": "bad/api_post.py",
+    "start_line": 10,
+    "end_line": 31,
+    "scope": ""
+  },
+  "web_params": []
+}

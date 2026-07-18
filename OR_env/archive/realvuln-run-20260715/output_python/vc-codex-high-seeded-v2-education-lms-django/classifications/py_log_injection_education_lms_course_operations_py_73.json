@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "Sink is logger.warning, which is safe I/O (logging) and not dangerous in a test environment."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "The return is JsonResponse({'status': 'queued'}), which does not reflect whether unsanitized data was passed to the logger. The violation is only observable at the logger.warning call site."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not reached; Q2 answered NO."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the logger.warning call on line 73 to intercept and record its arguments.",
+    "capture": "Capture the full log message string passed to logger.warning, preserving any newline or control characters injected from request.body or the Authorization header.",
+    "fake_behavior": "Allow the logger.warning call to execute without actual logging (no-op or pass-through) so execution continues normally.",
+    "notes": [
+      "The key assertion is that user-controlled data containing \\n or \\r characters reaches logger.warning unmodified.",
+      "Compare the captured argument against the original request.body and authorization header values to confirm the lack of sanitization."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

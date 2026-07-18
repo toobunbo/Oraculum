@@ -1,0 +1,52 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of the dashboard function",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The return value contains an unescaped HTML/JS injection payload derived from the user-controlled cookie value, confirming reflective XSS.",
+    "trigger_patterns": [
+      "<script",
+      "onerror\\s*=",
+      "onload\\s*=",
+      "javascript:",
+      "<img[^>]+src\\s*=",
+      "<svg[^>]+onload"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_REFLECTIVE_XSS: unescaped HTML/JS in return value — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "<script>alert(1)</script>",
+      "<img src=x onerror=alert(1)>",
+      "<svg onload=alert(1)>",
+      "javascript:alert(1)",
+      "\"><script>alert('XSS')</script>"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "dashboard",
+    "file": "app/app.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def dashboard()",
+    "tainted_params": [
+      {
+        "name": "session",
+        "index": -1,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_reflective_xss_app_app_py_47",
+    "finding_id": "1",
+    "rule_id": "py/reflective-xss",
+    "rule_slug": "py_reflective-xss",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-insecure-web/verification_results/findings/finding_1_py_reflective-xss.json"
+  }
+}

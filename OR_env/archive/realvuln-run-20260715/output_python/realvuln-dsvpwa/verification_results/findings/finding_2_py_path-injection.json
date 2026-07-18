@@ -1,0 +1,88 @@
+{
+  "id": "2",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-dsvpwa",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvpwa",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvpwa/verification_results/summary_realvuln-dsvpwa_20260714_145612.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "dsvpwa/handlers.py",
+    "start_line": 118,
+    "end_line": 118,
+    "repo_name": "realvuln-dsvpwa",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvpwa/realvuln-dsvpwa.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 196: ControlFlowNode for self",
+      "line 197: ControlFlowNode for self",
+      "line 198: ControlFlowNode for self",
+      "line 211: ControlFlowNode for Attribute",
+      "line 111: ControlFlowNode for path",
+      "line 112: ControlFlowNode for path",
+      "line 118: ControlFlowNode for Attribute()",
+      "--- Flow 2 ---",
+      "line 196: ControlFlowNode for self",
+      "line 197: ControlFlowNode for self",
+      "line 198: ControlFlowNode for Subscript",
+      "line 198: [post] ControlFlowNode for self [Attribute path]",
+      "line 211: ControlFlowNode for self [Attribute path]",
+      "line 211: ControlFlowNode for Attribute",
+      "line 111: ControlFlowNode for path",
+      "line 112: ControlFlowNode for path",
+      "line 118: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "confidence_score": 0.95,
+    "answers": [
+      "The EXACT flagged line is `self.content = open('./{}'.format(path), 'r')` on line 118. This line lives in the `find` method of the `StaticHandler` class.",
+      "The path value passed to open() is `'./{}'.format(path)` where `path` is the parameter to the `find` method. The assignments to this path value are on line 111-112.",
+      "The value of `path` derives from user input. Based on the dataflow provided in the original analysis, the source is `self.path` which represents the HTTP request path. The flow goes: self.path (line 196) → path parameter → path assignment (line 112).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The conditional on line 112 only handles favicon.ico specially but doesn't prevent directory traversal for other user-controlled paths.",
+      "There is no specific defense mechanism present. No path sanitization, validation, secure path resolution, or directory traversal prevention is performed. The code directly uses the user-controlled path in file operations.",
+      "The user-tainted value `path` clearly reaches the sink on line 118 without any sanitization. The additional context shows no callees, confirming that the vulnerability analysis must focus on this function alone."
+    ],
+    "data_flow": "self.path (external source, represents HTTP request path) → StaticHandler.find(path parameter) → path assignment (line 112) → open() call (line 118)",
+    "timestamp": "2026-07-14T14:56:02.146206",
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cached_input_tokens": 0,
+    "reasoning": "User-controlled path input flows directly to file open operation without any sanitization or validation, enabling directory traversal attacks. The conditional assignment for favicon.ico does not prevent exploitation for other paths.",
+    "context_needed": [],
+    "input_tokens": 16715,
+    "verdict": "True Positive",
+    "output_tokens": 1305,
+    "tokens_used": 18020,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "elapsed_seconds": 14.865362882614136
+  },
+  "function": {
+    "name": "find",
+    "file": "dsvpwa/handlers.py",
+    "start_line": 111,
+    "end_line": 125,
+    "scope": "StaticHandler"
+  },
+  "web_params": []
+}

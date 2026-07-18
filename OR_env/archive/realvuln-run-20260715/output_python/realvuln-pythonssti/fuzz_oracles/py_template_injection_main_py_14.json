@@ -1,0 +1,49 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "main.Jinja2.from_string",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "template-source string argument passed to Jinja2.from_string, which contains the user-controlled username concatenated into 'Welcome ' + username + '!'",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured template-source string contains Jinja2 expression delimiters ({{ or {%}) indicating user-controlled data was injected as template syntax rather than being passed as a safe variable.",
+    "trigger_patterns": [
+      "\\{\\{.*?\\}\\}",
+      "\\{%.*?%\\}"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_TEMPLATE_INJECTION: SSTI payload detected in template source — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "{{7*7}}",
+      "{{config}}",
+      "{%for x in ().__class__.__bases__[0].__subclasses__()%}{%endfor%}",
+      "{{''.__class__.__mro__[1].__subclasses__()}}",
+      "{{request.application.__globals__}}",
+      "{{lipsum.__globals__['os'].popen('id').read()}}"
+    ],
+    "skip_condition": "not username"
+  },
+  "_meta": {
+    "function": "read_root",
+    "file": "main.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def read_root(username)",
+    "tainted_params": [
+      {
+        "name": "username",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_template_injection_main_py_14",
+    "finding_id": "0",
+    "rule_id": "py/template-injection",
+    "rule_slug": "py_template-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-pythonssti/verification_results/findings/finding_0_py_template-injection.json"
+  }
+}

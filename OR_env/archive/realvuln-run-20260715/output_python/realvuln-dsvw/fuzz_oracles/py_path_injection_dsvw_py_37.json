@@ -1,0 +1,50 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "builtins.open",
+    "target_arg_index": 0,
+    "target_arg_name": "file",
+    "capture_what": "path passed to open",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "captured path contains directory traversal patterns like '../' or absolute paths outside intended scope",
+    "trigger_patterns": [
+      "\\.{2}\\/",
+      "\\.{2}\\\\",
+      "^\\/etc\\/passwd$",
+      "^C:\\\\windows\\\\win.ini$"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_PATH-INJECTION: Path traversal detected - captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "../../../etc/passwd",
+      "..\\..\\..\\windows\\win.ini",
+      "/etc/passwd",
+      "C:\\windows\\win.ini",
+      "../../../../../../../../etc/shadow"
+    ],
+    "skip_condition": "not ('path' in locals() and isinstance(params.get('path'), str))"
+  },
+  "_meta": {
+    "function": "do_GET",
+    "file": "dsvw.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def do_GET(self)",
+    "tainted_params": [
+      {
+        "name": "path",
+        "index": null,
+        "type": "query_param"
+      }
+    ],
+    "target_id": "py_path_injection_dsvw_py_37",
+    "finding_id": "3",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_3_py_path-injection.json"
+  }
+}

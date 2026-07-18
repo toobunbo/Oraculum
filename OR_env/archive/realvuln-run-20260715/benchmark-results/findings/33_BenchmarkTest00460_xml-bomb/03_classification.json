@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink is xml.dom.minidom.parseString which is an unsafe XML parser that can lead to XML bomb (billion laughs/quadratic blowup) attacks, especially with external entities enabled via parser.setFeature(xml.sax.handler.feature_external_ges, True)."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "not evaluated because Q1 was true"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "not evaluated"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "xml.dom.minidom.parseString call",
+    "capture": "the bar argument (user-controlled XML string) and parser configuration",
+    "fake_behavior": "return a mock DOM document without actually parsing the XML to prevent entity expansion attacks during testing",
+    "notes": [
+      "The parser is configured to allow external entities which increases risk",
+      "Should mock the parseString call to avoid actual XML parsing during tests",
+      "Need to capture the input XML string to verify it was passed correctly"
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

@@ -1,0 +1,149 @@
+{
+  "stage": "oracle",
+  "repo": "realvuln-dsvw",
+  "lang": "python",
+  "model": "ollama/qwen3-coder:480b-cloud",
+  "config": "config/oracle.yaml",
+  "source": {
+    "ingest_summary_path": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 10,
+    "generated": 7,
+    "skipped": 0,
+    "failed": 3
+  },
+  "oracles": [
+    {
+      "id": "0",
+      "target_id": "py_http_response_splitting_dsvw_py_78",
+      "rule_id": "py/http-response-splitting",
+      "file": "dsvw.py",
+      "start_line": "78",
+      "function_name": "do_GET",
+      "finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_0_py_http-response-splitting.json",
+      "oracle": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/fuzz_oracles/py_http_response_splitting_dsvw_py_78.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "1",
+      "target_id": "py_full_ssrf_dsvw_py_37",
+      "rule_id": "py/full-ssrf",
+      "file": "dsvw.py",
+      "start_line": "37",
+      "function_name": "do_GET",
+      "finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_1_py_full-ssrf.json",
+      "oracle": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/fuzz_oracles/py_full_ssrf_dsvw_py_37.json",
+      "status": "failed"
+    },
+    {
+      "id": "2",
+      "target_id": "py_full_ssrf_dsvw_py_56",
+      "rule_id": "py/full-ssrf",
+      "file": "dsvw.py",
+      "start_line": "56",
+      "function_name": "do_GET",
+      "finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_2_py_full-ssrf.json",
+      "oracle": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/fuzz_oracles/py_full_ssrf_dsvw_py_56.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "3",
+      "target_id": "py_path_injection_dsvw_py_37",
+      "rule_id": "py/path-injection",
+      "file": "dsvw.py",
+      "start_line": "37",
+      "function_name": "do_GET",
+      "finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_3_py_path-injection.json",
+      "oracle": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/fuzz_oracles/py_path_injection_dsvw_py_37.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "4",
+      "target_id": "py_path_injection_dsvw_py_41",
+      "rule_id": "py/path-injection",
+      "file": "dsvw.py",
+      "start_line": "41",
+      "function_name": "do_GET",
+      "finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_4_py_path-injection.json",
+      "oracle": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/fuzz_oracles/py_path_injection_dsvw_py_41.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "5",
+      "target_id": "py_path_injection_dsvw_py_56",
+      "rule_id": "py/path-injection",
+      "file": "dsvw.py",
+      "start_line": "56",
+      "function_name": "do_GET",
+      "finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_5_py_path-injection.json",
+      "oracle": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/fuzz_oracles/py_path_injection_dsvw_py_56.json",
+      "status": "failed"
+    },
+    {
+      "id": "6",
+      "target_id": "py_regex_injection_dsvw_py_26",
+      "rule_id": "py/regex-injection",
+      "file": "dsvw.py",
+      "start_line": "26",
+      "function_name": "do_GET",
+      "finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_6_py_regex-injection.json",
+      "oracle": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/fuzz_oracles/py_regex_injection_dsvw_py_26.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "7",
+      "target_id": "py_sql_injection_dsvw_py_30",
+      "rule_id": "py/sql-injection",
+      "file": "dsvw.py",
+      "start_line": "30",
+      "function_name": "do_GET",
+      "finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_7_py_sql-injection.json",
+      "oracle": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/fuzz_oracles/py_sql_injection_dsvw_py_30.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "8",
+      "target_id": "py_sql_injection_dsvw_py_50",
+      "rule_id": "py/sql-injection",
+      "file": "dsvw.py",
+      "start_line": "50",
+      "function_name": "do_GET",
+      "finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_8_py_sql-injection.json",
+      "oracle": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/fuzz_oracles/py_sql_injection_dsvw_py_50.json",
+      "status": "failed"
+    },
+    {
+      "id": "9",
+      "target_id": "py_sql_injection_dsvw_py_67",
+      "rule_id": "py/sql-injection",
+      "file": "dsvw.py",
+      "start_line": "67",
+      "function_name": "do_GET",
+      "finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_9_py_sql-injection.json",
+      "oracle": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/fuzz_oracles/py_sql_injection_dsvw_py_67.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    }
+  ],
+  "errors": [
+    {
+      "finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_1_py_full-ssrf.json",
+      "error": "litellm.APIConnectionError: Ollama_chatException - litellm.Timeout: Connection timed out after 180.0 seconds."
+    },
+    {
+      "finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_5_py_path-injection.json",
+      "error": "monitor.strategy invalid: 'patch_call'. Must be one of {'return_value', 'filesystem_state', 'recorded_call'}"
+    },
+    {
+      "finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_8_py_sql-injection.json",
+      "error": "monitor.strategy invalid: 'patch_call'. Must be one of {'return_value', 'filesystem_state', 'recorded_call'}"
+    }
+  ]
+}

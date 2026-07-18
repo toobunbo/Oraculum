@@ -1,0 +1,51 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "backend.app.loan_operations.pickle.loads",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "raw bytes argument passed to pickle.loads",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured bytes argument to pickle.loads contains pickle protocol header followed by a GLOBAL (c) or REDUCE (R) opcode, indicating a crafted deserialization payload capable of arbitrary code execution.",
+    "trigger_patterns": [
+      "\\x80\\x04c",
+      "\\x80\\x05c",
+      "\\x80\\x03c",
+      "\\x80\\x04R",
+      "\\x80\\x05R",
+      "\\x80\\x03R"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_UNSAFE_DESERIALIZATION: malicious pickle payload passed to pickle.loads — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "\u0004cos\nsystem\n(S'id'\ntR.",
+      "\u0005\u000b\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0002os\u0006system\u0002idR.",
+      "\u0003cos\nsystem\n(S'cat /etc/passwd'\ntR.",
+      "\u0004c__builtin__\neval\n(S'__import__(\"os\").system(\"id\")'\ntR."
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "loan_bundle_thaw_168",
+    "file": "backend/app/loan_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def loan_bundle_thaw_168(request: Request, gate_ref: None)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "Request"
+      }
+    ],
+    "target_id": "py_unsafe_deserialization_backend_app_loan_operations_py_61",
+    "finding_id": "14",
+    "rule_id": "py/unsafe-deserialization",
+    "rule_slug": "py_unsafe-deserialization",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_14_py_unsafe-deserialization.json"
+  }
+}

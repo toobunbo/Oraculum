@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is eval(expression) on line 120, which executes arbitrary Python code (RCE)."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Short-circuited by Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Short-circuited by Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the built-in eval() function or intercept the call on line 120.",
+    "capture": "Capture the exact string value of the 'expression' argument passed to eval() to verify taint reaches the sink.",
+    "fake_behavior": "Return a benign placeholder value (e.g., '0' or 'mocked_result') to allow the surrounding string formatting to complete without executing the payload.",
+    "notes": [
+      "Mocking eval is critical here because the tainted input allows arbitrary code execution, which would compromise the test environment.",
+      "Ensure the mock captures the input so the oracle can assert that the untrusted string from request.form['expression'] reaches the dangerous sink."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

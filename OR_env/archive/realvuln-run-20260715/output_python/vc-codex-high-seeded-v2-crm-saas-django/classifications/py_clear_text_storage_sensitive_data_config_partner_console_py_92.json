@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is target.write_text(...), a filesystem write that is an irreversible side effect"
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; decision stopped at Q1"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; decision stopped at Q1"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the write_text method on the Path object (target) to prevent actual filesystem writes",
+    "capture": "Capture the first argument passed to write_text, which is the JSON string containing SSN and credit card number in cleartext",
+    "fake_behavior": "No-op or return None to let execution continue without writing to disk",
+    "notes": [
+      "The violation is that the JSON payload passed to write_text contains SSN and card number without encryption",
+      "Verify the captured string contains the raw sensitive values from request.GET",
+      "The function also returns JsonResponse with the file path, but the core violation is in the write_text argument"
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

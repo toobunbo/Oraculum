@@ -1,0 +1,51 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "server.routes.file.save",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "filepath argument passed to file.save() containing path traversal sequences derived from unsanitized filename",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured filepath contains directory traversal sequences (../) that would escape the intended upload directory",
+    "trigger_patterns": [
+      "\\.\\./",
+      "\\.\\.\\\\",
+      "/etc/",
+      "\\\\etc\\\\"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_PATH_INJECTION: path traversal detected in file.save argument — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "../../../etc/passwd",
+      "..\\..\\..\\windows\\system32\\config\\sam",
+      "foo/../../etc/shadow",
+      "normal.txt",
+      "img/../../../var/log/auth.log",
+      "..%2F..%2Fetc%2Fpasswd"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "upload_file",
+    "file": "server/routes.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def upload_file()",
+    "tainted_params": [
+      {
+        "name": "file",
+        "index": 0,
+        "type": "FileStorage"
+      }
+    ],
+    "target_id": "py_path_injection_server_routes_py_264",
+    "finding_id": "0",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-threatbyte/verification_results/findings/finding_0_py_path-injection.json"
+  }
+}

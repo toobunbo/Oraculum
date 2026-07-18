@@ -1,0 +1,87 @@
+{
+  "id": "1",
+  "rule_slug": "py_reflective-xss",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulnpy",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnpy",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnpy/verification_results/summary_realvuln-vulnpy_20260714_151715.json"
+  },
+  "finding": {
+    "rule_id": "py/reflective-xss",
+    "message": "Cross-site scripting vulnerability due to a [user-provided value](1).",
+    "file": "src/vulnpy/django/vulnerable.py",
+    "start_line": 38,
+    "end_line": 38,
+    "repo_name": "realvuln-vulnpy",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnpy/realvuln-vulnpy.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 26: ControlFlowNode for request",
+      "line 27: ControlFlowNode for request",
+      "line 12: ControlFlowNode for request",
+      "line 14: ControlFlowNode for Attribute",
+      "line 14: ControlFlowNode for Attribute()",
+      "line 27: ControlFlowNode for _get_user_input()",
+      "line 27: ControlFlowNode for user_input",
+      "line 36: ControlFlowNode for template",
+      "line 38: ControlFlowNode for template",
+      "--- Flow 2 ---",
+      "line 26: ControlFlowNode for request",
+      "line 27: ControlFlowNode for request",
+      "line 12: ControlFlowNode for request",
+      "line 15: ControlFlowNode for Attribute",
+      "line 15: ControlFlowNode for Attribute()",
+      "line 27: ControlFlowNode for _get_user_input()",
+      "line 27: ControlFlowNode for user_input",
+      "line 36: ControlFlowNode for template",
+      "line 38: ControlFlowNode for template"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "elapsed_seconds": 12.508155345916748,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "timestamp": "2026-07-14T15:17:01.961157",
+    "output_tokens": 1355,
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "iterations": 3,
+    "tokens_used": 16290,
+    "cost_usd": 0.0,
+    "data_flow": "request (line 26) → _get_user_input (line 27) → user_input (line 27) → template concatenation (line 36) → HttpResponse(template) (line 38)",
+    "answers": [
+      "The EXACT sink is `return HttpResponse(template)` on line 38. The value being rendered is `template`.",
+      "Assignments to `template` reaching the sink:\n  - Line 33: `template = get_template(\"{}.html\".format(name))`\n  - Line 36: `template += \"<p>XSS: \" + user_input + \"</p>\"` (LAST assignment on the vulnerable path)",
+      "The LAST assignment on the vulnerable path (line 36) derives from user input. Data flow: `request` (line 26) → `_get_user_input(request)` (line 27) → `user_input` (line 27) → `template += \"<p>XSS: \" + user_input + \"</p>\"` (line 36).",
+      "No constant-time conditions or reassignments override the user-tainted value on the reaching path. The condition on line 35 (`if name == \"xss\" and trigger == \"raw\":`) determines whether the user input is appended, but if true, the tainted value reaches the sink.",
+      "No specific defense escapes the value at the sink. There is no call to `html.escape()`, `markupsafe.escape()`, `bleach.clean()`, or any framework auto-escape mechanism applied to `user_input` before it is concatenated into `template`.",
+      "No, `|safe` / `{% autoescape false %}` / `Markup(...)` / `mark_safe(...)` is NOT used to disable escaping on the user-tainted path.",
+      "The user-tainted value (`user_input`) reaches the sink (`template` on line 38) via line 36, and there is no escaping or sanitization applied. Django's `HttpResponse` does not perform auto-escaping."
+    ],
+    "context_needed": [],
+    "input_tokens": 14935,
+    "verdict": "True Positive",
+    "reasoning": "User-controlled input (`user_input`) flows directly into an HTML response via string concatenation without escaping (line 36), reaching the `HttpResponse` sink (line 38). No sanitization or escaping is applied, making this a clear reflective XSS vulnerability. The missing caller context does not change the fact that the data flow within the provided code is clearly exploitable.",
+    "cached_input_tokens": 0
+  },
+  "function": {
+    "name": "get_trigger_view",
+    "file": "src/vulnpy/django/vulnerable.py",
+    "start_line": 25,
+    "end_line": 40,
+    "scope": ""
+  },
+  "web_params": []
+}

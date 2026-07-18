@@ -1,0 +1,54 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of get_trigger_view, specifically the .content attribute of the HttpResponse object decoded to string",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The returned HttpResponse content contains raw HTML/JavaScript injection fragments (e.g., <script tags, event handlers like onerror=) that were passed as the trigger parameter, confirming no escaping was applied before rendering.",
+    "trigger_patterns": [
+      "<script[\\s>]",
+      "javascript\\s*:",
+      "onerror\\s*=",
+      "onload\\s*=",
+      "<img[^>]+onerror",
+      "<svg[^>]+onload",
+      "onmouse\\w+\\s*="
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_REFLECTIVE_XSS: unescaped XSS payload in HttpResponse content — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "<script>alert(1)</script>",
+      "<img src=x onerror=alert(1)>",
+      "<svg onload=alert(1)>",
+      "javascript:alert(1)",
+      "<body onload=alert(1)>",
+      "' onfocus=alert(1) autofocus '"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "get_trigger_view",
+    "file": "src/vulnpy/django/vulnerable_asgi.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def get_trigger_view(name, trigger)",
+    "tainted_params": [
+      {
+        "name": "trigger",
+        "index": 1,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_reflective_xss_src_vulnpy_django_vulnerable_asgi_py_57",
+    "finding_id": "3",
+    "rule_id": "py/reflective-xss",
+    "rule_slug": "py_reflective-xss",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-vulnpy/verification_results/findings/finding_3_py_reflective-xss.json"
+  }
+}

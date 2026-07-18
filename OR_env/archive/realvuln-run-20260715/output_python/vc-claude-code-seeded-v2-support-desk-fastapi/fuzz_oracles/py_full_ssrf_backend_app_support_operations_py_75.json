@@ -1,0 +1,56 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "urllib.request.urlopen",
+    "target_arg_index": 0,
+    "target_arg_name": "url",
+    "capture_what": "Full URL string passed to urlopen as the first positional argument",
+    "additional_imports": [
+      "urllib.request"
+    ]
+  },
+  "oracle_check": {
+    "condition_description": "The captured URL argument to urlopen matches a pattern indicating a request to an internal IP, localhost, cloud metadata endpoint, or file:// scheme — confirming SSRF exploitation.",
+    "trigger_patterns": [
+      "file://",
+      "https?://localhost[:/]",
+      "https?://127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}[:/]",
+      "https?://10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}[:/]",
+      "https?://172\\.(?:1[6-9]|2\\d|3[01])\\.\\d{1,3}\\.\\d{1,3}[:/]",
+      "https?://192\\.168\\.\\d{1,3}\\.\\d{1,3}[:/]",
+      "https?://169\\.254\\.169\\.254[:/]"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_FULL-SSRF: SSRF via urlopen — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "http://169.254.169.254/latest/meta-data/",
+      "http://10.0.0.1/admin",
+      "file:///etc/passwd",
+      "http://localhost:8080/internal",
+      "http://192.168.1.1/secret",
+      "http://127.0.0.1:6379/"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "ticket_relay_probe_354",
+    "file": "backend/app/support_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def ticket_relay_probe_354(endpoint: str, gate_ref: None)",
+    "tainted_params": [
+      {
+        "name": "endpoint",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_full_ssrf_backend_app_support_operations_py_75",
+    "finding_id": "0",
+    "rule_id": "py/full-ssrf",
+    "rule_slug": "py_full-ssrf",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_0_py_full-ssrf.json"
+  }
+}

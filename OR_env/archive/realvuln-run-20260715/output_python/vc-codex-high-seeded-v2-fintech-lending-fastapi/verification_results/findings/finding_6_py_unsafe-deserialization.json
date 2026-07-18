@@ -1,0 +1,75 @@
+{
+  "id": "6",
+  "rule_slug": "py_unsafe-deserialization",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-codex-high-seeded-v2-fintech-lending-fastapi_20260714_154154.json"
+  },
+  "finding": {
+    "rule_id": "py/unsafe-deserialization",
+    "message": "Unsafe deserialization depends on a [user-provided value](1).",
+    "file": "app/loan_operations.py",
+    "start_line": 61,
+    "end_line": 61,
+    "repo_name": "vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/vc-codex-high-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 51: ControlFlowNode for request",
+      "line 54: ControlFlowNode for raw",
+      "line 61: ControlFlowNode for raw",
+      "--- Flow 2 ---",
+      "line 51: ControlFlowNode for request",
+      "line 54: ControlFlowNode for raw",
+      "line 58: ControlFlowNode for raw",
+      "line 61: ControlFlowNode for raw"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-502"
+    ],
+    "tags": [
+      "security",
+      "serialization"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "elapsed_seconds": 10.666995763778687,
+    "answers": [
+      "The EXACT deserialization sink is `pickle.loads(raw)` on line 61. The bytes/text value passed to it is `raw`.",
+      "The assignments to `raw` on the path to the sink are: line 54: `raw = await request.body()`, line 56: `raw = request.query_params.get(\"blob\", \"\").encode(\"utf-8\")` (if body is empty), line 58: `raw = base64.b64decode(raw)` (if `wrap` param is `b64`). The LAST assignment on the primary flow is line 58 or 56 (if 58 is skipped).",
+      "For the LAST assignment on the primary flow (line 58 or 56): `raw` derives from `request.body()` (line 54) or `request.query_params.get(\"blob\")` (line 56), both of which are user-controlled input from the HTTP request.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path. The hardcoded fallback on line 60 only applies if `raw` is empty, but the dataflow analysis shows `raw` reaching the sink originates from the request.",
+      "There is NO specific defense preventing code execution. The code uses `pickle.loads()` directly on user-controlled input without any validation, HMAC, or safe deserialization method.",
+      "The user-controlled data from `request.body()` or `request.query_params` reaches the unsafe `pickle.loads()` sink on line 61 without any sanitization or defense."
+    ],
+    "tokens_used": 18683,
+    "data_flow": "request (line 51) → raw = await request.body() (line 54) → raw = base64.b64decode(raw) (line 58) → pickle.loads(raw) (line 61)",
+    "output_tokens": 1436,
+    "iterations": 3,
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "input_tokens": 17247,
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "timestamp": "2026-07-14T15:41:36.660251",
+    "reasoning": "User-controlled input from the request body or query parameters flows directly into `pickle.loads()` without any sanitization or validation, constituting a clear deserialization vulnerability. The additional context did not reveal any protective mechanisms.",
+    "cached_input_tokens": 0,
+    "confidence": "High"
+  },
+  "function": {
+    "name": "loan_bundle_thaw_178",
+    "file": "app/loan_operations.py",
+    "start_line": 51,
+    "end_line": 62,
+    "scope": ""
+  },
+  "web_params": []
+}

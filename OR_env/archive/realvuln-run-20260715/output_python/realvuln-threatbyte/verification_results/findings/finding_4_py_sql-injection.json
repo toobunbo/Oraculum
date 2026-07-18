@@ -1,0 +1,78 @@
+{
+  "id": "4",
+  "rule_slug": "py_sql-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-threatbyte",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte/verification_results/summary_realvuln-threatbyte_20260714_150915.json"
+  },
+  "finding": {
+    "rule_id": "py/sql-injection",
+    "message": "This SQL query depends on a [user-provided value](1).",
+    "file": "server/routes.py",
+    "start_line": 138,
+    "end_line": 138,
+    "repo_name": "realvuln-threatbyte",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte/realvuln-threatbyte.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 126: ControlFlowNode for request",
+      "line 126: ControlFlowNode for Attribute",
+      "line 126: ControlFlowNode for Attribute()",
+      "line 126: ControlFlowNode for search_query",
+      "line 137: ControlFlowNode for s_query",
+      "line 138: ControlFlowNode for s_query"
+    ],
+    "severity": "8.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-89"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "The user-controlled input `search_query` is directly interpolated into the SQL query string `s_query` using an f-string on line 137, which is then executed on line 138 without any parameterization or sanitization. The absence of protection in the `cursor.execute` method confirms this is a SQL injection vulnerability.",
+    "input_tokens": 16063,
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:08:46.860267",
+    "data_flow": "request.args (line 126) → search_query (line 126) → s_query (line 137) → cursor.execute(s_query) (line 138)",
+    "confidence_score": 0.95,
+    "answers": [
+      "The EXACT sink statement is: `cursor.execute(s_query)` on line 138. The variable passed to it is `s_query`.",
+      "The assignment to `s_query` is on line 137: `s_query = f\"SELECT filename FROM files WHERE user_id = {user_id} AND filename LIKE '%{search_query}%'\"`.",
+      "The value of `s_query` is derived from `search_query` which comes from user input via `request.args.get('search', '')` on line 126. The data flow is: `request.args` (line 126) → `search_query` (line 126) → `s_query` (line 137).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense sanitizing the value before the sink. The query is constructed using string formatting with f-strings, which is vulnerable to SQL injection. The `cursor.execute` method is not shown to provide any protection against SQL injection.",
+      "The user-tainted value `search_query` reaches the sink `cursor.execute(s_query)` on line 138 without any sanitization or parameterization, making it a clear SQL injection vulnerability. The additional context confirms that `cursor.execute` is not found in the analysis scope, suggesting it's a standard database cursor method that does not provide automatic SQL injection protection."
+    ],
+    "cost_usd": 0.0,
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "confidence": "High",
+    "output_tokens": 1300,
+    "elapsed_seconds": 10.038834810256958,
+    "tokens_used": 17363
+  },
+  "function": {
+    "name": "dashboard",
+    "file": "server/routes.py",
+    "start_line": 122,
+    "end_line": 145,
+    "scope": ""
+  },
+  "web_params": [
+    {
+      "name": "search",
+      "source": "args"
+    }
+  ]
+}

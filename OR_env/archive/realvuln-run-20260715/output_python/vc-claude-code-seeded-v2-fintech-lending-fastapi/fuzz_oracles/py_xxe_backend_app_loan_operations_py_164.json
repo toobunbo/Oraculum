@@ -1,0 +1,51 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "backend.app.loan_operations.etree.fromstring",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "Raw bytes passed as the first argument to etree.fromstring, originating from await request.body()",
+    "additional_imports": [
+      "lxml.etree"
+    ]
+  },
+  "oracle_check": {
+    "condition_description": "The captured XML bytes contain a DOCTYPE declaration with an ENTITY definition that references an external resource via SYSTEM or PUBLIC identifier, confirming an XXE payload reached the unsafe parser.",
+    "trigger_patterns": [
+      "<!DOCTYPE[\\s\\S]+<!ENTITY[\\s\\S]+SYSTEM\\s+[\"'](?:file|http|https|ftp)://",
+      "<!DOCTYPE[\\s\\S]+<!ENTITY[\\s\\S]+PUBLIC\\s+[\"']",
+      "<!ENTITY[\\s\\S]+SYSTEM\\s+[\"'](?:file|http|https|ftp)://"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_XXE: XXE payload reached etree.fromstring with unsafe parser — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><foo>&xxe;</foo>",
+      "<?xml version=\"1.0\"?><!DOCTYPE root [<!ENTITY % dtd SYSTEM \"http://169.254.169.254/latest/meta-data/\">%dtd;]><root/>",
+      "<?xml version=\"1.0\"?><!DOCTYPE data [<!ENTITY ext PUBLIC \"-//Example//DTD//EN\" \"http://internal-app:8080/secret\">]><data>&ext;</data>",
+      "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM \"file:///etc/hostname\">]><loan><id>&xxe;</id></loan>",
+      "<?xml version=\"1.0\"?><!DOCTYPE test [<!ENTITY % file SYSTEM \"file:///proc/self/environ\"><!ENTITY % eval \"<!ENTITY &#x25; error SYSTEM &#x27;file:///nonexistent/%file;&#x27;>\">%eval;%error;]><test/>"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "loan_xml_fold_449",
+    "file": "backend/app/loan_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def loan_xml_fold_449(request: Request, gate_ref: None)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "Request"
+      }
+    ],
+    "target_id": "py_xxe_backend_app_loan_operations_py_164",
+    "finding_id": "13",
+    "rule_id": "py/xxe",
+    "rule_slug": "py_xxe",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_13_py_xxe.json"
+  }
+}

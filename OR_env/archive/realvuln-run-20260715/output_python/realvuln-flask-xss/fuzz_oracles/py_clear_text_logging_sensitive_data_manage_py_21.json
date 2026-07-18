@@ -1,0 +1,48 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "manage.app.logger.info",
+    "target_arg_index": 0,
+    "target_arg_name": "msg",
+    "capture_what": "log message string containing the cleartext password passed to app.logger.info on line 21",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured log message argument contains the keyword 'password' (case-insensitive) followed by non-whitespace characters, indicating the actual password value is being logged in cleartext rather than masked or hashed",
+    "trigger_patterns": [
+      "(?i)password[^a-zA-Z]*\\S{4,}",
+      "(?i)pass\\s*[:=]\\s*\\S{4,}"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_CLEAR_TEXT_LOGGING_SENSITIVE_DATA: cleartext password logged — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "Admin@123",
+      "s3cretP@ssw0rd!",
+      "super_secret_pass",
+      "myInsecurePassword99",
+      "Ch@ng3M3_N0w"
+    ],
+    "skip_condition": "not password"
+  },
+  "_meta": {
+    "function": "add_admin",
+    "file": "manage.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def add_admin(password)",
+    "tainted_params": [
+      {
+        "name": "password",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_clear_text_logging_sensitive_data_manage_py_21",
+    "finding_id": "0",
+    "rule_id": "py/clear-text-logging-sensitive-data",
+    "rule_slug": "py_clear-text-logging-sensitive-data",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-flask-xss/verification_results/findings/finding_0_py_clear-text-logging-sensitive-data.json"
+  }
+}

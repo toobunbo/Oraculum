@@ -1,0 +1,76 @@
+{
+  "id": "3",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/summary_vc-codex-high-seeded-v2-crm-saas-django_20260714_153817.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "config/partner_console.py",
+    "start_line": 92,
+    "end_line": 92,
+    "repo_name": "vc-codex-high-seeded-v2-crm-saas-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django/vc-codex-high-seeded-v2-crm-saas-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 86: ControlFlowNode for request",
+      "line 89: ControlFlowNode for Attribute",
+      "line 89: ControlFlowNode for Attribute()",
+      "line 89: ControlFlowNode for ref",
+      "line 90: ControlFlowNode for target",
+      "line 92: ControlFlowNode for target"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "cost_usd": 0.0,
+    "confidence": "Medium",
+    "verdict": "True Positive",
+    "answers": [
+      "The exact flagged line is line 92: `target.write_text(json.dumps({\"ref\": ref, \"ssn\": request.GET.get(\"ssn\", \"111-22-3333\"), \"card\": request.GET.get(\"card\", \"4111111111111111\")}))`. This line is in the function `acct_vault_stash_244`.",
+      "The path value `target` is assigned on line 90: `target = BASE_EXPORT_DIR / f\"{ref}.json\"`. The variable `ref` used in the path is assigned on line 89: `ref = request.GET.get(\"ref\", \"daily\")`.",
+      "The value of `ref` on line 89 derives from user input via `request.GET.get(\"ref\", \"daily\")`. The data flow is: `request` (line 86) → `request.GET.get` (line 89) → `ref` (line 89) → `target` (line 90) → `target.write_text` (line 92).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value of `ref` on the reaching path. The value flows directly from user input to the path construction.",
+      "There is no specific defense visible in the code that contains the path. The definition of BASE_EXPORT_DIR is not available, so we cannot determine if it provides any path isolation or security guarantees.",
+      "Without knowing the definition and security properties of BASE_EXPORT_DIR, we cannot confirm that adequate defenses exist to prevent path traversal attacks."
+    ],
+    "reasoning": "The user-controlled `ref` parameter is directly used to construct a file path without sanitization or validation. Since BASE_EXPORT_DIR's definition is not available, we cannot determine if it provides adequate path isolation. The path flows from the HTTP request (line 86) to the file write operation (line 92) with no visible intervening defenses, making it vulnerable to directory traversal.",
+    "elapsed_seconds": 22.2383131980896,
+    "context_needed": [],
+    "tokens_used": 18691,
+    "output_tokens": 1494,
+    "cached_input_tokens": 0,
+    "input_tokens": 17197,
+    "timestamp": "2026-07-14T15:37:53.712971",
+    "data_flow": "request (line 86) → request.GET.get(\"ref\", \"daily\") (line 89) → ref (line 89) → target (line 90) → target.write_text (line 92)",
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence_score": 0.8
+  },
+  "function": {
+    "name": "acct_vault_stash_244",
+    "file": "config/partner_console.py",
+    "start_line": 86,
+    "end_line": 93,
+    "scope": ""
+  },
+  "web_params": []
+}

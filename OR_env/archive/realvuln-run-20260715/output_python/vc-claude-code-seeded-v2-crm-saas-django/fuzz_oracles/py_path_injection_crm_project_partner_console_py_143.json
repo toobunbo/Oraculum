@@ -1,0 +1,49 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "pathlib.Path.write_bytes",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "the Path object (self) representing the resolved file path that may contain directory traversal sequences",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured Path object's string representation contains directory traversal sequences (../ or ..\\), confirming that user-controlled 'name' was used to escape BASE_EXPORT_DIR",
+    "trigger_patterns": [
+      "\\.{2}[/\\\\]",
+      "\\.{2}[/\\\\]\\.{2}[/\\\\]"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_PATH_INJECTION: directory traversal detected in write_bytes path — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "../../etc/passwd",
+      "..\\..\\windows\\system32\\config",
+      "../../../tmp/evil",
+      "foo/../../../etc/hosts",
+      "normal.txt",
+      "..\\..\\..\\var\\log\\inject"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "acct_dock_shelf_388",
+    "file": "crm_project/partner_console.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def acct_dock_shelf_388(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "HttpRequest"
+      }
+    ],
+    "target_id": "py_path_injection_crm_project_partner_console_py_143",
+    "finding_id": "5",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/findings/finding_5_py_path-injection.json"
+  }
+}

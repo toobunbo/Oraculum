@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Template('Result: ' + fragment).render() on line 132 is an unsandboxed Jinja2 template instantiation with user-controlled source, which can achieve RCE via SSTI."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Decision halted at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Decision halted at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock jinja2.Template (constructor or the instance's render method) to intercept the template source string passed to Template().",
+    "capture": "Capture the full template-source argument ('Result: ' + fragment) passed to the Template constructor. Assert that it does not contain Jinja2 syntax delimiters ({{, }}, {%, %}) that originate from user input (the fragment portion).",
+    "fake_behavior": "Return a mock Template instance whose render() method returns a safe placeholder string (e.g., 'MOCKED_TEMPLATE_OUTPUT') so the subsequent HttpResponse construction on the return line succeeds without executing the real template engine.",
+    "notes": [
+      "Because default jinja2.Template is not sandboxed, calling render() with attacker-controlled source can execute arbitrary Python. Mocking is mandatory.",
+      "The check should verify that the fragment portion of the source string contains no template expressions."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

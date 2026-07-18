@@ -1,0 +1,73 @@
+{
+  "id": "5",
+  "rule_slug": "py_reflective-xss",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-legal-case-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/verification_results/summary_vc-claude-code-seeded-v2-legal-case-django_20260714_152949.json"
+  },
+  "finding": {
+    "rule_id": "py/reflective-xss",
+    "message": "Cross-site scripting vulnerability due to a [user-provided value](1).",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 33,
+    "end_line": 33,
+    "repo_name": "vc-claude-code-seeded-v2-legal-case-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/vc-claude-code-seeded-v2-legal-case-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 28: ControlFlowNode for request",
+      "line 31: ControlFlowNode for Attribute",
+      "line 31: ControlFlowNode for Attribute()",
+      "line 31: ControlFlowNode for copyline",
+      "line 32: ControlFlowNode for body",
+      "line 33: ControlFlowNode for body"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "answers": [
+      "The EXACT sink is `return HttpResponse(body, content_type=\"text/html\")` on line 33 in function `case_banner_fold_016`. The value being rendered is `body`.",
+      "The value `body` is assigned on line 32: `body = \"<section><h2>\" + copyline + \"</h2><p>Preview generated for operations.</p></section>\"`.",
+      "The value of `copyline` on line 31 (`copyline = request.GET.get(\"copyline\", \"matter file update\")`) derives from user input via `request.GET`. Data flow: `request` (line 28) → `request.GET.get(...)` (line 31) → `copyline` (line 31) → `body` (line 32).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the path from `copyline` to `body`.",
+      "No specific defense is present. There is no call to `html.escape()`, `markupsafe.escape()`, `bleach.clean()`, or any framework-specific escaping mechanism visible in the code.",
+      "There is no use of `|safe`, `{% autoescape false %}`, `Markup(...)`, or `mark_safe(...)` in the provided code.",
+      "The user-tainted value (`copyline`) reaches the sink (`body`) without any escaping or sanitization. The HttpResponse is rendered with `content_type=\"text/html\"`, making this a reflective XSS vulnerability."
+    ],
+    "reasoning": "User-controlled input (`copyline` from `request.GET`) is embedded directly into an HTML string (`body`) and returned via `HttpResponse` with content type `text/html`, without any escaping or sanitization. This constitutes a reflective XSS vulnerability.",
+    "cost_usd": 0.0,
+    "iterations": 3,
+    "input_tokens": 12520,
+    "cached_input_tokens": 0,
+    "output_tokens": 1485,
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request (line 28) → request.GET.get(\"copyline\", ...) (line 31) → copyline (line 31) → body (line 32) → HttpResponse(body, ...) (line 33)",
+    "elapsed_seconds": 11.360753536224365,
+    "tokens_used": 14005,
+    "verdict": "True Positive",
+    "confidence": "High",
+    "timestamp": "2026-07-14T15:29:27.731746"
+  },
+  "function": {
+    "name": "case_banner_fold_016",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 28,
+    "end_line": 33,
+    "scope": ""
+  },
+  "web_params": []
+}

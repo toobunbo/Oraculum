@@ -1,0 +1,59 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "sqlite3.Cursor.execute",
+    "target_arg_index": 0,
+    "target_arg_name": "sql",
+    "capture_what": "The full SQL query string passed to cursor.execute, containing f-string interpolated username and password",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured SQL query string contains evidence of SQL injection: a single-quote breakout followed by SQL keywords or operators that could not originate from the application's static query template",
+    "trigger_patterns": [
+      "'\\s+OR\\s+",
+      "'\\s+AND\\s+",
+      "';\\s*\\w",
+      "'\\s*;\\s*--",
+      "UNION\\s+SELECT",
+      "--\\s*$",
+      "'\\s*OR\\s+'\\d*'='\\d*"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_SQL_INJECTION: unparameterized SQL injection detected — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "' OR '1'='1",
+      "' OR 1=1--",
+      "admin'--",
+      "' UNION SELECT * FROM users--",
+      "'; DROP TABLE users--",
+      "' AND '1'='2' UNION SELECT * FROM users--"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "login",
+    "file": "app/app.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def login()",
+    "tainted_params": [
+      {
+        "name": "username",
+        "index": -1,
+        "type": "str"
+      },
+      {
+        "name": "password",
+        "index": -1,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_sql_injection_app_app_py_34",
+    "finding_id": "3",
+    "rule_id": "py/sql-injection",
+    "rule_slug": "py_sql-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-insecure-web/verification_results/findings/finding_3_py_sql-injection.json"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "strategy": "return_value",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "redirect() in Python web frameworks typically constructs a response object with a Location header; it does not perform network I/O, shell execution, or external resolution."
+    },
+    "q2_observable_after_return": {
+      "answer": true,
+      "evidence": "The redirect response object containing the tainted URL is returned by the function, making the unvalidated URL observable in the response headers."
+    },
+    "q3_result_in_memory": {
+      "answer": true,
+      "evidence": "returns.kind is 'value' and returns.exprs includes 'redirect(request.url)', indicating the result is a response object accessible in memory."
+    }
+  },
+  "mock_guidance": null,
+  "confidence": "high",
+  "warnings": []
+}

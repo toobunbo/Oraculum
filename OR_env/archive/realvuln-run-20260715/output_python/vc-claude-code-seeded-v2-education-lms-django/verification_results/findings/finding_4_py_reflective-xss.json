@@ -1,0 +1,73 @@
+{
+  "id": "4",
+  "rule_slug": "py_reflective-xss",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-education-lms-django/verification_results/summary_vc-claude-code-seeded-v2-education-lms-django_20260714_152145.json"
+  },
+  "finding": {
+    "rule_id": "py/reflective-xss",
+    "message": "Cross-site scripting vulnerability due to a [user-provided value](1).",
+    "file": "lms/course_operations.py",
+    "start_line": 33,
+    "end_line": 33,
+    "repo_name": "vc-claude-code-seeded-v2-education-lms-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-education-lms-django/vc-claude-code-seeded-v2-education-lms-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 28: ControlFlowNode for request",
+      "line 31: ControlFlowNode for Attribute",
+      "line 31: ControlFlowNode for Attribute()",
+      "line 31: ControlFlowNode for copyline",
+      "line 32: ControlFlowNode for body",
+      "line 33: ControlFlowNode for body"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:21:24.467397",
+    "cost_usd": 0.0,
+    "verdict": "True Positive",
+    "context_needed": [],
+    "data_flow": "request (line 28) → request.GET.get(\"copyline\", ...) (line 31) → copyline (line 31) → body (line 32) → HttpResponse (line 33)",
+    "answers": [
+      "The EXACT flagged line is: `return HttpResponse(body, content_type=\"text/html\")` on line 33. This line lives in the function `course_blurb_card_004`.",
+      "The value `body` is assigned on line 32: `body = \"<section><h2>\" + copyline + \"</h2><p>Preview generated for operations.</p></section>\"`.",
+      "The value `copyline` on line 31 derives from user input via `request.GET.get(\"copyline\", \"gradebook update\")`. The data flow is: `request` (line 28) → `request.GET.get(...)` (line 31) → `copyline` (line 31) → `body` (line 32).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the path to the sink.",
+      "No specific defense is present. There is no call to `html.escape()`, `markupsafe.escape()`, `bleach.clean()`, or any framework-specific escaping mechanism visible in the code.",
+      "No, `|safe`, `{% autoescape false %}`, `Markup(...)`, or `mark_safe(...)` is not used to disable escaping.",
+      "The user-tainted value `copyline` reaches the sink via `body` on line 32, and there is no escaping or sanitization visible in the code. The caller context is not available, but the function appears to be a Django view based on the HttpResponse return type and request parameter, and there's no indication of framework-level escaping."
+    ],
+    "output_tokens": 1425,
+    "tokens_used": 13820,
+    "confidence": "High",
+    "iterations": 3,
+    "reasoning": "User-controlled input (`copyline`) is directly embedded into an HTML string (`body`) and returned as an `HttpResponse` with `content_type=\"text/html\"` without any escaping or sanitization. The function appears to be a Django view, and Django does not automatically escape content in HttpResponse objects. No caller context changes this analysis.",
+    "cached_input_tokens": 0,
+    "confidence_score": 0.95,
+    "input_tokens": 12395,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 11.604986190795898
+  },
+  "function": {
+    "name": "course_blurb_card_004",
+    "file": "lms/course_operations.py",
+    "start_line": 28,
+    "end_line": 33,
+    "scope": ""
+  },
+  "web_params": []
+}

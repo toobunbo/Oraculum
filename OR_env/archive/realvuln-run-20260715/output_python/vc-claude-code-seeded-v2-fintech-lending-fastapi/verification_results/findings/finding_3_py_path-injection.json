@@ -1,0 +1,78 @@
+{
+  "id": "3",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-claude-code-seeded-v2-fintech-lending-fastapi_20260714_152421.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 78,
+    "end_line": 78,
+    "repo_name": "vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/vc-claude-code-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 72: ControlFlowNode for request",
+      "line 74: ControlFlowNode for payload",
+      "line 75: ControlFlowNode for payload",
+      "line 75: ControlFlowNode for Attribute()",
+      "line 75: ControlFlowNode for Attribute()",
+      "line 75: ControlFlowNode for ref",
+      "line 76: ControlFlowNode for target",
+      "line 78: ControlFlowNode for target"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "confidence": "High",
+    "iterations": 3,
+    "answers": [
+      "The exact file-operation sink is `target.write_text(...)` on line 78. The path value passed to it is `target`, which is derived from `BASE_EXPORT_DIR / f\"{ref}.json\"`.",
+      "The assignments to `target` are: line 76: `target = BASE_EXPORT_DIR / f\"{ref}.json\"`. This is the only assignment to `target` before it reaches the sink on line 78.",
+      "The value of `target` derives from `ref`, which comes from user input. Specifically: line 75: `ref = request.query_params.get(\"ref\", payload.get(\"ref\", \"daily\"))`. The data flow is: `request` (line 72) → `payload` (line 74) → `ref` (line 75) → `target` (line 76) → sink (line 78).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value `ref` on the path to `target`. The value of `ref` is directly used to construct `target` without any sanitization or validation.",
+      "There is no specific defense applied to the path. The code does not use any path sanitization or validation functions like `secure_filename`, `Path.resolve()`, or `is_relative_to()` to prevent directory traversal. The `BASE_EXPORT_DIR` global variable is not visible in the context, so we cannot determine if it provides any protection.",
+      "The user-tainted value `ref` reaches the sink via `target`, and there is no visible defense mechanism to prevent path traversal. The use of `f\"{ref}.json\"` directly incorporates user input into the file path without sanitization."
+    ],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 11.916851997375488,
+    "output_tokens": 1451,
+    "context_needed": [],
+    "reasoning": "User-controlled input `ref` is used directly in a file path via an f-string, reaching a file write operation without sanitization or validation, allowing potential directory traversal. The absence of `BASE_EXPORT_DIR` definition prevents confirming any base directory protection.",
+    "data_flow": "request (line 72) → payload (line 74) → ref (line 75) → target (line 76) → target.write_text(...) (line 78)",
+    "confidence_score": 0.9,
+    "timestamp": "2026-07-14T15:23:34.296237",
+    "cost_usd": 0.0,
+    "input_tokens": 17902,
+    "cached_input_tokens": 0,
+    "tokens_used": 19353
+  },
+  "function": {
+    "name": "loan_vault_stash_235",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 72,
+    "end_line": 79,
+    "scope": ""
+  },
+  "web_params": []
+}

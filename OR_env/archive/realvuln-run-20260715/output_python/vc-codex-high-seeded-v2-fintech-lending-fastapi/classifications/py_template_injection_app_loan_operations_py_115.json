@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Unsandboxed Jinja2 Template().render() with user-controlled input enables Server-Side Template Injection (SSTI), which is a form of RCE."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the Jinja2 Template constructor or its render method on line 115 so that Template(...).render() does not actually interpret the template source string.",
+    "capture": "Capture the template source string argument passed to Template(), specifically the value of \"Result: \" + fragment, to verify that user input is embedded unsanitized.",
+    "fake_behavior": "Return a benign placeholder string (e.g., the literal 'Result: ' + fragment without Jinja2 processing) so that execution continues to the HTMLResponse return without triggering template evaluation.",
+    "notes": [
+      "The function uses plain Jinja2 Template, not SandboxedEnvironment, so actual rendering is unsafe even in tests.",
+      "Mocking at the jinja2.Template class level or patching the render method of the instance are both viable approaches.",
+      "Ensure the mock does not strip or escape the fragment value, as the oracle needs to observe the raw unsanitized concatenation."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

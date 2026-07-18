@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink is exec(base64.decodestring(bytes(first_name, 'ascii'))), which is arbitrary code execution (RCE)."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "N/A - decision stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "N/A - decision stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the built-in exec function to intercept the call on line 72.",
+    "capture": "Capture the exact string argument passed to exec after it is evaluated by base64.decodestring(bytes(first_name, 'ascii')).",
+    "fake_behavior": "Prevent actual execution of the decoded payload. Return None or safely pass to allow the function to continue to the render call.",
+    "notes": [
+      "The base64 decoding will still occur before exec is called; ensure the test input is valid base64 to avoid TypeError during argument evaluation.",
+      "Verify that the mock captures the decoded string to assert the code injection payload reached the sink."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

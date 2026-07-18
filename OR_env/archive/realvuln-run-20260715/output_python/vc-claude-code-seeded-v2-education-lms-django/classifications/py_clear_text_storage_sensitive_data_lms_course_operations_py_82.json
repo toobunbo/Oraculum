@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "strategy": "filesystem_state",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "Sink is target.write_text() — local filesystem write, not network I/O, shell execution, DB write, or RCE."
+    },
+    "q2_observable_after_return": {
+      "answer": true,
+      "evidence": "Cleartext sensitive data is persisted to a file; the file can be read from disk after the function returns. The return value also exposes the file path via JsonResponse({'path': str(target)})."
+    },
+    "q3_result_in_memory": {
+      "answer": false,
+      "evidence": "returns.kind is 'value' but the expression is JsonResponse({'path': str(target)}), which only contains the file path — not the file contents. The actual cleartext data resides on disk, not in memory."
+    }
+  },
+  "mock_guidance": null,
+  "confidence": "high",
+  "warnings": []
+}

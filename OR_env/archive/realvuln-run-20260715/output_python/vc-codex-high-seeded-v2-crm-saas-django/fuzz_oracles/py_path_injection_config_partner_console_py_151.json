@@ -1,0 +1,50 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "config.partner_console.Path.write_bytes",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "Path object (self) whose string representation contains the user-controlled name concatenated into the file path",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured Path object's string representation contains directory traversal sequences (../ or ..\\) or starts with an absolute path separator, confirming that user-controlled 'name' escaped BASE_EXPORT_DIR",
+    "trigger_patterns": [
+      "\\.{2}[\\\\/]",
+      "\\.{2}[\\\\/]\\.{2}[\\\\/]",
+      "^[\\\\/]"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_PATH_INJECTION: directory traversal detected in write_bytes path — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "../../../etc/passwd",
+      "..\\..\\..\\windows\\system32\\config",
+      "../../tmp/evil.txt",
+      "/etc/crontab",
+      "....//....//etc//passwd",
+      "normal.txt"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "acct_dock_shelf_592",
+    "file": "config/partner_console.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def acct_dock_shelf_592(request)",
+    "tainted_params": [
+      {
+        "name": "name",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_path_injection_config_partner_console_py_151",
+    "finding_id": "5",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_5_py_path-injection.json"
+  }
+}

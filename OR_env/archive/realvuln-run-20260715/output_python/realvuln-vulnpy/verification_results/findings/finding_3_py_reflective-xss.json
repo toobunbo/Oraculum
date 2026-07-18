@@ -1,0 +1,100 @@
+{
+  "id": "3",
+  "rule_slug": "py_reflective-xss",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulnpy",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnpy",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnpy/verification_results/summary_realvuln-vulnpy_20260714_151715.json"
+  },
+  "finding": {
+    "rule_id": "py/reflective-xss",
+    "message": "Cross-site scripting vulnerability due to a [user-provided value](1).",
+    "file": "src/vulnpy/django/vulnerable_asgi.py",
+    "start_line": 57,
+    "end_line": 57,
+    "repo_name": "realvuln-vulnpy",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnpy/realvuln-vulnpy.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 45: ControlFlowNode for request",
+      "line 46: ControlFlowNode for request",
+      "line 14: ControlFlowNode for request",
+      "line 29: ControlFlowNode for Attribute",
+      "line 29: ControlFlowNode for Attribute()",
+      "line 46: ControlFlowNode for _get_user_input()",
+      "line 46: ControlFlowNode for user_input",
+      "line 55: ControlFlowNode for template",
+      "line 57: ControlFlowNode for template",
+      "--- Flow 2 ---",
+      "line 45: ControlFlowNode for request",
+      "line 46: ControlFlowNode for request",
+      "line 14: ControlFlowNode for request",
+      "line 34: ControlFlowNode for Attribute",
+      "line 34: ControlFlowNode for Attribute()",
+      "line 46: ControlFlowNode for _get_user_input()",
+      "line 46: ControlFlowNode for user_input",
+      "line 55: ControlFlowNode for template",
+      "line 57: ControlFlowNode for template",
+      "--- Flow 3 ---",
+      "line 45: ControlFlowNode for request",
+      "line 46: ControlFlowNode for request",
+      "line 14: ControlFlowNode for request",
+      "line 23: ControlFlowNode for Attribute",
+      "line 23: ControlFlowNode for Attribute()",
+      "line 23: ControlFlowNode for header_user_input",
+      "line 25: ControlFlowNode for Subscript",
+      "line 24: ControlFlowNode for Attribute()",
+      "line 46: ControlFlowNode for _get_user_input()",
+      "line 46: ControlFlowNode for user_input",
+      "line 55: ControlFlowNode for template",
+      "line 57: ControlFlowNode for template"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "elapsed_seconds": 12.091750860214233,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "timestamp": "2026-07-14T15:17:01.427297",
+    "output_tokens": 1343,
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "iterations": 3,
+    "tokens_used": 17506,
+    "cost_usd": 0.0,
+    "data_flow": "request (line 45) → _get_user_input (lines 14-35) → user_input (line 46) → template (line 55) → HttpResponse (line 57)",
+    "answers": [
+      "The sink is line 57: `return HttpResponse(template)`. The value being rendered is `template`.",
+      "The assignments to `template` are: line 52: `template = get_template(\"{}.html\".format(name))`, line 55: `template += \"<p>XSS: \" + user_input + \"</p>\"`. The last assignment is line 55.",
+      "The value of `template` at line 55 derives from user input `user_input` which comes from `_get_user_input(request)` (line 46). The data flow is: request (line 45) → _get_user_input (lines 14-35) → user_input (line 46) → template (line 55).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense that escapes the value at the sink. The code directly concatenates the user input into the template string without any escaping.",
+      "The code does not use `|safe`, `{% autoescape false %}`, `Markup(...)`, or `mark_safe(...)` to disable escaping.",
+      "The user-tainted value `user_input` reaches the sink at line 57 through the `template` variable. There is no escaping or sanitization applied to the user input before it is rendered in the HTML response."
+    ],
+    "context_needed": [],
+    "input_tokens": 16163,
+    "verdict": "True Positive",
+    "reasoning": "The user input `user_input` is directly concatenated into the `template` string without any escaping or sanitization, and then rendered in an HttpResponse. This creates a reflected XSS vulnerability. The data flow is clear and there are no defenses present.",
+    "cached_input_tokens": 0
+  },
+  "function": {
+    "name": "get_trigger_view",
+    "file": "src/vulnpy/django/vulnerable_asgi.py",
+    "start_line": 44,
+    "end_line": 59,
+    "scope": ""
+  },
+  "web_params": []
+}

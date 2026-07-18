@@ -1,0 +1,37 @@
+{
+  "stage": "ingest",
+  "repo": "realvuln-damn-vulnerable-graphql-application",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-damn-vulnerable-graphql-application",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-graphql-application",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-graphql-application/verification_results/summary_realvuln-damn-vulnerable-graphql-application_20260714_145154.json"
+  },
+  "counts": {
+    "total_verdicts": 2,
+    "selected": 2,
+    "enriched": 2,
+    "skipped": 0,
+    "failed": 0
+  },
+  "findings": [
+    {
+      "id": "0",
+      "rule_id": "py/shell-command-constructed-from-input",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-damn-vulnerable-graphql-application/verification_results/findings/finding_0_py_shell-command-constructed-from-input.json",
+      "function_name": "mutate"
+    },
+    {
+      "id": "1",
+      "rule_id": "py/shell-command-constructed-from-input",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-damn-vulnerable-graphql-application/verification_results/findings/finding_1_py_shell-command-constructed-from-input.json",
+      "function_name": "resolve_system_debug"
+    }
+  ],
+  "errors": []
+}

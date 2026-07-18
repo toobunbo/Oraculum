@@ -1,0 +1,70 @@
+{
+  "id": "18",
+  "rule_slug": "py_weak-sensitive-data-hashing",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-djangoat",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/verification_results/summary_realvuln-djangoat_20260714_145404.json"
+  },
+  "finding": {
+    "rule_id": "py/weak-sensitive-data-hashing",
+    "message": "[Sensitive data (password)](1) is used in a hashing algorithm (MD5) that is insecure for password hashing, since it is not a computationally expensive hash function.",
+    "file": "app/models/User/user.py",
+    "start_line": 133,
+    "end_line": 133,
+    "repo_name": "realvuln-djangoat",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/realvuln-djangoat.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 133: ControlFlowNode for Attribute",
+      "line 133: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-327",
+      "CWE-328",
+      "CWE-916"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 12845,
+    "output_tokens": 1035,
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "data_flow": "self.password (line 133) → hashlib.md5(self.password.encode()) (line 133) → self.password = hash_obj.hexdigest() (line 134)",
+    "cost_usd": 0.0,
+    "confidence_score": 0.95,
+    "reasoning": "The additional context confirms that no external callers or global variables affect this analysis. The code clearly uses MD5 for password hashing without any salt or computational hardness, which is insecure for password storage. The data flow shows sensitive password data being hashed with weak MD5 and stored back as the password.",
+    "confidence": "High",
+    "answers": [
+      "The EXACT crypto call is `hashlib.md5(self.password.encode())` on line 133, and the algorithm is MD5.",
+      "The algorithm name is specified via a direct call to `hashlib.md5`, which is a hardcoded reference to the MD5 hashing function (line 133).",
+      "The output of the MD5 hash is assigned back to `self.password` on line 134. Based on the method name `hash_password` and the context of assigning the hashed value back to the password field, this is clearly intended for **password storage**, which is a **SECURITY** use-case.",
+      "Yes, collision resistance is required here because the hash is used for password storage. MD5 is broken for collision resistance and is also vulnerable to preimage attacks in the context of password hashing due to its speed and lack of computational cost.",
+      "There is no defense or safe alternative present. The code uses plain MD5 without salt or key derivation, which is insecure for password hashing. A secure alternative would be `bcrypt`, `argon2`, `scrypt`, or `hashlib.pbkdf2_hmac` with sufficient iterations.",
+      "Not visible in provided context.",
+      "The use-case is SECURITY (password storage), and there is no visible defense or safe alternative being used."
+    ],
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 9.081243515014648,
+    "timestamp": "2026-07-14T14:54:01.383497",
+    "iterations": 3,
+    "tokens_used": 13880
+  },
+  "function": {
+    "name": "hash_password",
+    "file": "app/models/User/user.py",
+    "start_line": 131,
+    "end_line": 134,
+    "scope": "User"
+  },
+  "web_params": []
+}

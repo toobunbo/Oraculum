@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Unsafe deserialization sink (loads, likely pickle.loads) with user-controlled cookie data can achieve RCE, which is explicitly dangerous."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Skipped; Q1 answered true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Skipped; Q1 answered true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the unsafe deserialization function (e.g., pickle.loads) called on line 118 within the before_request function.",
+    "capture": "Capture the raw argument passed to loads (the base64-decoded bytes) to verify that untrusted user cookie data reaches the sink without sanitization.",
+    "fake_behavior": "Return a safe dummy value such as an empty dict or the application's default_preferences object to allow the request handler to continue execution without triggering deserialization side effects.",
+    "notes": [
+      "The exact import of loads is not provided in the evidence, but the rule py/unsafe-deserialization implies pickle.loads or a similar unsafe deserializer.",
+      "Ensure the mock intercepts the call after b64decode so the base64 decoding still occurs, preserving the data-flow chain for validation."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

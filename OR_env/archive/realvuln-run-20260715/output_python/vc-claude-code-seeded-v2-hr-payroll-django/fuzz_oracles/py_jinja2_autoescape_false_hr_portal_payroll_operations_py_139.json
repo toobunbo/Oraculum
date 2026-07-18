@@ -1,0 +1,52 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of payroll_jinja_cast_384 (HttpResponse object), inspecting its .content for unescaped XSS payload",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The HttpResponse content contains an unescaped script tag or XSS event handler, confirming that the Jinja2 template rendered user input with autoescape=False and no sanitization was applied.",
+    "trigger_patterns": [
+      "<script",
+      "onerror\\s*=",
+      "onload\\s*=",
+      "javascript:",
+      "<img[^>]+onerror",
+      "<svg[^>]+onload"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_JINJA2_AUTOESCAPE_FALSE: XSS payload survived unescaped in Jinja2 render — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "<script>alert(1)</script>",
+      "<img src=x onerror=alert(1)>",
+      "<svg onload=alert(1)>",
+      "javascript:alert(1)",
+      "' onerror='alert(1)"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "payroll_jinja_cast_384",
+    "file": "hr_portal/payroll_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def payroll_jinja_cast_384(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "django.http.HttpRequest"
+      }
+    ],
+    "target_id": "py_jinja2_autoescape_false_hr_portal_payroll_operations_py_139",
+    "finding_id": "11",
+    "rule_id": "py/jinja2/autoescape-false",
+    "rule_slug": "py_jinja2_autoescape-false",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_11_py_jinja2_autoescape-false.json"
+  }
+}
