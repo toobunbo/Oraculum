@@ -1,0 +1,72 @@
+{
+  "id": "0",
+  "rule_slug": "py_code-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/summary_vc-claude-code-seeded-v2-hr-payroll-django_20260714_152802.json"
+  },
+  "finding": {
+    "rule_id": "py/code-injection",
+    "message": "This code execution depends on a [user-provided value](1).",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 97,
+    "end_line": 97,
+    "repo_name": "vc-claude-code-seeded-v2-hr-payroll-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/vc-claude-code-seeded-v2-hr-payroll-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 93: ControlFlowNode for request",
+      "line 96: ControlFlowNode for Attribute",
+      "line 96: ControlFlowNode for Attribute()",
+      "line 96: ControlFlowNode for expr",
+      "line 97: ControlFlowNode for expr"
+    ],
+    "severity": "9.3",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-94",
+      "CWE-95"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "data_flow": "request (line 93) → request.GET.get(\"expr\", \"amount + fee\") (line 96) → expr (line 96) → eval(expr, {\"__builtins__\": {}}, {\"amount\": 42, \"fee\": 7}) (line 97)",
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "tokens_used": 13755,
+    "timestamp": "2026-07-14T15:27:38.262433",
+    "input_tokens": 12211,
+    "output_tokens": 1544,
+    "confidence_score": 0.95,
+    "elapsed_seconds": 12.217354536056519,
+    "reasoning": "User-provided input flows directly to eval() with insufficient sanitization. Although __builtins__ is restricted, the locals dictionary can still be exploited for attribute access and method calls, leading to arbitrary code execution. The additional context shows no callers were found, but the function is clearly designed to handle web requests, making the user input path realistic.",
+    "cost_usd": 0.0,
+    "answers": [
+      "The EXACT sink is `eval(expr, {\"__builtins__\": {}}, {\"amount\": 42, \"fee\": 7})` on line 97. The value passed to it is `expr`.",
+      "The only assignment to `expr` on the path reaching the sink is on line 96: `expr = request.GET.get(\"expr\", \"amount + fee\")`.",
+      "The value of `expr` derives from user input via `request.GET.get(\"expr\", \"amount + fee\")` on line 96. The data flow is: request (line 93) → request.GET.get (line 96) → expr (line 96) → eval (line 97).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "The defense present is the restricted globals dictionary `{\"__builtins__\": {}}`, which prevents access to built-in functions and modules. However, this does not prevent all code injection attacks, as the expression can still perform attribute access and call methods on the provided local variables. For example, an attacker could potentially use `amount.__class__.__mro__[1].__subclasses__()[145]('/etc/passwd').read()` to read files if the amount object has accessible attributes.",
+      "The user-tainted value `expr` reaches the `eval` sink on line 97. While the `__builtins__` restriction provides some protection, it is insufficient to prevent arbitrary code execution because the locals dictionary still allows attribute access and method calls that can lead to dangerous operations."
+    ],
+    "cached_input_tokens": 0,
+    "context_needed": []
+  },
+  "function": {
+    "name": "payroll_formula_cast_252",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 93,
+    "end_line": 98,
+    "scope": ""
+  },
+  "web_params": []
+}

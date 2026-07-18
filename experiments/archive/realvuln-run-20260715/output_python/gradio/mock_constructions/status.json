@@ -1,0 +1,28 @@
+{
+  "stage": "mock_analysis",
+  "repo": "gradio",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/mock_analysis.yaml",
+  "counts": {
+    "selected": 1,
+    "generated": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "mock_constructions": [
+    {
+      "id": "1",
+      "target_id": "py_full_ssrf_gradio_image_utils_py_252",
+      "rule_id": "py/full-ssrf",
+      "file": "gradio/image_utils.py",
+      "start_line": "252",
+      "function_name": "extract_svg_content",
+      "finding_artifact": "output/python/gradio/verification_results/findings/finding_1_py_full-ssrf.json",
+      "mock_construction": "output/python/gradio/mock_constructions/py_full_ssrf_gradio_image_utils_py_252.json",
+      "status": "generated",
+      "strategy": "standalone"
+    }
+  ],
+  "errors": []
+}

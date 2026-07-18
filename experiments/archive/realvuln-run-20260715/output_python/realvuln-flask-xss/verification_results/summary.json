@@ -1,0 +1,37 @@
+{
+  "stage": "ingest",
+  "repo": "realvuln-flask-xss",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-flask-xss",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-flask-xss",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-flask-xss/verification_results/summary_realvuln-flask-xss_20260714_150106.json"
+  },
+  "counts": {
+    "total_verdicts": 2,
+    "selected": 2,
+    "enriched": 2,
+    "skipped": 0,
+    "failed": 0
+  },
+  "findings": [
+    {
+      "id": "0",
+      "rule_id": "py/clear-text-logging-sensitive-data",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-flask-xss/verification_results/findings/finding_0_py_clear-text-logging-sensitive-data.json",
+      "function_name": "add_admin"
+    },
+    {
+      "id": "1",
+      "rule_id": "py/url-redirection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-flask-xss/verification_results/findings/finding_1_py_url-redirection.json",
+      "function_name": "index"
+    }
+  ],
+  "errors": []
+}

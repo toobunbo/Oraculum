@@ -1,0 +1,77 @@
+{
+  "id": "7",
+  "rule_slug": "py_unsafe-deserialization",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/summary_vc-claude-code-seeded-v2-hr-payroll-django_20260714_152802.json"
+  },
+  "finding": {
+    "rule_id": "py/unsafe-deserialization",
+    "message": "Unsafe deserialization depends on a [user-provided value](1).",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 79,
+    "end_line": 79,
+    "repo_name": "vc-claude-code-seeded-v2-hr-payroll-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/vc-claude-code-seeded-v2-hr-payroll-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 69: ControlFlowNode for request",
+      "line 74: ControlFlowNode for raw",
+      "line 79: ControlFlowNode for raw",
+      "--- Flow 2 ---",
+      "line 69: ControlFlowNode for request",
+      "line 74: ControlFlowNode for Attribute",
+      "line 74: ControlFlowNode for Attribute()",
+      "line 74: ControlFlowNode for raw",
+      "line 76: ControlFlowNode for raw",
+      "line 79: ControlFlowNode for raw"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-502"
+    ],
+    "tags": [
+      "security",
+      "serialization"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "data_flow": "request (line 69) → raw = request.body or request.GET.get(\"blob\", \"\").encode(\"utf-8\") (line 74) → (optional) raw = base64.b64decode(raw) (line 76) → pickle.loads(raw) (line 79)",
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "tokens_used": 14075,
+    "timestamp": "2026-07-14T15:27:50.553323",
+    "input_tokens": 12649,
+    "output_tokens": 1426,
+    "confidence_score": 0.95,
+    "elapsed_seconds": 12.288811683654785,
+    "reasoning": "User-controlled input flows directly to `pickle.loads()` without any validation, sanitization, or use of a safe deserializer. Pickle deserialization of untrusted data leads to arbitrary code execution. The additional context shows no callers or callees, confirming this function is a self-contained vulnerable endpoint.",
+    "cost_usd": 0.0,
+    "answers": [
+      "The EXACT deserialization sink is `pickle.loads(raw)` on line 79. The bytes value passed to it is `raw`.",
+      "Assignments to `raw` on the path to the sink: Line 74: `raw = request.body or request.GET.get(\"blob\", \"\").encode(\"utf-8\")`, Line 76: `raw = base64.b64decode(raw)` (if condition met), Line 78: `raw = b\"\\x80\\x04}q\\x00.\"` (if `raw` is falsy). The LAST assignment depends on runtime value, but the primary tainted assignment is line 74.",
+      "The value of `raw` on line 74 derives from user input: `request.body` or `request.GET.get(\"blob\", \"\")`, both user-controllable. Data flow: `request` (line 69) → `raw` (line 74). Base64 decoding (line 76) doesn't sanitize; it's still user data. Line 78's fallback is only reached if `raw` is falsy.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. Line 78 provides a fallback, but only if `raw` is falsy. The primary flow (lines 74 and 76) retains user input.",
+      "There is NO defense preventing code execution. The code uses `pickle.loads()` directly on user-provided data. No HMAC, schema validation, or safe deserializer (like `json.loads()`) is used.",
+      "User-controlled data (`request.body` or `request.GET['blob']`) reaches `pickle.loads()` on line 79 without any sanitization or defense. The use of `pickle.loads()` on untrusted data is inherently unsafe."
+    ],
+    "cached_input_tokens": 0,
+    "context_needed": []
+  },
+  "function": {
+    "name": "payroll_bundle_thaw_170",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 69,
+    "end_line": 80,
+    "scope": ""
+  },
+  "web_params": []
+}

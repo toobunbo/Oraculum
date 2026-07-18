@@ -1,0 +1,77 @@
+{
+  "id": "10",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/",
+    "vhx_repo_root": "/home/trieudai/bench-src",
+    "vhx_output_root": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python",
+    "summary_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/verification_results/summary_benchmark-python_filtered_20260610_105228.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "testcode/BenchmarkTest00001.py",
+    "start_line": 47,
+    "end_line": 47,
+    "repo_name": "benchmark-python",
+    "lang": "python",
+    "sarif_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/benchmark-python.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 39: ControlFlowNode for request",
+      "line 39: ControlFlowNode for Attribute",
+      "line 39: ControlFlowNode for Attribute()",
+      "line 39: ControlFlowNode for Attribute()",
+      "line 39: ControlFlowNode for param",
+      "line 41: ControlFlowNode for bar",
+      "line 47: ControlFlowNode for Fstring"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [],
+    "tags": [
+      "correctness",
+      "security",
+      "external/cwe/cwe-022",
+      "external/cwe/cwe-023",
+      "external/cwe/cwe-036",
+      "external/cwe/cwe-073",
+      "external/cwe/cwe-099"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-06-10T10:43:56.783385",
+    "context_needed": [],
+    "data_flow": "request.cookies.get (line 39) → param (line 39) → bar (line 41) → f'{helpers.utils.TESTFILES_DIR}/{bar}' (line 47)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "answers": [
+      "The exact flagged line is: `fileTarget = codecs.open(f'{helpers.utils.TESTFILES_DIR}/{bar}','r','utf-8')` (line 47). This line is in the function `BenchmarkTest00001_post`.",
+      "The assignments to the path components leading to the sink are: `param = urllib.parse.unquote_plus(request.cookies.get(\"BenchmarkTest00001\", \"noCookieValueSupplied\"))` (line 39), and `bar = param` (line 41). The last assignment is `bar = param` (line 41).",
+      "The value of `bar` derives from user input: `param` is assigned from `request.cookies.get(\"BenchmarkTest00001\", \"noCookieValueSupplied\")` (line 39), which is user-provided input retrieved from cookies. The data flow is: `request.cookies.get()` → `param` (line 39) → `bar` (line 41).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. No defensive logic is present between the source and sink.",
+      "No specific defense is present. There is no usage of `secure_filename`, `Path.resolve()`, `is_relative_to()`, or any other path-sanitization mechanism.",
+      "The user-tainted value `bar` directly reaches the sink without any sanitization or defensive checks."
+    ],
+    "confidence_score": 0.95,
+    "iterations": 3,
+    "input_tokens": 8114,
+    "elapsed_seconds": 30.793424606323242,
+    "confidence": "High",
+    "cached_input_tokens": 0,
+    "tokens_used": 9441,
+    "reasoning": "User-controlled input from cookies flows directly into a file path used in a filesystem operation without sanitization or validation, enabling potential directory traversal. The data flow is clear and no defensive measures are present.",
+    "verdict": "True Positive",
+    "output_tokens": 1327
+  },
+  "function": {
+    "name": "BenchmarkTest00001_post",
+    "file": "testcode/BenchmarkTest00001.py",
+    "start_line": 35,
+    "end_line": 62,
+    "scope": "Function init"
+  }
+}

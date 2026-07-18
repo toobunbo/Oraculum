@@ -1,0 +1,1 @@
+{"filter": {"$or": [{"role": "admin"}, {"role": "superadmin"}]}}

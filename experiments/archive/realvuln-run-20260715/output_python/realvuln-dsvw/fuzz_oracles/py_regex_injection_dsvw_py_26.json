@@ -1,0 +1,47 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "re.findall",
+    "target_arg_index": 0,
+    "target_arg_name": "pattern",
+    "capture_what": "regex pattern passed to re.findall",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "captured regex pattern contains user-controlled input without escaping, enabling ReDoS or data extraction",
+    "trigger_patterns": [
+      "\\(.*\\)",
+      "\\[.*\\]",
+      ".*\\*.*",
+      ".*\\+.*",
+      "\\{.*\\}",
+      ".*\\?\\?.*"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_REGEX_INJECTION: Unescaped user input in regex pattern — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "(a+)+",
+      "[a-z]*?",
+      "((.*))",
+      "(a|b)?{10}",
+      "(.*.*)*",
+      "[0-9]{100}"
+    ],
+    "skip_condition": "len(captured) > 1000 or '\\\\' in captured"
+  },
+  "_meta": {
+    "function": "do_GET",
+    "file": "dsvw.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def do_GET(self)",
+    "tainted_params": [],
+    "target_id": "py_regex_injection_dsvw_py_26",
+    "finding_id": "6",
+    "rule_id": "py/regex-injection",
+    "rule_slug": "py_regex-injection",
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_6_py_regex-injection.json"
+  }
+}

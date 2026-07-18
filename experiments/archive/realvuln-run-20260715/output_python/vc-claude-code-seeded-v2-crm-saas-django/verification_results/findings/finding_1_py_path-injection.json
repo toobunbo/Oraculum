@@ -1,0 +1,76 @@
+{
+  "id": "1",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/summary_vc-claude-code-seeded-v2-crm-saas-django_20260714_152015.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "crm_project/partner_console.py",
+    "start_line": 42,
+    "end_line": 42,
+    "repo_name": "vc-claude-code-seeded-v2-crm-saas-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/vc-claude-code-seeded-v2-crm-saas-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 36: ControlFlowNode for request",
+      "line 39: ControlFlowNode for Attribute",
+      "line 39: ControlFlowNode for Attribute()",
+      "line 39: ControlFlowNode for packet_ref",
+      "line 40: ControlFlowNode for parcel_path",
+      "line 42: ControlFlowNode for parcel_path"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 12712,
+    "confidence": "High",
+    "iterations": 3,
+    "output_tokens": 1117,
+    "context_needed": [],
+    "reasoning": "User-controlled input `packet_ref` is used to construct a file path which is then read without any sanitization or validation, allowing for potential directory traversal. The missing context does not provide any evidence of protective measures.",
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:19:52.715538",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request (line 36) → packet_ref = request.GET.get(\"packet_ref\", \"account-summary.csv\") (line 39) → parcel_path = BASE_EXPORT_DIR / packet_ref (line 40) → parcel_path.read_text() (line 42)",
+    "cost_usd": 0.0,
+    "cached_input_tokens": 0,
+    "tokens_used": 13829,
+    "elapsed_seconds": 9.301127910614014,
+    "confidence_score": 0.9,
+    "answers": [
+      "The EXACT file-operation sink is `parcel_path.read_text()` on line 42. The path value passed to it is `parcel_path`.",
+      "The assignments to `parcel_path` are: line 40: `parcel_path = BASE_EXPORT_DIR / packet_ref`.",
+      "The value of `parcel_path` derives from user input. The data flow is: `request` (line 36) → `request.GET.get(\"packet_ref\", \"account-summary.csv\")` (line 39) assigns to `packet_ref` → `parcel_path = BASE_EXPORT_DIR / packet_ref` (line 40). The last assignment is on line 40.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense that contains the path. No use of `secure_filename`, `resolve()` with `is_relative_to()`, `commonpath` checks, or `relative_to` is visible. The `read_text()` method implementation is not available, but standard Path.read_text() does not provide path traversal protection.",
+      "The user-tainted value `packet_ref` reaches the sink `parcel_path.read_text()` on line 42. There is no visible defense mechanism to prevent path traversal. The unavailability of `BASE_EXPORT_DIR` and `read_text` implementation does not change the fact that the user input directly influences the path construction."
+    ]
+  },
+  "function": {
+    "name": "acct_packet_pull_002",
+    "file": "crm_project/partner_console.py",
+    "start_line": 36,
+    "end_line": 45,
+    "scope": ""
+  },
+  "web_params": []
+}

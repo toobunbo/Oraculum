@@ -1,0 +1,85 @@
+{
+  "id": "6",
+  "rule_slug": "py_url-redirection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-threatbyte",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte/verification_results/summary_realvuln-threatbyte_20260714_150915.json"
+  },
+  "finding": {
+    "rule_id": "py/url-redirection",
+    "message": "Untrusted URL redirection depends on a [user-provided value](1).",
+    "file": "server/routes.py",
+    "start_line": 260,
+    "end_line": 260,
+    "repo_name": "realvuln-threatbyte",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-threatbyte/realvuln-threatbyte.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 253: ControlFlowNode for request",
+      "line 260: ControlFlowNode for Attribute",
+      "--- Flow 2 ---",
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 254: ControlFlowNode for request",
+      "line 260: ControlFlowNode for Attribute",
+      "--- Flow 3 ---",
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 257: ControlFlowNode for request",
+      "line 260: ControlFlowNode for Attribute",
+      "--- Flow 4 ---",
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 260: ControlFlowNode for request",
+      "line 260: ControlFlowNode for Attribute"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-601"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "The redirect on line 260 uses `request.url` which is directly controlled by the user. There is no sanitization, validation, or allow-list check to prevent redirection to an external or malicious domain. This is a classic open redirect vulnerability (CWE-601). The lack of caller information doesn't change the fact that the function directly uses user-controlled input for redirection.",
+    "input_tokens": 16630,
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:08:49.476548",
+    "data_flow": "request (flask request object, user-controlled) → request.url (line 260) → redirect() call (line 260)",
+    "confidence_score": 0.95,
+    "answers": [
+      "The EXACT flagged line is: `return redirect(request.url)` on line 260. This line lives in the `upload_file` function.",
+      "The redirect sink is `redirect(request.url)` on line 260. The URL/target value passed to it is `request.url`.",
+      "The value `request.url` is not assigned to any variable; it is directly used in the redirect call on line 260. There are no prior assignments to this value on the path.",
+      "The value `request.url` derives from the Flask `request` object, which represents the current HTTP request. Specifically, `request.url` contains the full URL of the current request, which is user-controlled as it originates from the client. The data-flow chain shows that `request` (line 1) flows to `request.url` (line 260).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the path to line 260. The value `request.url` is used directly in the redirect call without any intermediate checks or modifications.",
+      "There is no specific defense that contains the redirect. No validation, sanitization, or allow-list check is performed on `request.url` before it is passed to the redirect function. The function appears to be a Flask route handler, and there's no evidence of Flask's built-in URL validation being used (like `url_has_allowed_host_and_scheme`)."
+    ],
+    "cost_usd": 0.0,
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "confidence": "High",
+    "output_tokens": 1296,
+    "elapsed_seconds": 10.759168148040771,
+    "tokens_used": 17926
+  },
+  "function": {
+    "name": "upload_file",
+    "file": "server/routes.py",
+    "start_line": 249,
+    "end_line": 280,
+    "scope": ""
+  },
+  "web_params": []
+}

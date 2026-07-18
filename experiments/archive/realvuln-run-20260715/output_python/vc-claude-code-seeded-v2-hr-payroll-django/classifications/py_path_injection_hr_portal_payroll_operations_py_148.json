@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is target.write_bytes(request.body), a filesystem write that constitutes an irreversible side effect and could write to arbitrary paths due to traversal"
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the pathlib.Path.write_bytes method on the target object",
+    "capture": "Capture the full resolved path of target (to detect traversal like ../) and the content from request.body",
+    "fake_behavior": "Record the call arguments without performing any disk I/O; optionally raise no exception to let execution continue to the return statement",
+    "notes": [
+      "The function returns JsonResponse containing str(target), so mocking write_bytes allows verifying both the dangerous path argument and the return value in one test.",
+      "Ensure the mock captures the Path object before write_bytes is called so traversal sequences in name (e.g., '../../etc/passwd') are observable."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

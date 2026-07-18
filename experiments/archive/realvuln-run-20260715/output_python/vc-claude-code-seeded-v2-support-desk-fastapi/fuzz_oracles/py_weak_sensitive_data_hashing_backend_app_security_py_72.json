@@ -1,0 +1,47 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of hash_token function",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "Return value matches SHA256 hexdigest format (64 hex chars), confirming use of weak hash algorithm instead of key-stretching algorithms like bcrypt/argon2/scrypt which have different output formats",
+    "trigger_patterns": [
+      "^[a-f0-9]{64}$"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_WEAK_SENSITIVE_DATA_HASHING: weak SHA256 hash detected in return value — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "sk-1234567890abcdef",
+      "my-secret-api-key-2024",
+      "x-api-key-token-value",
+      "Bearer abcdef1234567890",
+      "admin-secret-token"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "hash_token",
+    "file": "backend/app/security.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def hash_token(token: str)",
+    "tainted_params": [
+      {
+        "name": "token",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_weak_sensitive_data_hashing_backend_app_security_py_72",
+    "finding_id": "10",
+    "rule_id": "py/weak-sensitive-data-hashing",
+    "rule_slug": "py_weak-sensitive-data-hashing",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_10_py_weak-sensitive-data-hashing.json"
+  }
+}

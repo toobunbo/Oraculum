@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "pickle.loads is an unsafe parser that can execute arbitrary code (RCE) from untrusted input."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "N/A - decision made at Q1"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "N/A - decision made at Q1"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "pickle.loads",
+    "capture": "The raw bytes argument passed to pickle.loads on line 73.",
+    "fake_behavior": "Return a benign, empty dictionary (matching the constant fallback on line 72) or a predefined safe mock object instead of actually deserializing the payload.",
+    "notes": [
+      "Mocking pickle.loads is critical to prevent arbitrary code execution during test harness execution.",
+      "The captured raw bytes can be separately analyzed or validated in the test assertion."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

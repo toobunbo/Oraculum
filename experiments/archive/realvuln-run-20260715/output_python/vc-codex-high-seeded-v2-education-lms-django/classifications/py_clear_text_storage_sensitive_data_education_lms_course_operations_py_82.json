@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "strategy": "filesystem_state",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "Sink is target.write_text() on a local file path (line 82); filesystem writes are side effects but not inherently dangerous in a controlled test environment."
+    },
+    "q2_observable_after_return": {
+      "answer": true,
+      "evidence": "Cleartext SSN and credit card data are persisted to disk in BASE_EXPORT_DIR; the file contents can be inspected after the function returns."
+    },
+    "q3_result_in_memory": {
+      "answer": false,
+      "evidence": "returns.exprs shows JsonResponse({'path': str(target)}) which only contains the file path, not the sensitive file contents themselves."
+    }
+  },
+  "mock_guidance": null,
+  "confidence": "high",
+  "warnings": []
+}

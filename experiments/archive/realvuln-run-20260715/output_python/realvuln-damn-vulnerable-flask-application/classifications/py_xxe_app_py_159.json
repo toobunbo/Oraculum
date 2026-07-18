@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "etree.fromstring with parser configured as no_network=False and dtd_validation=True, enabling network I/O and external entity resolution"
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "not evaluated"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "not evaluated"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock etree.fromstring to prevent actual XML parsing with the unsafe parser",
+    "capture": "Capture the raw XML string argument passed to etree.fromstring (str(xml)) to verify it contains user-controlled input from request.form['xml']",
+    "fake_behavior": "Return a harmless, fixed lxml ElementTree node (e.g., etree.Element('root')) so that downstream string concatenation with parsed_xml does not crash",
+    "notes": [
+      "The dangerous parser is created on line 157 with no_network=False and dtd_validation=True; mocking etree.fromstring bypasses both the parser creation and the parse call.",
+      "Alternatively, patch etree.XMLParser to always inject resolve_entities=False and load_dtd=False, then let the real parse proceed on safe input."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

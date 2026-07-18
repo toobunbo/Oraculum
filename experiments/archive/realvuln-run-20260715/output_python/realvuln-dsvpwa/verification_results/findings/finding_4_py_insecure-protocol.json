@@ -1,0 +1,65 @@
+{
+  "id": "4",
+  "rule_slug": "py_insecure-protocol",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-dsvpwa",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvpwa",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvpwa/verification_results/summary_realvuln-dsvpwa_20260714_145612.json"
+  },
+  "finding": {
+    "rule_id": "py/insecure-protocol",
+    "message": "Insecure SSL/TLS protocol version SSLv3 allowed by [call to ssl.SSLContext](1).\nInsecure SSL/TLS protocol version TLSv1 allowed by [call to ssl.SSLContext](1).\nInsecure SSL/TLS protocol version TLSv1_1 allowed by [call to ssl.SSLContext](1).",
+    "file": "dsvpwa.py",
+    "start_line": 41,
+    "end_line": 41,
+    "repo_name": "realvuln-dsvpwa",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvpwa/realvuln-dsvpwa.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-327"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "confidence_score": 0.9,
+    "answers": [
+      "The flagged line 41 calls `ctx.wrap_socket(httpd.socket, server_side=True)`. This is not a direct cryptographic algorithm call but rather an SSL socket wrapping operation.",
+      "The SSL context is configured on line 36 with `ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)` and insecure options are explicitly enabled on lines 37-39 by clearing the corresponding 'NO' flags.",
+      "The SSL context is used to wrap the server socket for HTTPS communication, which is a security-related use case for establishing encrypted connections.",
+      "The use case requires strong cryptographic security for SSL/TLS connections, but the configuration explicitly enables insecure protocols (SSLv3, TLSv1, TLSv1_1).",
+      "The defense would be to use only secure TLS versions (1.2 or 1.3) and avoid explicitly enabling insecure protocols by not clearing the ssl.OP_NO_* flags.",
+      "No explicit backward compatibility requirement is shown in the code - this appears to be an intentionally vulnerable application based on the name DSVPWA (Damn Simple Vulnerable Python Web Application).",
+      "While the primary use is for SSL/TLS encryption (security-related), the explicit enabling of insecure protocols creates a vulnerability, though this is about protocol versions rather than specific weak algorithms like MD5/SHA1."
+    ],
+    "data_flow": "source (lines 36-39 SSL context creation and insecure option enabling) → transform (SSL context configuration) → sink (line 41 socket wrapping with insecure SSL context)",
+    "timestamp": "2026-07-14T14:56:12.311951",
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cached_input_tokens": 0,
+    "reasoning": "The code explicitly enables insecure SSL/TLS protocols (SSLv3, TLSv1, TLSv1_1) by clearing the corresponding security flags, then uses this insecure configuration to wrap the server socket. This creates a real security vulnerability by allowing connections using known-insecure protocols, even though the finding description mentions MD5/SHA1/DES/RC4 specifically, the underlying issue of using insecure cryptographic configurations is present.",
+    "context_needed": [],
+    "input_tokens": 15672,
+    "verdict": "True Positive",
+    "output_tokens": 1437,
+    "tokens_used": 17109,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "elapsed_seconds": 12.694600105285645
+  },
+  "function": {
+    "name": "main",
+    "file": "dsvpwa.py",
+    "start_line": 13,
+    "end_line": 52,
+    "scope": ""
+  },
+  "web_params": []
+}

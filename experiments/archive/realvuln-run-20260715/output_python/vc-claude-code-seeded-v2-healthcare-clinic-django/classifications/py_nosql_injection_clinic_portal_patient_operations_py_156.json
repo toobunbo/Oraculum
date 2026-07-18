@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink is MongoClient(...).ops.records.find_one(query), which involves network I/O to a database and potentially unsafe execution via $where operators."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the MongoClient instance or its ops.records.find_one method.",
+    "capture": "Capture the exact query dictionary argument passed to find_one to assert the presence of injected NoSQL operators like $where or $gt.",
+    "fake_behavior": "Return a safe, static dictionary (e.g., {'_id': 'mock_id', 'data': 'safe_value'}) to allow execution to continue to the JsonResponse without performing actual network I/O.",
+    "notes": [
+      "Ensure the mock prevents any real connection to the MongoDB server.",
+      "The mock should be configured on the specific collection path (ops.records) to avoid affecting other tests if the client is shared."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

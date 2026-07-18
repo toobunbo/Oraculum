@@ -1,0 +1,71 @@
+{
+  "id": "0",
+  "rule_slug": "py_stack-trace-exposure",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulnerable-flask-app",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-flask-app",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-flask-app/verification_results/summary_realvuln-vulnerable-flask-app_20260714_151300.json"
+  },
+  "finding": {
+    "rule_id": "py/stack-trace-exposure",
+    "message": "[Stack trace information](1) flows to this location and may be exposed to an external user.",
+    "file": "app/app.py",
+    "start_line": 281,
+    "end_line": 281,
+    "repo_name": "realvuln-vulnerable-flask-app",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-flask-app/realvuln-vulnerable-flask-app.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 270: ControlFlowNode for e",
+      "line 271: ControlFlowNode for template",
+      "line 281: ControlFlowNode for template",
+      "line 281: ControlFlowNode for render_template_string()",
+      "line 281: ControlFlowNode for Tuple"
+    ],
+    "severity": "5.4",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-209",
+      "CWE-497"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "cost_usd": 0.0,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "input_tokens": 4574,
+    "confidence": "High",
+    "cached_input_tokens": 0,
+    "reasoning": "The exception object `e` from line 270 flows directly into an HTML template string on line 271 and is rendered via `render_template_string()` on line 281, exposing internal error details to external users without any sanitization or generic error handling.",
+    "context_needed": [],
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 378,
+    "tokens_used": 4952,
+    "data_flow": "source (line 270) → transform (line 271) → sink (line 281)",
+    "answers": [
+      "The sensitive information that could be exposed includes stack trace details and internal variable values through the exception message `e` (line 270) which is embedded into the HTML template (lines 271-279).",
+      "Yes, this is returned in an HTTP response via `render_template_string()` on line 281, which generates an HTML page containing the exception details and is sent back to the client with a 404 status code.",
+      "Not visible in provided context. There is no explicit check for DEBUG mode or use of generic error pages in the provided code.",
+      "Yes, an attacker could potentially trigger this by providing malformed input that causes an exception during the database query execution (line 265), leading to the exception handler exposing internal details.",
+      "Yes, the exception handler catches all exceptions broadly with `except Exception as e` (line 270) and directly exposes the exception message in the response without sanitization.",
+      "External users can observe this output via the HTTP response since `render_template_string()` returns an HTML response that is sent back to the client (line 281)."
+    ],
+    "timestamp": "2026-07-14T15:12:49.892726",
+    "elapsed_seconds": 3.948363780975342,
+    "iterations": 1
+  },
+  "function": {
+    "name": "search_customer",
+    "file": "app/app.py",
+    "start_line": 247,
+    "end_line": 281,
+    "scope": ""
+  },
+  "web_params": []
+}

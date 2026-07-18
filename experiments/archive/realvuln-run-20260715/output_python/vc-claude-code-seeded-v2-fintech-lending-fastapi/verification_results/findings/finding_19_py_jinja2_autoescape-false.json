@@ -1,0 +1,65 @@
+{
+  "id": "19",
+  "rule_slug": "py_jinja2_autoescape-false",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-claude-code-seeded-v2-fintech-lending-fastapi_20260714_152421.json"
+  },
+  "finding": {
+    "rule_id": "py/jinja2/autoescape-false",
+    "message": "Using jinja2 templates with autoescape=False can potentially allow XSS attacks.",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 113,
+    "end_line": 113,
+    "repo_name": "vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/vc-claude-code-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [],
+    "severity": "6.1",
+    "precision": "medium",
+    "cwe_ids": [
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "confidence": "High",
+    "iterations": 3,
+    "answers": [
+      "The exact flagged line is line 113: `body = Template(\"Result: \" + fragment).render()`. This line is inside the function `loan_jinja_cast_379` which starts at line 111.",
+      "The `fragment` parameter is assigned from the query parameter on line 111: `async def loan_jinja_cast_379(fragment: str = \"{{ 7 * 7 }}\", gate_ref: None = Depends(_wrk_gate)):`. This is the only assignment to `fragment`.",
+      "The `fragment` value derives from user input via the query parameter `fragment` in the HTTP GET request. The data flow is: HTTP request query parameter `fragment` (line 111) → function parameter `fragment` (line 111) → template string construction (line 113).",
+      "There are no constant-time conditions or reassignments that override the user-tainted `fragment` value on the reaching path.",
+      "There is no specific defense that escapes the value at the sink. The Jinja2 `Template` is created without enabling autoescape, and there is no explicit escaping function like `html.escape()` or `markupsafe.escape()` called on the `fragment` value before it's rendered.",
+      "The template does not explicitly use `|safe` or `{% autoescape false %}`. However, the Jinja2 `Template` class is instantiated without enabling autoescape (line 113), which means autoescape is disabled by default. This is equivalent to having autoescape disabled.",
+      "The user-tainted `fragment` value reaches the sink (line 113) without any escaping or sanitization. The Jinja2 template is created with autoescape disabled by default, making this a potential XSS vulnerability."
+    ],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 13.720457315444946,
+    "output_tokens": 1626,
+    "context_needed": [],
+    "reasoning": "The function `loan_jinja_cast_379` is a FastAPI route handler (indicated by the `@router.get` decorator) that directly accepts user input via the `fragment` query parameter. This user-controlled input is then embedded into a Jinja2 template without any escaping or sanitization. The Jinja2 `Template` is created without enabling autoescape, which creates a clear XSS vulnerability.",
+    "data_flow": "HTTP request query parameter `fragment` (line 111) → function parameter `fragment` (line 111) → template string construction and render (line 113)",
+    "confidence_score": 0.95,
+    "timestamp": "2026-07-14T15:24:21.475651",
+    "cost_usd": 0.0,
+    "input_tokens": 17370,
+    "cached_input_tokens": 0,
+    "tokens_used": 18996
+  },
+  "function": {
+    "name": "loan_jinja_cast_379",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 111,
+    "end_line": 114,
+    "scope": ""
+  },
+  "web_params": []
+}

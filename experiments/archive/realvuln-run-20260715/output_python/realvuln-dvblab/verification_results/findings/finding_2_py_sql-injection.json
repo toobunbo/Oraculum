@@ -1,0 +1,74 @@
+{
+  "id": "2",
+  "rule_slug": "py_sql-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-dvblab",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab/verification_results/summary_realvuln-dvblab_20260714_145756.json"
+  },
+  "finding": {
+    "rule_id": "py/sql-injection",
+    "message": "This SQL query depends on a [user-provided value](1).",
+    "file": "backend/routes/auth_routes.py",
+    "start_line": 37,
+    "end_line": 37,
+    "repo_name": "realvuln-dvblab",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab/realvuln-dvblab.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 32: ControlFlowNode for request",
+      "line 32: ControlFlowNode for data",
+      "line 33: ControlFlowNode for data",
+      "line 33: ControlFlowNode for Attribute()",
+      "line 33: ControlFlowNode for username",
+      "line 36: ControlFlowNode for query",
+      "line 37: ControlFlowNode for query"
+    ],
+    "severity": "8.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-89"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "The user-controlled `username` is directly interpolated into the SQL query using an f-string on line 36, which is then executed on line 37. There is no sanitization or parameterization, making this a clear case of SQL injection. The absence of callees for the login function doesn't affect this conclusion.",
+    "elapsed_seconds": 11.157761096954346,
+    "answers": [
+      "The EXACT sink statement is: `user = db.session.execute(query).fetchone()` on line 37. The variable passed to it is `query`.",
+      "The assignment to `query` is on line 36: `query = f\"SELECT * FROM user WHERE username = '{username}'\"`.",
+      "The value of `query` derives from user input. The data flow is: `request.get_json()` on line 32 → `data` on line 32 → `username = data.get('username')` on line 33 → `query = f\"SELECT * FROM user WHERE username = '{username}'\"` on line 36. The `username` is directly taken from the JSON payload of the request without any sanitization.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense that sanitizes the value before the sink. The query is constructed using an f-string, which is vulnerable to SQL injection. A parameterized query would be a defense, but it is not used here.",
+      "The user-tainted value `username` reaches the sink on line 37 via the `query` variable, and there is no sanitization or parameterization to prevent SQL injection. The additional context showing no callees doesn't change this analysis."
+    ],
+    "cached_input_tokens": 0,
+    "tokens_used": 16337,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence_score": 0.95,
+    "timestamp": "2026-07-14T14:57:28.472936",
+    "context_needed": [],
+    "data_flow": "request.get_json() (line 32) → data (line 32) → username (line 33) → query (line 36) → db.session.execute(query) (line 37)",
+    "output_tokens": 1303,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "iterations": 3,
+    "verdict": "True Positive",
+    "input_tokens": 15034
+  },
+  "function": {
+    "name": "login",
+    "file": "backend/routes/auth_routes.py",
+    "start_line": 31,
+    "end_line": 79,
+    "scope": ""
+  },
+  "web_params": []
+}

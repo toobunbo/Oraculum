@@ -1,0 +1,46 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "pathlib.Path.write_text",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "full file path of the Path instance (self) that write_text is called on, which contains the user-controlled ref value via BASE_EXPORT_DIR / f\"{ref}.json\"",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The file path of the Path instance (self) passed to write_text contains directory traversal sequences (../), indicating the user-controlled ref parameter escaped BASE_EXPORT_DIR",
+    "trigger_patterns": [
+      "\\.\\./"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_PATH-INJECTION: path traversal detected in write_text target path — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "../../../etc/passwd",
+      "../../tmp/evil",
+      "../other_dir/file",
+      "../../etc/shadow"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "acct_vault_stash_233",
+    "file": "crm_project/partner_console.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def acct_vault_stash_233(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "HttpRequest"
+      }
+    ],
+    "target_id": "py_path_injection_crm_project_partner_console_py_92",
+    "finding_id": "3",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/findings/finding_3_py_path-injection.json"
+  }
+}

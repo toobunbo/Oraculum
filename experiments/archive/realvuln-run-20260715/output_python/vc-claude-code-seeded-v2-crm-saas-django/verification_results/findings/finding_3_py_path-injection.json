@@ -1,0 +1,76 @@
+{
+  "id": "3",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/summary_vc-claude-code-seeded-v2-crm-saas-django_20260714_152015.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "crm_project/partner_console.py",
+    "start_line": 92,
+    "end_line": 92,
+    "repo_name": "vc-claude-code-seeded-v2-crm-saas-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/vc-claude-code-seeded-v2-crm-saas-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 86: ControlFlowNode for request",
+      "line 89: ControlFlowNode for Attribute",
+      "line 89: ControlFlowNode for Attribute()",
+      "line 89: ControlFlowNode for ref",
+      "line 90: ControlFlowNode for target",
+      "line 92: ControlFlowNode for target"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 17305,
+    "confidence": "Medium",
+    "iterations": 3,
+    "output_tokens": 1618,
+    "context_needed": [],
+    "reasoning": "The user-controlled `ref` parameter is used directly in a file path construction without sanitization or validation. While we don't have the definition of BASE_EXPORT_DIR, the lack of any visible path sanitization and the direct use of user input in file path construction indicates a path traversal vulnerability.",
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:19:55.144670",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request (line 86) → ref = request.GET.get(\"ref\", \"daily\") (line 89) → target = BASE_EXPORT_DIR / f\"{ref}.json\" (line 90) → target.write_text(...) (line 92)",
+    "cost_usd": 0.0,
+    "cached_input_tokens": 0,
+    "tokens_used": 18923,
+    "elapsed_seconds": 13.188588619232178,
+    "confidence_score": 0.75,
+    "answers": [
+      "The EXACT flagged line is line 92: `target.write_text(json.dumps({\"ref\": ref, \"ssn\": request.GET.get(\"ssn\", \"111-22-3333\"), \"card\": request.GET.get(\"card\", \"111-1111111111111\")}))`. This line is located in the function `acct_vault_stash_233`.",
+      "The path value `target` is assigned on line 90: `target = BASE_EXPORT_DIR / f\"{ref}.json\"`. The variable `ref` used in the path is assigned on line 89: `ref = request.GET.get(\"ref\", \"daily\")`.",
+      "The value of `ref` on line 89 derives from user input via `request.GET.get(\"ref\", \"daily\")`. The data-flow chain is: `request` (line 86, source) → `request.GET.get(\"ref\", \"daily\")` (line 89) → `ref` (line 89) → `target` (line 90) → `target.write_text(...)` (line 92).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The value of `ref` directly influences the path used in the file operation without any sanitization or validation.",
+      "There is no specific defense mechanism applied to contain the path. No use of `secure_filename`, `Path.resolve()`, `is_relative_to()`, or similar defenses is visible. The BASE_EXPORT_DIR global variable definition is not available to confirm if it provides any protection.",
+      "The user-tainted value `ref` directly reaches the sink without any visible sanitization or defense mechanism. The path construction is vulnerable to directory traversal if `ref` contains path traversal sequences like `../`. Without knowing the value or protection mechanisms of BASE_EXPORT_DIR, we cannot confirm if this is safely contained."
+    ]
+  },
+  "function": {
+    "name": "acct_vault_stash_233",
+    "file": "crm_project/partner_console.py",
+    "start_line": 86,
+    "end_line": 93,
+    "scope": ""
+  },
+  "web_params": []
+}

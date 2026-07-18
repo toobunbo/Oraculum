@@ -1,0 +1,75 @@
+{
+  "id": "14",
+  "rule_slug": "py_unsafe-deserialization",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-claude-code-seeded-v2-fintech-lending-fastapi_20260714_152421.json"
+  },
+  "finding": {
+    "rule_id": "py/unsafe-deserialization",
+    "message": "Unsafe deserialization depends on a [user-provided value](1).",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 61,
+    "end_line": 61,
+    "repo_name": "vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/vc-claude-code-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 51: ControlFlowNode for request",
+      "line 54: ControlFlowNode for raw",
+      "line 61: ControlFlowNode for raw",
+      "--- Flow 2 ---",
+      "line 51: ControlFlowNode for request",
+      "line 54: ControlFlowNode for raw",
+      "line 58: ControlFlowNode for raw",
+      "line 61: ControlFlowNode for raw"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-502"
+    ],
+    "tags": [
+      "security",
+      "serialization"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "confidence": "High",
+    "iterations": 3,
+    "answers": [
+      "The EXACT deserialization sink is `pickle.loads(raw)` on line 61. The bytes value passed to it is `raw`.",
+      "Assignments to `raw` on the path to the sink (line 61):\n- Line 54: `raw = await request.body()`\n- Line 56: `raw = request.query_params.get(\"blob\", \"\").encode(\"utf-8\")` (conditional)\n- Line 58: `raw = base64.b64decode(raw)` (conditional)\n- Line 60: `raw = b\"\\x80\\x04}q\\x00.\"` (fallback if `raw` is falsy)\nThe LAST assignment depends on control flow, but in the primary flow (e.g., if `raw` is provided via body or query param), it is either line 54, 56, or 58.",
+      "The value of `raw` derives from user input in the following cases:\n- Line 54: `raw = await request.body()` — user-controlled request body.\n- Line 56: `raw = request.query_params.get(\"blob\", \"\").encode(\"utf-8\")` — user-controlled query parameter `blob`.\n- Line 58: `raw = base64.b64decode(raw)` — if `raw` was from query param or body, this is a decoding of user input.\nThus, in all relevant paths, `raw` originates from user-controlled input.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. Line 60 (`raw = b\"\\x80\\x04}q\\x00.\"`) only applies if `raw` is falsy, but this does not prevent prior user-controlled assignments from reaching the sink.",
+      "There is NO defense preventing code execution. The code directly uses `pickle.loads()` on user-controlled input. No HMAC, schema validation, or safe deserializer (like `json.loads`) is used.",
+      "User-controlled data (`request.body()` or `query_params[\"blob\"]`) reaches `pickle.loads(raw)` on line 61. There is no defense mechanism visible in the code to prevent unsafe deserialization."
+    ],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 14.721127033233643,
+    "output_tokens": 1600,
+    "context_needed": [],
+    "reasoning": "User-controlled input (request body or query param) flows directly into `pickle.loads()` without any sanitization or safe deserialization mechanism. The use of `pickle.loads()` on untrusted data is inherently unsafe and leads to remote code execution. The additional context confirms the function is a FastAPI route handler, making it externally reachable.",
+    "data_flow": "request.body (line 54) / query_params['blob'] (line 56) → raw → pickle.loads (line 61)",
+    "confidence_score": 0.95,
+    "timestamp": "2026-07-14T15:24:06.675798",
+    "cost_usd": 0.0,
+    "input_tokens": 17541,
+    "cached_input_tokens": 0,
+    "tokens_used": 19141
+  },
+  "function": {
+    "name": "loan_bundle_thaw_168",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 51,
+    "end_line": 62,
+    "scope": ""
+  },
+  "web_params": []
+}

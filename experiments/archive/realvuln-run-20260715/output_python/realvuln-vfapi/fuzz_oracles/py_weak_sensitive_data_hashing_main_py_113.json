@@ -1,0 +1,42 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "sqlite3.Cursor.execute",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "SQL query string passed to cursor.execute containing the MD5-hashed password value",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured SQL query string contains an INSERT INTO users statement with a password value that is an unsalted MD5 hex digest (exactly 32 lowercase hex characters enclosed in SQL string quotes)",
+    "trigger_patterns": [
+      "INSERT\\s+INTO\\s+users.*?'[0-9a-f]{32}'",
+      "'[0-9a-f]{32}'"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_WEAK_SENSITIVE_DATA_HASHING: password hashed with unsalted MD5 detected in SQL INSERT — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "password123",
+      "admin",
+      "testuser@example.com",
+      "P@ssw0rd!",
+      "default_password"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "init_sql_db",
+    "file": "main.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def init_sql_db()",
+    "tainted_params": [],
+    "target_id": "py_weak_sensitive_data_hashing_main_py_113",
+    "finding_id": "0",
+    "rule_id": "py/weak-sensitive-data-hashing",
+    "rule_slug": "py_weak-sensitive-data-hashing",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-vfapi/verification_results/findings/finding_0_py_weak-sensitive-data-hashing.json"
+  }
+}

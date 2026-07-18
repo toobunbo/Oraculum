@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "etree.fromstring called with parser configured with resolve_entities=True, load_dtd=True, no_network=False, enabling external entity resolution (network I/O, file access)"
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "not evaluated, decision stopped at Q1"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "not evaluated, decision stopped at Q1"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock etree.XMLParser on line 192 to override unsafe defaults, or mock etree.fromstring on line 193 to prevent actual parsing",
+    "capture": "Capture the request.body argument passed to etree.fromstring to verify it reaches the sink",
+    "fake_behavior": "Return a safe dummy lxml Element (e.g., etree.Element('root')) so downstream access to doc.tag in the JsonResponse succeeds without triggering entity resolution",
+    "notes": [
+      "Mocking XMLParser with safe defaults (resolve_entities=False, load_dtd=False) is an alternative that still exercises real parsing logic",
+      "If mocking fromstring directly, ensure the fake element has a .tag attribute since the function returns JsonResponse({'root': doc.tag})"
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

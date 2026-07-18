@@ -1,0 +1,54 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "sqlite3.Cursor.execute",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "formatted SQL string passed as first argument to c.execute() containing interpolated username and password",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured SQL string contains a single-quote breakout within the VALUES clause followed by a SQL keyword or comment terminator, confirming unsanitized interpolation of user input.",
+    "trigger_patterns": [
+      "VALUES\\s*\\([^)]*'\\s*(OR|AND|UNION)\\b",
+      "VALUES\\s*\\([^)]*'\\s*;\\s*(DROP|DELETE|UPDATE|SELECT|INSERT)\\b",
+      "VALUES\\s*\\([^)]*'\\s*--"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_SQL-INJECTION: SQL injection detected in cursor.execute argument — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "admin' OR '1'='1",
+      "test'); DROP TABLE users;--",
+      "x' UNION SELECT 1,2,3,4,5--",
+      "user' AND 1=1--",
+      "a'); INSERT INTO admins VALUES('hacker','pass')--"
+    ],
+    "skip_condition": "len(username) == 0 and len(password) == 0"
+  },
+  "_meta": {
+    "function": "create",
+    "file": "bad/libuser.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def create(username, password)",
+    "tainted_params": [
+      {
+        "name": "username",
+        "index": 0,
+        "type": "str"
+      },
+      {
+        "name": "password",
+        "index": 1,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_sql_injection_bad_libuser_py_25",
+    "finding_id": "3",
+    "rule_id": "py/sql-injection",
+    "rule_slug": "py_sql-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-vulpy/verification_results/findings/finding_3_py_sql-injection.json"
+  }
+}

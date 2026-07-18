@@ -1,0 +1,22 @@
+{
+  "stage": "ingest",
+  "repo": "vc-codex-high-seeded-v2-logistics-dispatch-fastapi",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-logistics-dispatch-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-logistics-dispatch-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-logistics-dispatch-fastapi/verification_results/summary_vc-codex-high-seeded-v2-logistics-dispatch-fastapi_20260714_154919.json"
+  },
+  "counts": {
+    "total_verdicts": 18,
+    "selected": 0,
+    "enriched": 0,
+    "skipped": 18,
+    "failed": 0
+  },
+  "findings": [],
+  "errors": []
+}

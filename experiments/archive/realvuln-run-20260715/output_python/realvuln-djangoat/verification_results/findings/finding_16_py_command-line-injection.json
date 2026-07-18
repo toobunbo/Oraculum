@@ -1,0 +1,83 @@
+{
+  "id": "16",
+  "rule_slug": "py_command-line-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-djangoat",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/verification_results/summary_realvuln-djangoat_20260714_145404.json"
+  },
+  "finding": {
+    "rule_id": "py/command-line-injection",
+    "message": "This command line depends on a [user-provided value](1).",
+    "file": "app/models/Benefits/benefits.py",
+    "start_line": 73,
+    "end_line": 73,
+    "repo_name": "realvuln-djangoat",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/realvuln-djangoat.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 40: ControlFlowNode for request",
+      "line 43: ControlFlowNode for Subscript",
+      "line 31: ControlFlowNode for uploaded_file",
+      "line 33: ControlFlowNode for full_file_name",
+      "line 41: ControlFlowNode for full_file_name",
+      "line 67: ControlFlowNode for full_file_name",
+      "line 73: ControlFlowNode for BinaryExpr",
+      "--- Flow 2 ---",
+      "line 40: ControlFlowNode for request",
+      "line 43: ControlFlowNode for Subscript",
+      "line 31: ControlFlowNode for uploaded_file",
+      "line 40: ControlFlowNode for uploaded_file",
+      "line 67: ControlFlowNode for orig_file",
+      "line 70: ControlFlowNode for bak_file_path",
+      "line 73: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-78",
+      "CWE-88"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 12625,
+    "output_tokens": 1417,
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "data_flow": "request (line 40) → uploaded_file (line 31) → full_file_name (line 33) → full_file_name (line 67) → os.system command (line 73)",
+    "cost_usd": 0.0,
+    "confidence_score": 0.95,
+    "reasoning": "User-controlled input flows directly into a shell command via `os.system` without sanitization or quoting, creating a command injection vulnerability. The additional context confirms there are no callers or callees that would prevent this.",
+    "confidence": "High",
+    "answers": [
+      "The EXACT sink is `os.system(\"cp %s %s\" % (full_file_name, bak_file_path))` on line 73. The command argument is the formatted string `\"cp %s %s\" % (full_file_name, bak_file_path)`.",
+      "The assignments to the values in the command string are: (a) `full_file_name` is a parameter to the function (line 67); (b) `bak_file_path` is built from `data_path`, `epoch_time`, and `orig_file.name` (lines 69–71). The last assignments are the initial parameter values and the string formatting on line 70.",
+      "According to the dataflow path, `full_file_name` originates from user input via `request` (line 40 → 43 → 31 → 33 → 41 → 67). Similarly, `orig_file` (used to build `bak_file_path`) also originates from user input (line 40 → 43 → 31 → 40 → 67). Therefore, both components of the command string are derived from user input.",
+      "There are no constant-time conditions or reassignments that override the user-tainted values. The values flow directly from the parameters to the `os.system` call without modification.",
+      "There is no specific defense such as `shlex.quote()`, allow-listing, or safe subprocess invocation. The code directly interpolates user-controlled values into a shell command string.",
+      "The user-tainted value `full_file_name` reaches the sink at line 73, and there is no sanitization or defense mechanism visible in the code. The additional context does not show any caller that might provide safe inputs or any callees that might sanitize the inputs."
+    ],
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 11.33633017539978,
+    "timestamp": "2026-07-14T14:54:02.554848",
+    "iterations": 3,
+    "tokens_used": 14042
+  },
+  "function": {
+    "name": "make_backup",
+    "file": "app/models/Benefits/benefits.py",
+    "start_line": 67,
+    "end_line": 74,
+    "scope": "Benefits"
+  },
+  "web_params": []
+}

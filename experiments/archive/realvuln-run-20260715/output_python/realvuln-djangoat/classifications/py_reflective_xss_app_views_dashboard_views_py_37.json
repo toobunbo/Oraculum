@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "strategy": "return_value",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "The sink is HttpResponse(...) which only constructs an in-memory response object; no network I/O, shell execution, or external side effects."
+    },
+    "q2_observable_after_return": {
+      "answer": true,
+      "evidence": "The XSS violation (missing escaping of dashboard_id) is embedded in the returned HttpResponse object's content and can be inspected after the function returns."
+    },
+    "q3_result_in_memory": {
+      "answer": true,
+      "evidence": "returns.kind is 'value' with expr 'HttpResponse('Dashboard ' + str(dashboard_id))', allowing in-memory inspection of the response content attribute."
+    }
+  },
+  "mock_guidance": null,
+  "confidence": "high",
+  "warnings": []
+}

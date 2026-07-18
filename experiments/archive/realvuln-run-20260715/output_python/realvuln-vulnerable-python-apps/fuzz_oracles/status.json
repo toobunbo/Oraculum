@@ -1,0 +1,31 @@
+{
+  "stage": "oracle",
+  "repo": "realvuln-vulnerable-python-apps",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/oracle.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/realvuln-vulnerable-python-apps/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 1,
+    "generated": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "oracles": [
+    {
+      "id": "0",
+      "target_id": "py_incomplete_url_substring_sanitization_Other_url_fetch_py_14",
+      "rule_id": "py/incomplete-url-substring-sanitization",
+      "file": "Other/url_fetch.py",
+      "start_line": "14",
+      "function_name": "fetch",
+      "finding_artifact": "output/python/realvuln-vulnerable-python-apps/verification_results/findings/finding_0_py_incomplete-url-substring-sanitization.json",
+      "oracle": "output/python/realvuln-vulnerable-python-apps/fuzz_oracles/py_incomplete_url_substring_sanitization_Other_url_fetch_py_14.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    }
+  ],
+  "errors": []
+}

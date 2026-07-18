@@ -1,0 +1,76 @@
+{
+  "id": "4",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/summary_vc-claude-code-seeded-v2-crm-saas-django_20260714_152015.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "crm_project/partner_console.py",
+    "start_line": 142,
+    "end_line": 142,
+    "repo_name": "vc-claude-code-seeded-v2-crm-saas-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/vc-claude-code-seeded-v2-crm-saas-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 137: ControlFlowNode for request",
+      "line 140: ControlFlowNode for Attribute",
+      "line 140: ControlFlowNode for Attribute()",
+      "line 140: ControlFlowNode for name",
+      "line 141: ControlFlowNode for target",
+      "line 142: ControlFlowNode for Attribute"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 12419,
+    "confidence": "High",
+    "iterations": 3,
+    "output_tokens": 1216,
+    "context_needed": [],
+    "reasoning": "User-controlled input `name` is used directly in a file path construction without sanitization. Even though we cannot see BASE_EXPORT_DIR, the user input directly influences the path used in the mkdir operation, creating a directory traversal vulnerability.",
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:20:02.141718",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request (line 137) → name = request.GET.get(\"name\", \"packet.bin\") (line 140) → target = BASE_EXPORT_DIR / name (line 141) → target.parent.mkdir(...) (line 142)",
+    "cost_usd": 0.0,
+    "cached_input_tokens": 0,
+    "tokens_used": 13635,
+    "elapsed_seconds": 9.424314737319946,
+    "confidence_score": 0.9,
+    "answers": [
+      "The EXACT flagged line is: `target.parent.mkdir(parents=True, exist_ok=True)` on line 142. This line lives in the function `acct_dock_shelf_388`.",
+      "The assignments to the path value are: line 140 assigns `name = request.GET.get(\"name\", \"packet.bin\")`, and line 141 assigns `target = BASE_EXPORT_DIR / name`.",
+      "The last assignment is `target = BASE_EXPORT_DIR / name` on line 141. The value of `name` derives from user input via `request.GET.get(\"name\", \"packet.bin\")` on line 140. The data flow is: request (line 137) → name (line 140) → target (line 141).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. No defensive code like path validation or sanitization is present.",
+      "There is no specific defense mechanism applied to the path. No use of `secure_filename`, `resolve()`, `is_relative_to()`, or similar protections is visible. The additional context does not reveal any sanitization.",
+      "The user-tainted value `name` flows directly into the path construction and then to the `mkdir` call without any visible sanitization or validation to prevent directory traversal. The missing context about BASE_EXPORT_DIR and callers does not change the fact that user input directly influences the path."
+    ]
+  },
+  "function": {
+    "name": "acct_dock_shelf_388",
+    "file": "crm_project/partner_console.py",
+    "start_line": 137,
+    "end_line": 144,
+    "scope": ""
+  },
+  "web_params": []
+}

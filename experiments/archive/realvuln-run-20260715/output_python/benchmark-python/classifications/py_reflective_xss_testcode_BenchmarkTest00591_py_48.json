@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink at line 48 involves unescaped data reaching HTML output, which can lead to XSS - a dangerous client-side vulnerability."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated because Q1 was true"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated because Q1 was true"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "HTTP response rendering or HTML generation at the sink (line 48)",
+    "capture": "The 'bar' variable (line 41) containing the unsanitized Referer header value",
+    "fake_behavior": "Return a safe placeholder response instead of rendering vulnerable HTML",
+    "notes": [
+      "The XSS vulnerability occurs when the 'bar' value is embedded in HTML output without escaping",
+      "Mocking should intercept the final HTML generation or response rendering step",
+      "Ensure the Referer header input is captured for validation but not actually rendered"
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

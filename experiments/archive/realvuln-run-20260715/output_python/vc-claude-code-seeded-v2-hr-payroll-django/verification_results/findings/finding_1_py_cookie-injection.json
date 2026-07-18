@@ -1,0 +1,74 @@
+{
+  "id": "1",
+  "rule_slug": "py_cookie-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/summary_vc-claude-code-seeded-v2-hr-payroll-django_20260714_152802.json"
+  },
+  "finding": {
+    "rule_id": "py/cookie-injection",
+    "message": "Cookie is constructed from a [user-supplied input](1).",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 105,
+    "end_line": 105,
+    "repo_name": "vc-claude-code-seeded-v2-hr-payroll-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/vc-claude-code-seeded-v2-hr-payroll-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 100: ControlFlowNode for request",
+      "line 103: ControlFlowNode for Attribute",
+      "line 103: ControlFlowNode for Attribute()",
+      "line 103: ControlFlowNode for marker",
+      "line 105: ControlFlowNode for marker"
+    ],
+    "severity": "5.0",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-20"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "data_flow": "request.GET.get(\"marker\", \"portal\") (line 103) → marker (line 103) → response.set_cookie(\"portal_crumb\", marker) (line 105)",
+    "iterations": 1,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "tokens_used": 5482,
+    "timestamp": "2026-07-14T15:27:24.649890",
+    "input_tokens": 4946,
+    "output_tokens": 536,
+    "confidence_score": 0.95,
+    "elapsed_seconds": 4.102830410003662,
+    "reasoning": "User-controlled input from request.GET is directly used in set_cookie without any sanitization, which can lead to cookie injection vulnerabilities. The data flow is clear and unmitigated.",
+    "cost_usd": 0.0,
+    "answers": [
+      "Step 1: The potentially dangerous data originates from user input via the HTTP request GET parameter 'marker' on line 103.",
+      "Step 2: The data flows through the following variables with line numbers: request.GET.get(\"marker\", \"portal\") on line 103 assigns to 'marker', which is then used in response.set_cookie on line 105.",
+      "Step 3: There is no validation, sanitization, or encoding applied to the 'marker' variable between its retrieval from the request and its use in setting the cookie.",
+      "Step 4: The sink is the response.set_cookie(\"portal_crumb\", marker) call on line 105. The specific operation that makes it dangerous is directly using unsanitized user input as the value for a cookie, which could lead to cookie injection or manipulation.",
+      "Step 5: There are no intermediate transformations such as encoding, decoding, or type conversion between the source and sink that could bypass sanitization.",
+      "Step 6: The framework does not provide automatic protections against cookie injection in this context. The Django JsonResponse and set_cookie method do not sanitize cookie values by default.",
+      "Step 7: The attacker needs to be able to make a request to this endpoint, which appears to be accessible without specific authentication checks shown in the code snippet (though _wrk_gate might perform some checks not shown).",
+      "Step 8: This code does not appear to be in a test file, debug path, or dead code. It seems to be part of the main application logic.",
+      "Step 9: The concrete security impact if an attacker controls this data could be session fixation, cookie injection, or bypassing security mechanisms that rely on cookie values.",
+      "Step 10: The weakest link in the defense chain is the lack of any sanitization or validation of the user-supplied 'marker' value before using it as a cookie value."
+    ],
+    "cached_input_tokens": 0,
+    "context_needed": []
+  },
+  "function": {
+    "name": "payroll_crumb_lane_290",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 100,
+    "end_line": 106,
+    "scope": ""
+  },
+  "web_params": []
+}

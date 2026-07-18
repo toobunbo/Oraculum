@@ -1,0 +1,71 @@
+{
+  "stage": "classification",
+  "repo": "realvuln-insecure-web",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/classification.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/realvuln-insecure-web/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 4,
+    "generated": 4,
+    "skipped": 0,
+    "failed": 0
+  },
+  "classifications": [
+    {
+      "id": "0",
+      "target_id": "py_cookie_injection_app_app_py_38",
+      "rule_id": "py/cookie-injection",
+      "file": "app/app.py",
+      "start_line": "38",
+      "function_name": "login",
+      "finding_artifact": "output/python/realvuln-insecure-web/verification_results/findings/finding_0_py_cookie-injection.json",
+      "classification": "output/python/realvuln-insecure-web/classifications/py_cookie_injection_app_app_py_38.json",
+      "status": "generated",
+      "strategy": "return_value",
+      "confidence": "high"
+    },
+    {
+      "id": "1",
+      "target_id": "py_reflective_xss_app_app_py_47",
+      "rule_id": "py/reflective-xss",
+      "file": "app/app.py",
+      "start_line": "47",
+      "function_name": "dashboard",
+      "finding_artifact": "output/python/realvuln-insecure-web/verification_results/findings/finding_1_py_reflective-xss.json",
+      "classification": "output/python/realvuln-insecure-web/classifications/py_reflective_xss_app_app_py_47.json",
+      "status": "generated",
+      "strategy": "return_value",
+      "confidence": "high"
+    },
+    {
+      "id": "2",
+      "target_id": "py_reflective_xss_app_app_py_53",
+      "rule_id": "py/reflective-xss",
+      "file": "app/app.py",
+      "start_line": "53",
+      "function_name": "search",
+      "finding_artifact": "output/python/realvuln-insecure-web/verification_results/findings/finding_2_py_reflective-xss.json",
+      "classification": "output/python/realvuln-insecure-web/classifications/py_reflective_xss_app_app_py_53.json",
+      "status": "generated",
+      "strategy": "return_value",
+      "confidence": "high"
+    },
+    {
+      "id": "3",
+      "target_id": "py_sql_injection_app_app_py_34",
+      "rule_id": "py/sql-injection",
+      "file": "app/app.py",
+      "start_line": "34",
+      "function_name": "login",
+      "finding_artifact": "output/python/realvuln-insecure-web/verification_results/findings/finding_3_py_sql-injection.json",
+      "classification": "output/python/realvuln-insecure-web/classifications/py_sql_injection_app_app_py_34.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "high"
+    }
+  ],
+  "errors": []
+}

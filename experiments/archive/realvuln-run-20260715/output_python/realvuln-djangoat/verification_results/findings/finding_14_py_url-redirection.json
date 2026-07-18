@@ -1,0 +1,68 @@
+{
+  "id": "14",
+  "rule_slug": "py_url-redirection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-djangoat",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/verification_results/summary_realvuln-djangoat_20260714_145404.json"
+  },
+  "finding": {
+    "rule_id": "py/url-redirection",
+    "message": "Untrusted URL redirection depends on a [user-provided value](1).",
+    "file": "app/views/sessions/views.py",
+    "start_line": 43,
+    "end_line": 43,
+    "repo_name": "realvuln-djangoat",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/realvuln-djangoat.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 23: ControlFlowNode for request",
+      "line 27: ControlFlowNode for path",
+      "line 43: ControlFlowNode for path"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-601"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 13837,
+    "output_tokens": 1449,
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "data_flow": "request (line 23) → request.POST['path'] (line 27) → path (line 27) → HttpResponseRedirect(path) (line 43)",
+    "cost_usd": 0.0,
+    "confidence_score": 0.9,
+    "reasoning": "The user-controlled value `path` from `request.POST` is used directly in `HttpResponseRedirect` without any validation or sanitization. The absence of a caller suggests this function is directly exposed, making the open redirect vulnerability exploitable.",
+    "confidence": "High",
+    "answers": [
+      "The EXACT flagged line is `response = HttpResponseRedirect(path)` on line 43. This line resides within the `sessions_index` function in the file `app/views/sessions/views.py`.",
+      "The assignments to `path` that reach the sink on line 43 are: line 23 (default value `/dashboard/home`), and line 27 (`path = request.POST['path']`). The LAST assignment on the path reaching the sink is line 27.",
+      "The value of `path` on line 27 derives from user input via `request.POST['path']`, which is a user-provided value from the POST request data. The data-flow chain is: `request` (line 23) → `request.POST['path']` (line 27) → `path` (line 27) → `HttpResponseRedirect(path)` (line 43).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value of `path` on the path reaching the sink. No defensive code is present between line 27 and line 43 that would neutralize the user-controlled input.",
+      "There is no specific defense mechanism applied to the redirect. No validation, sanitization, or allow-list check is performed on the `path` variable before it is used in the redirect. No call to `url_has_allowed_host_and_scheme` or similar is visible.",
+      "The user-tainted value `path` from `request.POST['path']` reaches the sink `HttpResponseRedirect(path)` without any visible sanitization or validation. The fact that no caller was found suggests this function may be directly exposed as a view handler, making the vulnerability exploitable."
+    ],
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 10.514953851699829,
+    "timestamp": "2026-07-14T14:53:52.299390",
+    "iterations": 3,
+    "tokens_used": 15286
+  },
+  "function": {
+    "name": "sessions_index",
+    "file": "app/views/sessions/views.py",
+    "start_line": 23,
+    "end_line": 66,
+    "scope": ""
+  },
+  "web_params": []
+}

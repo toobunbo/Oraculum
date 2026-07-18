@@ -1,0 +1,76 @@
+{
+  "id": "4",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-legal-case-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/verification_results/summary_vc-claude-code-seeded-v2-legal-case-django_20260714_152949.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 142,
+    "end_line": 142,
+    "repo_name": "vc-claude-code-seeded-v2-legal-case-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/vc-claude-code-seeded-v2-legal-case-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 136: ControlFlowNode for request",
+      "line 139: ControlFlowNode for Attribute",
+      "line 139: ControlFlowNode for Attribute()",
+      "line 139: ControlFlowNode for name",
+      "line 140: ControlFlowNode for target",
+      "line 142: ControlFlowNode for target"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "answers": [
+      "The exact file-operation sink is `target.write_bytes(request.body)` on line 142. The path value passed to it is `target`, which is derived from `BASE_EXPORT_DIR / name`.",
+      "The assignments to the path value are: line 139: `name = request.GET.get(\"name\", \"packet.bin\")`, line 140: `target = BASE_EXPORT_DIR / name`. The last assignment is on line 140.",
+      "The value of `target` derives from `name`, which is assigned on line 139 as `request.GET.get(\"name\", \"packet.bin\")`. This directly retrieves user input from the GET parameters. The data flow is: `request` (line 136) → `name` (line 139) → `target` (line 140) → sink (line 142).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. No defensive checks or sanitizations are present in the code snippet.",
+      "There is no specific defense mechanism applied to the path. No use of `secure_filename`, `resolve()`, `is_relative_to()`, or any other path sanitization or validation technique is visible. The additional context does not reveal any protections in `BASE_EXPORT_DIR` or the caller context.",
+      "The user-tainted value `name` from `request.GET` reaches the sink at line 142 without any visible sanitization or validation. The additional context does not provide any evidence of protections, so the vulnerability assessment remains the same."
+    ],
+    "reasoning": "User-controlled input `name` is used to construct a file path which is then written to using `write_bytes`. There is no sanitization or validation of the input, and the additional context does not reveal any protections. This makes it vulnerable to path traversal attacks.",
+    "cost_usd": 0.0,
+    "iterations": 3,
+    "input_tokens": 12456,
+    "cached_input_tokens": 0,
+    "output_tokens": 1264,
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request (line 136) → name = request.GET.get(\"name\", ...) (line 139) → target = BASE_EXPORT_DIR / name (line 140) → target.write_bytes(...) (line 142)",
+    "elapsed_seconds": 10.730530261993408,
+    "tokens_used": 13720,
+    "verdict": "True Positive",
+    "confidence": "High",
+    "timestamp": "2026-07-14T15:29:25.892819"
+  },
+  "function": {
+    "name": "case_dock_shelf_392",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 136,
+    "end_line": 143,
+    "scope": ""
+  },
+  "web_params": []
+}

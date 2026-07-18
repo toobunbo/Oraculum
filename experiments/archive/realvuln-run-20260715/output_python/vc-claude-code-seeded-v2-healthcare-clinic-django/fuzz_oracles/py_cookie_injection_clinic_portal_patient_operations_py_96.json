@@ -1,0 +1,54 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "cookie value extracted from response.cookies dict (e.g. str(response.cookies.get('portal_crumb', '')))",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The extracted cookie value contains CRLF characters or injected cookie attribute fragments (Path=, Domain=, etc.) preceded by a semicolon, confirming that unsanitized user input survived into the Set-Cookie header.",
+    "trigger_patterns": [
+      "\r\n",
+      ";\r\n",
+      ";\n",
+      ";\\s*[Pp]ath\\s*=",
+      ";\\s*[Dd]omain\\s*=",
+      ";\\s*[Ee]xpires\\s*=",
+      ";\\s*[Mm]ax-[Aa]ge\\s*="
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_COOKIE_INJECTION: unsanitized cookie injection payload survived in cookie value — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "x\r\nX-Injected: true",
+      "portal; Path=/",
+      "portal; Domain=.evil.com",
+      "a\r\nSet-Cookie: session=hijacked",
+      "val; Max-Age=99999",
+      "test; Expires=Wed, 09 Jun 2100 10:18:14 GMT"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "patient_crumb_lane_289",
+    "file": "clinic_portal/patient_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def patient_crumb_lane_289(request)",
+    "tainted_params": [
+      {
+        "name": "marker",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_cookie_injection_clinic_portal_patient_operations_py_96",
+    "finding_id": "1",
+    "rule_id": "py/cookie-injection",
+    "rule_slug": "py_cookie-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_1_py_cookie-injection.json"
+  }
+}

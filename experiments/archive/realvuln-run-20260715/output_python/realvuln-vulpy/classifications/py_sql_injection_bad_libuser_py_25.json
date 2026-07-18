@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is c.execute() performing an INSERT INTO users query, which is a database write operation."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; Q1 answered YES."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; Q1 answered YES."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the cursor.execute() call on line 25.",
+    "capture": "Capture the first argument passed to c.execute(), which is the formatted SQL string containing the interpolated username and password values.",
+    "fake_behavior": "Make the mocked execute() a no-op that does not actually connect to or write to any database. Optionally return a fake cursor result.",
+    "notes": [
+      "The mock must intercept the exact string produced by the % formatting to verify that tainted values are embedded unsanitized.",
+      "Ensure the database connection and cursor objects used in the create() function are replaced or patched so the real execute is never reached."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

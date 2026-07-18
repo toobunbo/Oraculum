@@ -1,0 +1,188 @@
+{
+  "stage": "oracle",
+  "repo": "vc-claude-code-seeded-v2-support-desk-fastapi",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/oracle.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 13,
+    "generated": 9,
+    "skipped": 0,
+    "failed": 4
+  },
+  "oracles": [
+    {
+      "id": "0",
+      "target_id": "py_full_ssrf_backend_app_support_operations_py_75",
+      "rule_id": "py/full-ssrf",
+      "file": "backend/app/support_operations.py",
+      "start_line": "75",
+      "function_name": "ticket_relay_probe_354",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_0_py_full-ssrf.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/fuzz_oracles/py_full_ssrf_backend_app_support_operations_py_75.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "1",
+      "target_id": "py_path_injection_backend_app_support_operations_py_56",
+      "rule_id": "py/path-injection",
+      "file": "backend/app/support_operations.py",
+      "start_line": "56",
+      "function_name": "ticket_vault_stash_232",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_1_py_path-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/fuzz_oracles/py_path_injection_backend_app_support_operations_py_56.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "2",
+      "target_id": "py_path_injection_backend_app_support_operations_py_57",
+      "rule_id": "py/path-injection",
+      "file": "backend/app/support_operations.py",
+      "start_line": "57",
+      "function_name": "ticket_vault_stash_232",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_2_py_path-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/fuzz_oracles/py_path_injection_backend_app_support_operations_py_57.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "3",
+      "target_id": "py_path_injection_backend_app_support_operations_py_97",
+      "rule_id": "py/path-injection",
+      "file": "backend/app/support_operations.py",
+      "start_line": "97",
+      "function_name": "ticket_dock_shelf_387",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_3_py_path-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/fuzz_oracles/py_path_injection_backend_app_support_operations_py_97.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "4",
+      "target_id": "py_path_injection_backend_app_support_operations_py_98",
+      "rule_id": "py/path-injection",
+      "file": "backend/app/support_operations.py",
+      "start_line": "98",
+      "function_name": "ticket_dock_shelf_387",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_4_py_path-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/fuzz_oracles/py_path_injection_backend_app_support_operations_py_98.json",
+      "status": "failed"
+    },
+    {
+      "id": "5",
+      "target_id": "py_reflective_xss_backend_app_support_operations_py_25",
+      "rule_id": "py/reflective-xss",
+      "file": "backend/app/support_operations.py",
+      "start_line": "25",
+      "function_name": "ticket_copy_badge_028",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_5_py_reflective-xss.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/fuzz_oracles/py_reflective_xss_backend_app_support_operations_py_25.json",
+      "status": "generated",
+      "strategy": "return_value"
+    },
+    {
+      "id": "6",
+      "target_id": "py_clear_text_logging_sensitive_data_backend_app_seed_py_535",
+      "rule_id": "py/clear-text-logging-sensitive-data",
+      "file": "backend/app/seed.py",
+      "start_line": "535",
+      "function_name": "seed",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_6_py_clear-text-logging-sensitive-data.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/fuzz_oracles/py_clear_text_logging_sensitive_data_backend_app_seed_py_535.json",
+      "status": "failed"
+    },
+    {
+      "id": "7",
+      "target_id": "py_clear_text_storage_sensitive_data_backend_app_support_operations_py_57",
+      "rule_id": "py/clear-text-storage-sensitive-data",
+      "file": "backend/app/support_operations.py",
+      "start_line": "57",
+      "function_name": "ticket_vault_stash_232",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_7_py_clear-text-storage-sensitive-data.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/fuzz_oracles/py_clear_text_storage_sensitive_data_backend_app_support_operations_py_57.json",
+      "status": "generated",
+      "strategy": "filesystem_state"
+    },
+    {
+      "id": "8",
+      "target_id": "py_url_redirection_backend_app_support_operations_py_42",
+      "rule_id": "py/url-redirection",
+      "file": "backend/app/support_operations.py",
+      "start_line": "42",
+      "function_name": "ticket_return_lane_148",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_8_py_url-redirection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/fuzz_oracles/py_url_redirection_backend_app_support_operations_py_42.json",
+      "status": "generated",
+      "strategy": "return_value"
+    },
+    {
+      "id": "9",
+      "target_id": "py_command_line_injection_backend_app_support_operations_py_104",
+      "rule_id": "py/command-line-injection",
+      "file": "backend/app/support_operations.py",
+      "start_line": "104",
+      "function_name": "ticket_shell_probe_398",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_9_py_command-line-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/fuzz_oracles/py_command_line_injection_backend_app_support_operations_py_104.json",
+      "status": "failed"
+    },
+    {
+      "id": "10",
+      "target_id": "py_weak_sensitive_data_hashing_backend_app_security_py_72",
+      "rule_id": "py/weak-sensitive-data-hashing",
+      "file": "backend/app/security.py",
+      "start_line": "72",
+      "function_name": "hash_token",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_10_py_weak-sensitive-data-hashing.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/fuzz_oracles/py_weak_sensitive_data_hashing_backend_app_security_py_72.json",
+      "status": "generated",
+      "strategy": "return_value"
+    },
+    {
+      "id": "11",
+      "target_id": "py_template_injection_backend_app_support_operations_py_90",
+      "rule_id": "py/template-injection",
+      "file": "backend/app/support_operations.py",
+      "start_line": "90",
+      "function_name": "ticket_jinja_cast_378",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_11_py_template-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/fuzz_oracles/py_template_injection_backend_app_support_operations_py_90.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "13",
+      "target_id": "py_log_injection_backend_app_support_operations_py_47",
+      "rule_id": "py/log-injection",
+      "file": "backend/app/support_operations.py",
+      "start_line": "47",
+      "function_name": "ticket_wire_tally_210",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_13_py_log-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/fuzz_oracles/py_log_injection_backend_app_support_operations_py_47.json",
+      "status": "failed"
+    }
+  ],
+  "errors": [
+    {
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_4_py_path-injection.json",
+      "error": "monitor.strategy invalid: 'patch_call'. Must be one of {'return_value', 'recorded_call', 'filesystem_state'}"
+    },
+    {
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_6_py_clear-text-logging-sensitive-data.json",
+      "error": "LLM output not valid JSON:\n```json\n{\n  \"monitor\": {\n    \"strategy\": \"return_value\",\n    \"patch_target\": null,\n    \"target_arg_index\": null,\n    \"target_arg_name\": null,\n    \"capture_what\": \"return value of the seed function, which contains the stats dictionary with cleartext credentials\",\n    \"additional_imports\": []\n  },\n  \"oracle_check\": {\n    \"condition_description\": \"The return value contains the cleartext password 'Password123!', confirming that sensitive credential data flows through the function without encryption or hashing\",\n    \"trigger_patterns\": [\n      \"Password123!\"\n    ],\n    \"raise_type\": \"RuntimeError\",\n    \"raise_message_template\": \"PY_CLEAR_TEXT_LOGGING_SENSITIVE_DATA: cleartext password found in return value — captured={captured} pattern={matched_pattern}\"\n  },\n  \"fuzz_guidance\": {\n    \"seed_corpus\": [\n      \"\\x01\\x01\",\n      \"\\x00\\x01\",\n      \"\\x01\\x00\",\n      \"\\x00\\x00\"\n    ],\n    \"skip_condition\": \"False\"\n  },\n  \"meta\": {\n    \"function\": \"seed\",\n    \"file\": \"backend/app/seed.py\",\n    \"input_strategy\": \"direct_params\",\n    \"function_signature\": \"def seed(reset: bool, *, verbose: bool)\",\n    \"tainted_params\": [\n      {\n        \"name\": \"reset\",\n        \"index\": 0,\n        \"type\": \"bool\"\n      },\n      {\n        \"name\": \"verbose\",\n        \"index\": 1,\n        \"type\": \"bool\"\n      }\n    ]\n  }\n}\n```"
+    },
+    {
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_9_py_command-line-injection.json",
+      "error": "_meta missing field: 'tainted_params'"
+    },
+    {
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_13_py_log-injection.json",
+      "error": "monitor.strategy invalid: 'patch_call'. Must be one of {'return_value', 'recorded_call', 'filesystem_state'}"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "id": "12",
+  "rule_slug": "py_jinja2_autoescape-false",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-codex-high-seeded-v2-fintech-lending-fastapi_20260714_154154.json"
+  },
+  "finding": {
+    "rule_id": "py/jinja2/autoescape-false",
+    "message": "Using jinja2 templates with autoescape=False can potentially allow XSS attacks.",
+    "file": "app/loan_operations.py",
+    "start_line": 115,
+    "end_line": 115,
+    "repo_name": "vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/vc-codex-high-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [],
+    "severity": "6.1",
+    "precision": "medium",
+    "cwe_ids": [
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "elapsed_seconds": 12.259854555130005,
+    "answers": [
+      "The exact flagged line is line 115: `body = Template(\"Result: \" + fragment).render()`. This line is inside the function `loan_jinja_cast_583`.",
+      "The value `fragment` is assigned as a default parameter on line 113: `fragment: str = \"{{ 7 * 7 }}\"`. However, this default can be overridden by user input via the query parameter `fragment`.",
+      "The `fragment` parameter is user-controlled input from the HTTP GET request. It flows directly into the template string on line 115 without sanitization or escaping.",
+      "There are no conditions or reassignments overriding the user-tainted value.",
+      "No specific defense is present. The Jinja2 `Template` is instantiated without enabling autoescape, and no escaping function is applied to `fragment`.",
+      "No explicit `|safe` or `Markup(...)` is used, but the template is created with default `autoescape=False`, which is the core issue flagged by the rule.",
+      "The user-tainted `fragment` reaches the sink, and no adequate defense is visible in the provided code. The caller context is not found, but the route decorator on line 112 indicates this is an HTTP endpoint, making the user input reachable."
+    ],
+    "tokens_used": 17881,
+    "data_flow": "User input (query parameter `fragment`) → function parameter `fragment` (line 113) → template string construction and render (line 115)",
+    "output_tokens": 1241,
+    "iterations": 3,
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "input_tokens": 16640,
+    "confidence_score": 0.9,
+    "context_needed": [],
+    "timestamp": "2026-07-14T15:41:51.745326",
+    "reasoning": "The function is an HTTP endpoint (indicated by `@router.get`), so user input is reachable. The user-controlled `fragment` parameter is embedded into a Jinja2 template without autoescape or escaping, creating an XSS vulnerability.",
+    "cached_input_tokens": 0,
+    "confidence": "High"
+  },
+  "function": {
+    "name": "loan_jinja_cast_583",
+    "file": "app/loan_operations.py",
+    "start_line": 113,
+    "end_line": 116,
+    "scope": ""
+  },
+  "web_params": []
+}

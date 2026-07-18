@@ -1,0 +1,101 @@
+{
+  "id": "3",
+  "rule_slug": "py_sql-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-insecure-web",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-insecure-web",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-insecure-web/verification_results/summary_realvuln-insecure-web_20260714_144146.json"
+  },
+  "finding": {
+    "rule_id": "py/sql-injection",
+    "message": "This SQL query depends on a [user-provided value](1).",
+    "file": "app/app.py",
+    "start_line": 34,
+    "end_line": 34,
+    "repo_name": "realvuln-insecure-web",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-insecure-web/realvuln-insecure-web.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 27: ControlFlowNode for request",
+      "line 27: ControlFlowNode for Attribute",
+      "line 27: ControlFlowNode for Attribute()",
+      "line 27: ControlFlowNode for username",
+      "line 33: ControlFlowNode for query",
+      "line 34: ControlFlowNode for query",
+      "--- Flow 2 ---",
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 28: ControlFlowNode for request",
+      "line 28: ControlFlowNode for Attribute",
+      "line 28: ControlFlowNode for Attribute()",
+      "line 28: ControlFlowNode for password",
+      "line 33: ControlFlowNode for query",
+      "line 34: ControlFlowNode for query",
+      "--- Flow 3 ---",
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 27: ControlFlowNode for request",
+      "line 28: ControlFlowNode for Attribute",
+      "line 28: ControlFlowNode for Attribute()",
+      "line 28: ControlFlowNode for password",
+      "line 33: ControlFlowNode for query",
+      "line 34: ControlFlowNode for query"
+    ],
+    "severity": "8.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-89"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "User-provided values (username and password) are directly interpolated into a SQL query string via an f-string on line 33, which is then executed on line 34 without any sanitization or parameterization, constituting a classic SQL injection vulnerability. The additional context confirms there are no callees that might provide protection.",
+    "context_needed": [],
+    "confidence": "High",
+    "data_flow": "username (line 27) and password (line 28) → query (line 33) → sink (line 34)",
+    "output_tokens": 1246,
+    "elapsed_seconds": 10.337071180343628,
+    "timestamp": "2026-07-14T14:41:42.115189",
+    "iterations": 3,
+    "answers": [
+      "The EXACT sink statement is: `result = c.execute(query).fetchone()` on line 34. The variable passed to it is `query`.",
+      "The assignment to `query` is on line 33: `query = f\"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'\"`. This is the LAST and ONLY assignment to `query` on the path to the sink.",
+      "The value of `query` derives from user input: `username` (line 27: `username = request.form.get(\"username\")`) and `password` (line 28: `password = request.form.get(\"password\")`). The data flow is: `request.form.get()` → `username`/`password` (lines 27–28) → `query` (line 33) → sink (line 34).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The `query` variable is constructed directly from user inputs without any intervening guards or overrides.",
+      "There is NO specific defense sanitising the value before the sink. The query is built using an f-string with direct interpolation of user-provided values, and executed via `c.execute(query)` — a clear case of dynamic SQL without parameterization.",
+      "The user-tainted values `username` and `password` reach the sink via `query`, and there is no evidence of sanitization or parameterized queries. The sink is exploitable."
+    ],
+    "cached_input_tokens": 0,
+    "cost_usd": 0.0,
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "input_tokens": 14832,
+    "confidence_score": 0.95,
+    "tokens_used": 16078
+  },
+  "function": {
+    "name": "login",
+    "file": "app/app.py",
+    "start_line": 26,
+    "end_line": 41,
+    "scope": ""
+  },
+  "web_params": [
+    {
+      "name": "username",
+      "source": "form"
+    },
+    {
+      "name": "password",
+      "source": "form"
+    }
+  ]
+}

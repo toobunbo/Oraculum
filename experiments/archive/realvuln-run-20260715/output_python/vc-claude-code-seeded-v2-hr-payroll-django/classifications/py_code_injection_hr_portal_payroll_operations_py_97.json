@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is eval(expr, {...}, {...}) on line 97; reasoning states it leads to arbitrary code execution via attribute access on locals"
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "not evaluated"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "not evaluated"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock or record the built-in eval() call on line 97",
+    "capture": "Capture the first argument 'expr' passed to eval to verify it contains user-controlled input from request.GET.get('expr', ...)",
+    "fake_behavior": "Return a safe default value such as 49 (42 + 7, the result of the default expression 'amount + fee') to allow execution to continue without executing the tainted string",
+    "notes": [
+      "The eval call restricts __builtins__ but still allows dangerous attribute traversal on the locals, so it must not be invoked with untrusted input.",
+      "If the harness can import the function, patching builtins.eval via unittest.mock.patch('builtins.eval') is the cleanest approach."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

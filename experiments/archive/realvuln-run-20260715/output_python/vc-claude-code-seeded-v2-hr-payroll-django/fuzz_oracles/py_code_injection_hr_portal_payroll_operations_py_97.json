@@ -1,0 +1,51 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "builtins.eval",
+    "target_arg_index": 0,
+    "target_arg_name": "source",
+    "capture_what": "first argument (expr) passed to eval, which contains user-controlled expression string",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured eval source argument contains Python dunder attribute traversal patterns (e.g., __class__.__mro__, __subclasses__, __globals__, __init__) used to bypass the restricted __builtins__ sandbox",
+    "trigger_patterns": [
+      "__class__\\s*\\.\\s*__(mro|base|subclasses)__",
+      "__subclasses__\\s*\\(",
+      "__init__\\s*\\.\\s*__globals__",
+      "__globals__\\s*\\[",
+      "__builtins__\\s*\\["
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_CODE_INJECTION: sandbox escape via dunder traversal detected in eval argument — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "amount.__class__.__mro__[1].__subclasses__()",
+      "amount.__class__.__base__.__subclasses__()[145]('/etc/passwd').read()",
+      "fee.__init__.__globals__['__builtins__']['open']('/etc/passwd').read()",
+      "(lambda: 0).__code__.co_consts",
+      "amount.__class__.__mro__[1].__subclasses__()[X].__init__.__globals__"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "payroll_formula_cast_252",
+    "file": "hr_portal/payroll_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def payroll_formula_cast_252(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "django.http.HttpRequest"
+      }
+    ],
+    "target_id": "py_code_injection_hr_portal_payroll_operations_py_97",
+    "finding_id": "0",
+    "rule_id": "py/code-injection",
+    "rule_slug": "py_code-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_0_py_code-injection.json"
+  }
+}

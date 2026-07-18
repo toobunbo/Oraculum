@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is db.session.execute(query), which performs live SQL execution against a database—irreversible side effects in a test environment."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Skipped: Q1 answered true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Skipped: Q1 answered true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock db.session.execute, specifically the call on line 37 where the tainted f-string query is passed.",
+    "capture": "Capture the exact string value of the query argument passed to db.session.execute to verify that unsanitized user input is interpolated into the SQL string.",
+    "fake_behavior": "Return a mock result object that supports .fetchone() returning either None (to test the 401 error path) or a mock row object with id, username, and balance attributes (to test the success path), allowing execution to continue without hitting a real database.",
+    "notes": [
+      "Use a library like unittest.mock.patch to replace db.session.execute.",
+      "Assert that the captured query string contains the raw user-controlled username without parameterization.",
+      "For the success path, also mock db.session.commit if the login flow performs a commit after authentication."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

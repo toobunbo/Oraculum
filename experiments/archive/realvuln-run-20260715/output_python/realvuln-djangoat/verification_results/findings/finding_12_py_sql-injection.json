@@ -1,0 +1,69 @@
+{
+  "id": "12",
+  "rule_slug": "py_sql-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-djangoat",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/verification_results/summary_realvuln-djangoat_20260714_145404.json"
+  },
+  "finding": {
+    "rule_id": "py/sql-injection",
+    "message": "This SQL query depends on a [user-provided value](1).",
+    "file": "app/views/users/views.py",
+    "start_line": 75,
+    "end_line": 76,
+    "repo_name": "realvuln-djangoat",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/realvuln-djangoat.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 65: ControlFlowNode for request",
+      "line 67: ControlFlowNode for form",
+      "line 70: ControlFlowNode for user_id_form",
+      "line 75: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "8.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-89"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 12949,
+    "output_tokens": 1142,
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "data_flow": "request (line 65) → form = request.POST (line 67) → user_id_form = form['user_id'] (line 70) → SQL query construction (line 75)",
+    "cost_usd": 0.0,
+    "confidence_score": 0.95,
+    "reasoning": "The user-controlled value user_id_form is directly interpolated into a SQL query string on line 75 without any sanitization or parameterization. The additional context confirms there are no external callers or callees that would provide any form of sanitization or protection.",
+    "confidence": "High",
+    "answers": [
+      "The EXACT sink statement is: \"SELECT * FROM %s WHERE user_id='%s' ORDER BY is_admin='0'\" % (table_name, user_id_form) on line 75. The variable passed to it is user_id_form.",
+      "The assignment to user_id_form is on line 70: user_id_form = form['user_id']. This is the LAST assignment on the path reaching the sink.",
+      "The value of user_id_form derives from user input. The data flow is: request (line 65) → form = request.POST (line 67) → user_id_form = form['user_id'] (line 70). The additional context shows no external callers or callees that would affect this flow.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense sanitizing the value before the sink. The query is constructed using string formatting with the % operator, which is vulnerable to SQL injection.",
+      "The user-tainted value user_id_form reaches the sink on line 75 without any sanitization or parameterization. The additional context confirms there are no external functions that would provide sanitization."
+    ],
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 11.658019542694092,
+    "timestamp": "2026-07-14T14:53:51.217268",
+    "iterations": 3,
+    "tokens_used": 14091
+  },
+  "function": {
+    "name": "user_view",
+    "file": "app/views/users/views.py",
+    "start_line": 65,
+    "end_line": 101,
+    "scope": ""
+  },
+  "web_params": []
+}

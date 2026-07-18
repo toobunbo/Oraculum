@@ -1,0 +1,53 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of the try_hack_me function, which is the rendered Jinja2 template output",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The return value contains unescaped HTML/JS tag fragments (e.g. <script, <img onerror, <svg onload) that were injected via the name parameter, confirming autoescape=False allows raw HTML through",
+    "trigger_patterns": [
+      "<script",
+      "<img\\s+[^>]*onerror",
+      "<svg\\s+[^>]*onload",
+      "<iframe\\s+[^>]*src",
+      "<body\\s+[^>]*onload",
+      "<input\\s+[^>]*onfocus"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_JINJA2_AUTOESCAPE_FALSE: XSS via unescaped template render — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "<script>alert(1)</script>",
+      "<img src=x onerror=alert(1)>",
+      "<svg onload=alert(1)>",
+      "<iframe src=javascript:alert(1)>",
+      "<body onload=alert(1)>",
+      "<input onfocus=alert(1) autofocus>"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "try_hack_me",
+    "file": "app/main.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def try_hack_me(name: str)",
+    "tainted_params": [
+      {
+        "name": "name",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_jinja2_autoescape_false_app_main_py_41",
+    "finding_id": "1",
+    "rule_id": "py/jinja2/autoescape-false",
+    "rule_slug": "py_jinja2_autoescape-false",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-python-insecure-app/verification_results/findings/finding_1_py_jinja2_autoescape-false.json"
+  }
+}

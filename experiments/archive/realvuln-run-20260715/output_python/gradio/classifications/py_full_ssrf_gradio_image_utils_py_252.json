@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink is httpx.get(image_file) which performs network I/O and can lead to SSRF, making it dangerous in a test environment."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "not evaluated because Q1 was true"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "not evaluated because Q1 was true"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "httpx.get() call",
+    "capture": "the image_file parameter value",
+    "fake_behavior": "return a mock response with safe, predefined content to prevent actual network requests",
+    "notes": [
+      "The httpx.get call should be mocked to prevent SSRF during testing",
+      "Capture the URL being requested to verify it's not an internal/private IP"
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

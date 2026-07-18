@@ -1,0 +1,69 @@
+{
+  "id": "5",
+  "rule_slug": "py_clear-text-storage-sensitive-data",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-education-lms-django/verification_results/summary_vc-claude-code-seeded-v2-education-lms-django_20260714_152145.json"
+  },
+  "finding": {
+    "rule_id": "py/clear-text-storage-sensitive-data",
+    "message": "This expression stores [sensitive data (private)](1) as clear text.",
+    "file": "lms/course_operations.py",
+    "start_line": 82,
+    "end_line": 82,
+    "repo_name": "vc-claude-code-seeded-v2-education-lms-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-education-lms-django/vc-claude-code-seeded-v2-education-lms-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 82: ControlFlowNode for Attribute()",
+      "line 82: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-312",
+      "CWE-315",
+      "CWE-359"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:21:17.911798",
+    "cost_usd": 0.0,
+    "verdict": "True Positive",
+    "context_needed": [],
+    "data_flow": "request.GET.get(\"ssn\") and request.GET.get(\"card\") (line 82) → json.dumps() (line 82) → target.write_text() (line 82)",
+    "answers": [
+      "The sensitive data being stored includes SSN and credit card number, as seen on line 82: \"ssn\": request.GET.get(\"ssn\", \"111-22-3333\"), \"card\": request.GET.get(\"card\", \"4111111111111111\").",
+      "The data is stored in a file, specifically a JSON file written to disk using target.write_text(), as seen on line 82.",
+      "The data is not encrypted or hashed before storage. It's directly written to the file in cleartext as part of a JSON dump, as seen on line 82.",
+      "Yes, an attacker with access to the storage medium (the file) could read the sensitive data directly since it's stored in cleartext, as seen on line 82.",
+      "This storage is reachable in production as it's part of a web request handler function course_vault_stash_234(), and there are no indications it's limited to tests/development.",
+      "The blast radius is high as exposure of SSN and credit card numbers could lead to identity theft, financial fraud, and regulatory violations."
+    ],
+    "output_tokens": 414,
+    "tokens_used": 5190,
+    "confidence": "High",
+    "iterations": 1,
+    "reasoning": "The code stores sensitive PII (SSN) and financial data (credit card number) in cleartext to a file without any encryption or hashing, making it directly readable by anyone with file access. This is a clear violation of CWE-312 (Cleartext Storage of Sensitive Information).",
+    "cached_input_tokens": 0,
+    "confidence_score": 0.95,
+    "input_tokens": 4776,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 3.681852340698242
+  },
+  "function": {
+    "name": "course_vault_stash_234",
+    "file": "lms/course_operations.py",
+    "start_line": 76,
+    "end_line": 83,
+    "scope": ""
+  },
+  "web_params": []
+}

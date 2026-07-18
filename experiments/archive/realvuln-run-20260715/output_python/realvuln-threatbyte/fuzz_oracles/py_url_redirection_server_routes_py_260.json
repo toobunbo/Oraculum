@@ -1,0 +1,42 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "Location header of the Flask Response object returned by redirect()",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The returned Response object has a Location header containing an http:// or https:// URL pointing to an external domain or IP, confirming that the user-provided request.url was passed through to the redirect without any allow-list or host validation",
+    "trigger_patterns": [
+      "https?://[a-zA-Z0-9][a-zA-Z0-9\\-]*\\.[a-zA-Z]{2,}",
+      "https?://\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_URL-REDIRECTION: open redirect bypass detected — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "http://evil.com",
+      "https://attacker.com/steal",
+      "http://127.0.0.1/admin",
+      "https://malicious.site/phishing",
+      "http://evil.example.net/path?token=abc"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "upload_file",
+    "file": "server/routes.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def upload_file()",
+    "tainted_params": [],
+    "target_id": "py_url_redirection_server_routes_py_260",
+    "finding_id": "6",
+    "rule_id": "py/url-redirection",
+    "rule_slug": "py_url-redirection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-threatbyte/verification_results/findings/finding_6_py_url-redirection.json"
+  }
+}

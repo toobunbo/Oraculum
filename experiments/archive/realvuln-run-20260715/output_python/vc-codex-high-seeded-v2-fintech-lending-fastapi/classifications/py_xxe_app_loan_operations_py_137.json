@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Parser configured with no_network=False and resolve_entities=True, enabling external resolution and network I/O during etree.fromstring."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "N/A - stopped at Q1"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "N/A - stopped at Q1"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock etree.fromstring or etree.XMLParser to prevent actual XML parsing with the unsafe configuration.",
+    "capture": "Capture the exact bytes passed as the first argument to etree.fromstring (originating from await request.body()) and the parser keyword argument.",
+    "fake_behavior": "Return a fake ElementTree node (e.g., with a dummy tag like 'mock') so that subsequent access to doc.tag succeeds without triggering network requests or entity resolution.",
+    "notes": [
+      "Alternatively, patch etree.XMLParser to force no_network=True, resolve_entities=False, and load_dtd=False regardless of the arguments passed.",
+      "Ensure the mock allows the function to proceed to its return statement {'root': doc.tag}."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

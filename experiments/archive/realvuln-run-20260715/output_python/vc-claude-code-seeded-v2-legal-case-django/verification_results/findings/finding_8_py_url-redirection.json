@@ -1,0 +1,69 @@
+{
+  "id": "8",
+  "rule_slug": "py_url-redirection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-legal-case-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/verification_results/summary_vc-claude-code-seeded-v2-legal-case-django_20260714_152949.json"
+  },
+  "finding": {
+    "rule_id": "py/url-redirection",
+    "message": "Untrusted URL redirection depends on a [user-provided value](1).",
+    "file": "accounts/views.py",
+    "start_line": 79,
+    "end_line": 79,
+    "repo_name": "vc-claude-code-seeded-v2-legal-case-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/vc-claude-code-seeded-v2-legal-case-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 76: ControlFlowNode for request",
+      "line 79: ControlFlowNode for Attribute",
+      "line 79: ControlFlowNode for Attribute()",
+      "line 79: ControlFlowNode for BoolExpr"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-601"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "answers": [
+      "The EXACT flagged line is: `return redirect(request.POST.get(\"next\") or reverse(\"accounts:notifications\"))` on line 79. This line lives in the `notification_read` function.",
+      "The URL value is assigned on line 79 as `request.POST.get(\"next\") or reverse(\"accounts:notifications\")`. This is the only assignment on this path.",
+      "The value `request.POST.get(\"next\")` derives from user input via `request.POST`, which is user-controllable. The data-flow chain is: `request` (line 76, source) → `request.POST.get(\"next\")` (line 79, transform) → `redirect(...)` (line 79, sink). The alternative `reverse(\"accounts:notifications\")` is a constant/internal source.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on this path. The expression uses `or`, which means if `request.POST.get(\"next\")` is truthy, it will be used directly.",
+      "There is no specific defense visible in the code. No validation or sanitization function like `url_has_allowed_host_and_scheme` is applied to the `next` parameter before being passed to `redirect`. The caller context is not available, but Django's redirect function does not inherently provide protection against open redirects.",
+      "The user-tainted value `request.POST.get(\"next\")` reaches the sink directly without any visible sanitization or validation. The lack of caller context does not change the fact that the code is vulnerable as written."
+    ],
+    "reasoning": "The user-controlled value `request.POST.get(\"next\")` is used directly in a redirect without any validation or sanitization, which can lead to open redirect vulnerabilities. No defense mechanism is visible in the code, and the unavailability of caller context does not provide any additional protections.",
+    "cost_usd": 0.0,
+    "iterations": 3,
+    "input_tokens": 13487,
+    "cached_input_tokens": 0,
+    "output_tokens": 1347,
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request (line 76) → request.POST.get(\"next\") (line 79) → redirect(...) (line 79)",
+    "elapsed_seconds": 15.860570907592773,
+    "tokens_used": 14834,
+    "verdict": "True Positive",
+    "confidence": "High",
+    "timestamp": "2026-07-14T15:29:41.756070"
+  },
+  "function": {
+    "name": "notification_read",
+    "file": "accounts/views.py",
+    "start_line": 76,
+    "end_line": 79,
+    "scope": ""
+  },
+  "web_params": []
+}

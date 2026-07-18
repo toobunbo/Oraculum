@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is target.parent.mkdir(parents=True, exist_ok=True) on line 81, a filesystem write operation that can create directories outside intended locations via path traversal."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; decision made at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; decision made at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock pathlib.Path.mkdir or replace it on the target.parent object so that the call on line 81 does not touch the real filesystem.",
+    "capture": "Capture the full path string passed as the implicit self (target.parent) to the mkdir call; this reveals the resolved directory path including any traversal components from user input 'ref'.",
+    "fake_behavior": "Return None silently (mimicking a successful mkdir with exist_ok=True) so execution continues to the JsonResponse return without raising exceptions.",
+    "notes": [
+      "The function also returns a JsonResponse containing str(target), which could be checked separately via return_value strategy, but the primary violation is the filesystem side effect.",
+      "Ensure BASE_EXPORT_DIR is set to a safe temporary directory in tests to avoid accidental real filesystem interaction if mocking is incomplete."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

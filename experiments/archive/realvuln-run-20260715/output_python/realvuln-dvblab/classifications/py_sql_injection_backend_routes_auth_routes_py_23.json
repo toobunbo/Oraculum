@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "db.session.execute(insert_query) executes a raw SQL INSERT query, which is a database write and an irreversible side effect."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; decision stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; decision stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock db.session.execute so that any raw SQL string passed to it is intercepted before reaching the database.",
+    "capture": "Capture the insert_query string argument passed to db.session.execute. Assert or record that it contains unsanitized user input (e.g., the username value) interpolated directly into the SQL, proving the injection path.",
+    "fake_behavior": "Prevent actual database execution. Optionally raise an exception after capturing (to stop further flow), or return a dummy result object that allows the function to continue if branch coverage is needed.",
+    "notes": [
+      "The f-string on line 22 builds the query with direct interpolation of username and password_hash.",
+      "Ensure the mock captures the exact string to verify the lack of parameterization."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

@@ -1,0 +1,76 @@
+{
+  "id": "10",
+  "rule_slug": "py_clear-text-logging-sensitive-data",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulpy",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulpy",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulpy/verification_results/summary_realvuln-vulpy_20260714_151852.json"
+  },
+  "finding": {
+    "rule_id": "py/clear-text-logging-sensitive-data",
+    "message": "This expression logs [sensitive data (password)](1) as clear text.\nThis expression logs [sensitive data (password)](2) as clear text.",
+    "file": "utils/httpbrute.py",
+    "start_line": 26,
+    "end_line": 26,
+    "repo_name": "realvuln-vulpy",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulpy/realvuln-vulpy.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 21: ControlFlowNode for Attribute()",
+      "line 21: ControlFlowNode for passwords",
+      "line 24: ControlFlowNode for password",
+      "line 26: ControlFlowNode for Attribute()",
+      "--- Flow 2 ---",
+      "line 24: ControlFlowNode for passwords",
+      "line 24: ControlFlowNode for password",
+      "line 26: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-312",
+      "CWE-359",
+      "CWE-532"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "confidence_score": 0.95,
+    "reasoning": "The code logs the password in cleartext (line 26) as part of the logging.info call. There is no encryption or hashing applied to the password before logging, and the logging level is set to INFO when verbose is enabled (lines 16-17), making this output visible. This constitutes a clear case of logging sensitive data without protection.",
+    "confidence": "High",
+    "context_needed": [],
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:18:45.323504",
+    "iterations": 1,
+    "data_flow": "password_file.read().split('\\n') (line 21) → for password in passwords (line 24) → logging.info('{} {} {}'.format(username, password, response.status_code)) (line 26)",
+    "cost_usd": 0.0,
+    "elapsed_seconds": 4.050756454467773,
+    "cached_input_tokens": 0,
+    "answers": [
+      "The sensitive data being logged is the password (line 26).",
+      "The data is logged to the logging system, which in this context appears to output to standard output or standard error (lines 17, 19, and 26).",
+      "The data is not encrypted or hashed; it is logged in clear text (line 26).",
+      "Yes, an attacker with access to the logs or output stream could read the sensitive data (line 26).",
+      "The code appears to be a command-line utility, so its reachability depends on where and how it's executed. However, the logging of passwords happens unconditionally in the loop (line 26).",
+      "The blast radius includes account compromise due to exposed credentials (line 26)."
+    ],
+    "tokens_used": 3953,
+    "input_tokens": 3609,
+    "output_tokens": 344,
+    "model": "ollama_chat/qwen3-coder:480b-cloud"
+  },
+  "function": {
+    "name": "http_brute",
+    "file": "utils/httpbrute.py",
+    "start_line": 14,
+    "end_line": 29,
+    "scope": ""
+  },
+  "web_params": []
+}

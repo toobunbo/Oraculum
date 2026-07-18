@@ -1,0 +1,73 @@
+{
+  "id": "37",
+  "rule_slug": "py_xpath-injection",
+  "source": {
+    "vhx_root": "/home/tuonglnc/repo/VulnHunterX",
+    "vhx_repo_root": "/home/tuonglnc/repo/VulnHunterX/repos/python/benchmark-python",
+    "vhx_output_root": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python",
+    "summary_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/verification_results/summary_benchmark-python_filtered_20260610_105228.json"
+  },
+  "finding": {
+    "rule_id": "py/xpath-injection",
+    "message": "XPath expression depends on a [user-provided value](1).",
+    "file": "testcode/BenchmarkTest00021.py",
+    "start_line": 58,
+    "end_line": 58,
+    "repo_name": "benchmark-python",
+    "lang": "python",
+    "sarif_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/benchmark-python.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 39: ControlFlowNode for request",
+      "line 39: ControlFlowNode for Attribute",
+      "line 39: ControlFlowNode for Attribute()",
+      "line 39: ControlFlowNode for Attribute()",
+      "line 39: ControlFlowNode for param",
+      "line 43: ControlFlowNode for bar",
+      "line 57: ControlFlowNode for query",
+      "line 58: ControlFlowNode for query"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [],
+    "tags": [
+      "security",
+      "external/cwe/cwe-643"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-06-10T10:49:36.991136",
+    "context_needed": [],
+    "data_flow": "",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "answers": [
+      "The exact XPath sink is not visible in the provided code context. The code opens an XML file (line 59) but does not show any XPath expression construction or execution.",
+      "The code shows user input flowing to line 58 where 'query' is mentioned, but the actual XPath expression is not visible.",
+      "The user input (param from request.cookies.get) flows through urllib.parse.unquote_plus (line 39) and is assigned to bar (line 43), then referenced in what appears to be query construction (line 58).",
+      "There is a check for apostrophes in bar (lines 50-54) which returns early, but this is not a complete defense against XPath injection.",
+      "No complete defense is visible - the apostrophe check is insufficient as other XPath metacharacters could still be used for injection.",
+      "The CodeQL tool has high precision and has flagged line 58 as the sink. User input clearly flows from the cookie parameter through several transformations to this point."
+    ],
+    "confidence_score": 0.75,
+    "iterations": 11,
+    "input_tokens": 47494,
+    "elapsed_seconds": 112.86040210723877,
+    "confidence": "Medium",
+    "cached_input_tokens": 0,
+    "tokens_used": 51012,
+    "reasoning": "User input from cookies flows through minimal sanitization (apostrophe check only) to what CodeQL identifies as an XPath sink. The incomplete sanitization and high-precision flagging support this being a true positive.",
+    "verdict": "True Positive",
+    "output_tokens": 3518
+  },
+  "function": {
+    "name": "BenchmarkTest00021_post",
+    "file": "testcode/BenchmarkTest00021.py",
+    "start_line": 35,
+    "end_line": 71,
+    "scope": "Function init"
+  }
+}

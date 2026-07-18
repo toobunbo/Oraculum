@@ -1,0 +1,51 @@
+{
+  "stage": "harness",
+  "repo": "realvuln-vulnerable-flask-app",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/harness.yaml",
+  "source": {
+    "oracle_status_path": "output/python/realvuln-vulnerable-flask-app/fuzz_oracles/status.json"
+  },
+  "counts": {
+    "selected": 2,
+    "generated": 2,
+    "skipped": 0,
+    "failed": 0
+  },
+  "harnesses": [
+    {
+      "id": "2",
+      "target_id": "py_sql_injection_app_app_py_265",
+      "rule_id": "py/sql-injection",
+      "file": "app/app.py",
+      "start_line": "265",
+      "function_name": "search_customer",
+      "harness": "output/python/realvuln-vulnerable-flask-app/fuzz_targets/py_sql_injection_app_app_py_265.py",
+      "oracle": "output/python/realvuln-vulnerable-flask-app/fuzz_oracles/py_sql_injection_app_app_py_265.json",
+      "finding_artifact": "output/python/realvuln-vulnerable-flask-app/verification_results/findings/finding_2_py_sql-injection.json",
+      "corpus": "output/python/realvuln-vulnerable-flask-app/fuzz_corpus/py_sql_injection_app_app_py_265",
+      "strategy": "recorded_call",
+      "status": "generated",
+      "seed_count": 5,
+      "errors": ""
+    },
+    {
+      "id": "3",
+      "target_id": "py_weak_sensitive_data_hashing_app_app_py_141",
+      "rule_id": "py/weak-sensitive-data-hashing",
+      "file": "app/app.py",
+      "start_line": "141",
+      "function_name": "reg_customer",
+      "harness": "output/python/realvuln-vulnerable-flask-app/fuzz_targets/py_weak_sensitive_data_hashing_app_app_py_141.py",
+      "oracle": "output/python/realvuln-vulnerable-flask-app/fuzz_oracles/py_weak_sensitive_data_hashing_app_app_py_141.json",
+      "finding_artifact": "output/python/realvuln-vulnerable-flask-app/verification_results/findings/finding_3_py_weak-sensitive-data-hashing.json",
+      "corpus": "output/python/realvuln-vulnerable-flask-app/fuzz_corpus/py_weak_sensitive_data_hashing_app_app_py_141",
+      "strategy": "recorded_call",
+      "status": "generated",
+      "seed_count": 5,
+      "errors": ""
+    }
+  ],
+  "errors": []
+}

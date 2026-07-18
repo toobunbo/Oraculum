@@ -1,0 +1,44 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "http.server.BaseHTTPRequestHandler.send_header",
+    "target_arg_index": 1,
+    "target_arg_name": "message",
+    "capture_what": "Content-Type header value with user-controlled charset parameter",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "Captured Content-Type header contains CRLF sequences that indicate HTTP response splitting",
+    "trigger_patterns": [
+      "charset=[^;]*\\r\\n",
+      "charset=[^;]*\\n\\r",
+      "charset=[^;]*\\r[^\\n]",
+      "charset=[^;]*\\n[^\\r]"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_HTTP-RESPONSE-SPLITTING: HTTP response splitting detected in Content-Type header - captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "utf-8%0d%0aSet-Cookie:malicious=1",
+      "iso-8859-1%0aX-Header:injected",
+      "utf-8%0dContent-Length:0%0a",
+      "ascii%0a%0dLocation:evil.com",
+      "utf-8%0d%0aContent-Type:text/plain"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "do_GET",
+    "file": "dsvw.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def do_GET(self)",
+    "tainted_params": [],
+    "target_id": "py_http_response_splitting_dsvw_py_78",
+    "finding_id": "0",
+    "rule_id": "py/http-response-splitting",
+    "rule_slug": "py_http-response-splitting",
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_0_py_http-response-splitting.json"
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "target": "codecs.open",
+    "capture": [
+      {
+        "arg_index": 0,
+        "name": "filename",
+        "tainted": true
+      },
+      {
+        "arg_index": 1,
+        "name": "mode",
+        "tainted": false
+      }
+    ],
+    "patch_target": "codecs.open",
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "captured value",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "predicates": [
+      {
+        "type": "regex",
+        "pattern": ".*\\.\\.[/\\\\].*",
+        "arg_index": 0,
+        "name": "filename",
+        "description": "Detects directory traversal patterns like ../ or ..\\ in the file path"
+      }
+    ],
+    "condition_description": "oracle condition",
+    "trigger_patterns": [
+      ".*\\.\\.[/\\\\].*"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "ORACULUM_VIOLATION: captured={captured}"
+  },
+  "fuzz_guidance": {
+    "sink_args": [
+      {
+        "arg_index": 0,
+        "name": "filename",
+        "mutate": true,
+        "fuzz_type": "path_traversal"
+      }
+    ],
+    "fake_behavior": {
+      "return_value": "<MockFileObject>",
+      "side_effect": null,
+      "notes": [
+        "Return a mock file object to prevent actual filesystem I/O.",
+        "Mocked call will still allow inspection of the path argument for violations.",
+        "Use unittest.mock or similar to patch codecs.open during fuzzing."
+      ]
+    },
+    "seed_corpus": [],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "aliasing_risks": [
+      "Ensure 'codecs' is not aliased or imported as another name in the target module.",
+      "Check if 'open' is used interchangeably with 'codecs.open' elsewhere (though not the sink here)."
+    ],
+    "import_risks": [
+      "The target module may import 'codecs' as 'c' or similar; verify the actual name used at runtime.",
+      "If 'codecs.open' is indirectly called via another function, the patch point may differ."
+    ],
+    "async_risks": null,
+    "classification_strategy": "recorded_call",
+    "classification_confidence": "high",
+    "mock_guidance": {
+      "required": true,
+      "target": "codecs.open() call",
+      "capture": "the file path argument (f'{helpers.utils.TESTFILES_DIR}/{bar}') and the mode ('r')",
+      "fake_behavior": "return a mock file object that does not perform actual I/O",
+      "notes": [
+        "Mocking codecs.open prevents actual filesystem access while preserving the ability to test control flow.",
+        "Ensure the mock captures the path to verify no traversal occurs.",
+        "Return a safe, in-memory file-like object for deterministic behavior."
+      ]
+    },
+    "target_id": "py_path_injection_testcode_BenchmarkTest00001_py_47",
+    "finding_id": "10",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "file": "testcode/BenchmarkTest00001.py",
+    "function": "BenchmarkTest00001_post",
+    "input_strategy": "flask_view",
+    "function_signature": "def BenchmarkTest00001_post()",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": -1,
+        "type": "flask_request"
+      }
+    ],
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "output/python/benchmark-python/verification_results/findings/finding_10_py_path-injection.json"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "id": "22",
+  "rule_slug": "py_unsafe-deserialization",
+  "source": {
+    "vhx_root": "/home/trieudai/",
+    "vhx_repo_root": "/home/trieudai/bench-src",
+    "vhx_output_root": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python",
+    "summary_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/verification_results/summary_benchmark-python_filtered_20260610_105228.json"
+  },
+  "finding": {
+    "rule_id": "py/unsafe-deserialization",
+    "message": "Unsafe deserialization depends on a [user-provided value](1).",
+    "file": "testcode/BenchmarkTest00270.py",
+    "start_line": 41,
+    "end_line": 41,
+    "repo_name": "benchmark-python",
+    "lang": "python",
+    "sarif_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/benchmark-python.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 31: ControlFlowNode for request",
+      "line 31: ControlFlowNode for values",
+      "line 34: ControlFlowNode for param",
+      "line 36: ControlFlowNode for bar",
+      "line 41: ControlFlowNode for bar"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [],
+    "tags": [
+      "external/cwe/cwe-502",
+      "security",
+      "serialization"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-06-10T10:45:25.228428",
+    "context_needed": [],
+    "data_flow": "request.form.getlist(\"BenchmarkTest00270\") (line 32) → values[0] (line 34) → param (line 34) → param + '_SafeStuff' (line 36) → bar (line 36) → yaml.load(bar, Loader=yaml.Loader) (line 41)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "answers": [
+      "The EXACT deserialization sink is `yaml.load(bar, Loader=yaml.Loader)` on line 41 in function `BenchmarkTest00270_post`. The bytes/text value passed to it is `bar`.",
+      "The only assignment to `bar` is `bar = param + '_SafeStuff'` on line 36.",
+      "The value `bar` derives from user input: `values = request.form.getlist(\"BenchmarkTest00270\")` (line 32) → `param = values[0]` (line 34) → `bar = param + '_SafeStuff'` (line 36). The user controls the `BenchmarkTest00270` form parameter.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The flow is direct from request to deserialization.",
+      "No defense prevents code execution. The code uses the unsafe `yaml.load()` with `yaml.Loader`, not the safe `yaml.safe_load()`. There is no validation, HMAC, schema check, or allow-list filtering.",
+      "User-controlled data reaches the unsafe sink with concrete line numbers: line 32 (request), line 34 (param), line 36 (bar), line 41 (yaml.load). No defenses are present."
+    ],
+    "confidence_score": 0.95,
+    "iterations": 3,
+    "input_tokens": 7775,
+    "elapsed_seconds": 22.961405754089355,
+    "confidence": "High",
+    "cached_input_tokens": 0,
+    "tokens_used": 9027,
+    "reasoning": "User-provided input flows directly into an unsafe YAML deserialization call without any sanitization or safe loader usage. The high severity and precision of the rule support this conclusion.",
+    "verdict": "True Positive",
+    "output_tokens": 1252
+  },
+  "function": {
+    "name": "BenchmarkTest00270_post",
+    "file": "testcode/BenchmarkTest00270.py",
+    "start_line": 28,
+    "end_line": 51,
+    "scope": "Function init"
+  }
+}

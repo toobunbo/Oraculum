@@ -1,0 +1,65 @@
+{
+  "id": "11",
+  "rule_slug": "py_jinja2_autoescape-false",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-codex-high-seeded-v2-fintech-lending-fastapi_20260714_154154.json"
+  },
+  "finding": {
+    "rule_id": "py/jinja2/autoescape-false",
+    "message": "Using jinja2 templates with autoescape=False can potentially allow XSS attacks.",
+    "file": "app/loan_operations.py",
+    "start_line": 85,
+    "end_line": 85,
+    "repo_name": "vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/vc-codex-high-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [],
+    "severity": "6.1",
+    "precision": "medium",
+    "cwe_ids": [
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "elapsed_seconds": 11.279530763626099,
+    "answers": [
+      "The EXACT flagged line is line 85: `body = Template(\"{{ card|safe }}\").render(card=card)`. This line is inside the function `loan_blurb_tile_326` which starts at line 83.",
+      "The value `card` is assigned as a function parameter on line 83: `async def loan_blurb_tile_326(card: str = \"<b>pending</b>\", gate_ref: None = Depends(_wrk_gate)):`. This is the only assignment.",
+      "The value `card` comes from the HTTP GET parameter `card`. In FastAPI, such parameters are automatically populated from the request. This is confirmed as the function is a route handler (decorated implicitly via router).",
+      "There are no reassignments or overrides of `card` in the function.",
+      "There is NO escaping or sanitization. The template disables escaping with `|safe`.",
+      "Yes, `|safe` is used on line 85: `{{ card|safe }}`, which disables auto-escaping.",
+      "The user-tainted value `card` reaches the sink with no escaping due to `|safe`."
+    ],
+    "tokens_used": 17868,
+    "data_flow": "source (HTTP GET parameter `card`, line 83) → sink (Template.render with `|safe`, line 85)",
+    "output_tokens": 1192,
+    "iterations": 3,
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "input_tokens": 16676,
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "timestamp": "2026-07-14T15:41:49.137029",
+    "reasoning": "User-controlled input `card` flows directly to a Jinja2 template render with `|safe`, which disables escaping and allows XSS. No sanitization occurs, and the function is a FastAPI route handler, making the source remote and attacker-controllable.",
+    "cached_input_tokens": 0,
+    "confidence": "High"
+  },
+  "function": {
+    "name": "loan_blurb_tile_326",
+    "file": "app/loan_operations.py",
+    "start_line": 83,
+    "end_line": 86,
+    "scope": ""
+  },
+  "web_params": []
+}

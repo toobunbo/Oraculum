@@ -1,0 +1,48 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "sqli.dao.user.md5",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "bytes argument (encoded password) passed to md5 constructor",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "md5 is called with any non-empty bytes payload representing an encoded password, confirming weak hashing of sensitive data",
+    "trigger_patterns": [
+      "b'\\w+",
+      "b'[!@#$%^&*()_+\\-=:;\"'<>,./?]+"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_WEAK_SENSITIVE_DATA_HASHING: md5 used for password hashing — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "admin123",
+      "password",
+      "P@ssw0rd!",
+      "test_user",
+      "secret"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "check_password",
+    "file": "sqli/dao/user.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def check_password(password: str)",
+    "tainted_params": [
+      {
+        "name": "password",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_weak_sensitive_data_hashing_sqli_dao_user_py_41",
+    "finding_id": "0",
+    "rule_id": "py/weak-sensitive-data-hashing",
+    "rule_slug": "py_weak-sensitive-data-hashing",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-dvpwa/verification_results/findings/finding_0_py_weak-sensitive-data-hashing.json"
+  }
+}

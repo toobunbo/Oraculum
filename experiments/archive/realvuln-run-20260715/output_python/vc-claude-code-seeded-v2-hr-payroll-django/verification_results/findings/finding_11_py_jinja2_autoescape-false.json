@@ -1,0 +1,65 @@
+{
+  "id": "11",
+  "rule_slug": "py_jinja2_autoescape-false",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/summary_vc-claude-code-seeded-v2-hr-payroll-django_20260714_152802.json"
+  },
+  "finding": {
+    "rule_id": "py/jinja2/autoescape-false",
+    "message": "Using jinja2 templates with autoescape=False can potentially allow XSS attacks.",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 139,
+    "end_line": 139,
+    "repo_name": "vc-claude-code-seeded-v2-hr-payroll-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/vc-claude-code-seeded-v2-hr-payroll-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [],
+    "severity": "6.1",
+    "precision": "medium",
+    "cwe_ids": [
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "data_flow": "request.GET.get(\"fragment\", ...) (line 138) → Template(\"Result: \" + fragment).render() (line 139) → HttpResponse(body, ...) (line 140)",
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "tokens_used": 17682,
+    "timestamp": "2026-07-14T15:28:02.454765",
+    "input_tokens": 16300,
+    "output_tokens": 1382,
+    "confidence_score": 0.95,
+    "elapsed_seconds": 11.89791750907898,
+    "reasoning": "User-controlled input `fragment` is directly embedded into a Jinja2 template without enabling autoescaping, and the rendered result is sent as HTML in an HttpResponse. This allows for potential XSS exploitation. The default behavior of `jinja2.Template` is `autoescape=False`, and no escaping or sanitization is applied. The additional context showing no caller found doesn't change the fact that this function is vulnerable as written.",
+    "cost_usd": 0.0,
+    "answers": [
+      "The sink is `HttpResponse(body, content_type=\"text/html\")` on line 140, where `body` is the value being rendered.",
+      "The value `body` is assigned on line 139: `body = Template(\"Result: \" + fragment).render()`.",
+      "The value of `fragment` is derived from user input via `request.GET.get(\"fragment\", \"{{ 7 * 7 }}\")` on line 138. This is the last assignment on the path to the sink.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the path to the sink.",
+      "There is no specific defense escaping the value at the sink. The Jinja2 `Template` is instantiated with `autoescape=False` by default, and no explicit escaping function like `html.escape()` or `markupsafe.escape()` is used.",
+      "The Jinja2 template is created without enabling autoescape (`autoescape=False` is the default for `Template`), and there is no use of `|safe`, `{% autoescape false %}`, `Markup(...)`, or `mark_safe(...)` in the provided code.",
+      "The user-tainted value `fragment` reaches the sink in `body`, and there is no escaping or sanitization. The use of `jinja2.Template` with the default `autoescape=False` constitutes a vulnerability."
+    ],
+    "cached_input_tokens": 0,
+    "context_needed": []
+  },
+  "function": {
+    "name": "payroll_jinja_cast_384",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 134,
+    "end_line": 140,
+    "scope": ""
+  },
+  "web_params": []
+}

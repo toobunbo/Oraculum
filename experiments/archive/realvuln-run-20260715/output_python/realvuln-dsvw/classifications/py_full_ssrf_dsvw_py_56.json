@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "urllib.request.urlopen() is network I/O, causing external resolution and side effects."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Skipped because Q1 is true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Skipped because Q1 is true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "urllib.request.urlopen",
+    "capture": "Capture the first argument (the URL string from params['include']) to verify SSRF reachability and payload reflection.",
+    "fake_behavior": "Return a fake HTTP response object (e.g., a mock with read() returning an empty byte string and status 200) to allow execution to continue without performing real network I/O.",
+    "notes": [
+      "Ensure the mock handles both local file paths and URLs if the conditional on line 56 is exercised.",
+      "Do not attempt to resolve or connect to the captured URL."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

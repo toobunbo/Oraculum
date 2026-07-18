@@ -1,0 +1,43 @@
+{
+  "stage": "oracle",
+  "repo": "realvuln-damn-vulnerable-graphql-application",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/oracle.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/realvuln-damn-vulnerable-graphql-application/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 2,
+    "generated": 2,
+    "skipped": 0,
+    "failed": 0
+  },
+  "oracles": [
+    {
+      "id": "0",
+      "target_id": "py_shell_command_constructed_from_input_core_views_py_211",
+      "rule_id": "py/shell-command-constructed-from-input",
+      "file": "core/views.py",
+      "start_line": "211",
+      "function_name": "mutate",
+      "finding_artifact": "output/python/realvuln-damn-vulnerable-graphql-application/verification_results/findings/finding_0_py_shell-command-constructed-from-input.json",
+      "oracle": "output/python/realvuln-damn-vulnerable-graphql-application/fuzz_oracles/py_shell_command_constructed_from_input_core_views_py_211.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "1",
+      "target_id": "py_shell_command_constructed_from_input_core_views_py_352",
+      "rule_id": "py/shell-command-constructed-from-input",
+      "file": "core/views.py",
+      "start_line": "352",
+      "function_name": "resolve_system_debug",
+      "finding_artifact": "output/python/realvuln-damn-vulnerable-graphql-application/verification_results/findings/finding_1_py_shell-command-constructed-from-input.json",
+      "oracle": "output/python/realvuln-damn-vulnerable-graphql-application/fuzz_oracles/py_shell_command_constructed_from_input_core_views_py_352.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    }
+  ],
+  "errors": []
+}

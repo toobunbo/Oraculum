@@ -1,0 +1,49 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "Location header value from the Flask Response object returned by redirect()",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The Location header in the redirect response contains an untrusted external URL (protocol-relative, javascript:, or explicit external http/https scheme to attacker-controlled domain), confirming no sanitization is applied to the user-provided 'next' parameter.",
+    "trigger_patterns": [
+      "^//",
+      "^javascript:",
+      "https?://evil\\.com",
+      "https?://attacker\\.com"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_URL-REDIRECTION: open redirect bypass detected — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "https://evil.com",
+      "//evil.com/steal",
+      "http://attacker.com/phishing",
+      "javascript:alert(document.cookie)"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "index",
+    "file": "app/blueprints/xss_protection/views.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def index()",
+    "tainted_params": [
+      {
+        "name": "next",
+        "index": -1,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_url_redirection_app_blueprints_xss_protection_views_py_12",
+    "finding_id": "1",
+    "rule_id": "py/url-redirection",
+    "rule_slug": "py_url-redirection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-flask-xss/verification_results/findings/finding_1_py_url-redirection.json"
+  }
+}

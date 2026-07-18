@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is a file write operation (fh.write on line 80) to a log file, which is an irreversible filesystem side effect."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Skipped: Q1 answered true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Skipped: Q1 answered true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the file write operation on line 80 (fh.write) or the builtins.open call on line 79 for the password_reset_mailbox.log file.",
+    "capture": "Capture the full string argument passed to fh.write, specifically extracting the initial_password value to verify it is written in cleartext without hashing or encryption.",
+    "fake_behavior": "Suppress the actual filesystem write so the test environment is not modified; optionally store the captured string in an in-memory buffer for later assertion.",
+    "notes": [
+      "The violation occurs at the point of writing, so intercepting the write call is sufficient to detect the cleartext password leak.",
+      "Ensure the mock does not interfere with other file operations if the function performs additional I/O."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

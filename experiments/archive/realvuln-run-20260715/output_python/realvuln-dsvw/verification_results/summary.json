@@ -1,0 +1,93 @@
+{
+  "stage": "ingest",
+  "repo": "realvuln-dsvw",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-dsvw",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvw",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvw/verification_results/summary_realvuln-dsvw_20260714_141916.json"
+  },
+  "counts": {
+    "total_verdicts": 10,
+    "selected": 10,
+    "enriched": 10,
+    "skipped": 0,
+    "failed": 0
+  },
+  "findings": [
+    {
+      "id": "0",
+      "rule_id": "py/http-response-splitting",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dsvw/verification_results/findings/finding_0_py_http-response-splitting.json",
+      "function_name": "do_GET"
+    },
+    {
+      "id": "1",
+      "rule_id": "py/full-ssrf",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dsvw/verification_results/findings/finding_1_py_full-ssrf.json",
+      "function_name": "do_GET"
+    },
+    {
+      "id": "2",
+      "rule_id": "py/full-ssrf",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dsvw/verification_results/findings/finding_2_py_full-ssrf.json",
+      "function_name": "do_GET"
+    },
+    {
+      "id": "3",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dsvw/verification_results/findings/finding_3_py_path-injection.json",
+      "function_name": "do_GET"
+    },
+    {
+      "id": "4",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dsvw/verification_results/findings/finding_4_py_path-injection.json",
+      "function_name": "do_GET"
+    },
+    {
+      "id": "5",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dsvw/verification_results/findings/finding_5_py_path-injection.json",
+      "function_name": "do_GET"
+    },
+    {
+      "id": "6",
+      "rule_id": "py/regex-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dsvw/verification_results/findings/finding_6_py_regex-injection.json",
+      "function_name": "do_GET"
+    },
+    {
+      "id": "7",
+      "rule_id": "py/sql-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dsvw/verification_results/findings/finding_7_py_sql-injection.json",
+      "function_name": "do_GET"
+    },
+    {
+      "id": "8",
+      "rule_id": "py/sql-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dsvw/verification_results/findings/finding_8_py_sql-injection.json",
+      "function_name": "do_GET"
+    },
+    {
+      "id": "9",
+      "rule_id": "py/sql-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dsvw/verification_results/findings/finding_9_py_sql-injection.json",
+      "function_name": "do_GET"
+    }
+  ],
+  "errors": []
+}

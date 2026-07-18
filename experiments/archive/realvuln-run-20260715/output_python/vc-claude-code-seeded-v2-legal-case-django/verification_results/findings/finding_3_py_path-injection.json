@@ -1,0 +1,76 @@
+{
+  "id": "3",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-legal-case-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/verification_results/summary_vc-claude-code-seeded-v2-legal-case-django_20260714_152949.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 141,
+    "end_line": 141,
+    "repo_name": "vc-claude-code-seeded-v2-legal-case-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/vc-claude-code-seeded-v2-legal-case-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 136: ControlFlowNode for request",
+      "line 139: ControlFlowNode for Attribute",
+      "line 139: ControlFlowNode for Attribute()",
+      "line 139: ControlFlowNode for name",
+      "line 140: ControlFlowNode for target",
+      "line 141: ControlFlowNode for Attribute"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "answers": [
+      "The exact file-operation sink is `target.parent.mkdir(parents=True, exist_ok=True)` on line 141. The path value passed to it is `target.parent`, where `target` is derived from `BASE_EXPORT_DIR / name` (line 140).",
+      "The assignments to the path value are: line 139: `name = request.GET.get(\"name\", \"packet.bin\")`, line 140: `target = BASE_EXPORT_DIR / name`.",
+      "The last assignment is `target = BASE_EXPORT_DIR / name` on line 140. The value of `name` derives from user input via `request.GET.get(\"name\", \"packet.bin\")` on line 139. This means `target` is constructed using user-provided input.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. No defensive code is present to neutralize or constrain the user input before it is used in the path construction.",
+      "There is no specific defense mechanism applied to the path. No use of `secure_filename`, `Path.resolve()`, `is_relative_to()`, or any other explicit path sanitization or validation is visible.",
+      "The user-tainted value `name` is used to construct `target` on line 140, which directly flows into the `mkdir` call on line 141. No sanitization or validation is evident in the provided code."
+    ],
+    "reasoning": "User-controlled input (`name`) is used to construct a file path (`target`) which is then used in a directory creation operation (`mkdir`) without any visible sanitization or validation, allowing potential directory traversal. The additional context did not reveal any defensive measures.",
+    "cost_usd": 0.0,
+    "iterations": 3,
+    "input_tokens": 12462,
+    "cached_input_tokens": 0,
+    "output_tokens": 1249,
+    "confidence_score": 0.9,
+    "context_needed": [],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request.GET.get(\"name\", \"packet.bin\") (line 139) → target = BASE_EXPORT_DIR / name (line 140) → target.parent.mkdir(...) (line 141)",
+    "elapsed_seconds": 10.479033946990967,
+    "tokens_used": 13711,
+    "verdict": "True Positive",
+    "confidence": "High",
+    "timestamp": "2026-07-14T15:29:23.945299"
+  },
+  "function": {
+    "name": "case_dock_shelf_392",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 136,
+    "end_line": 143,
+    "scope": ""
+  },
+  "web_params": []
+}

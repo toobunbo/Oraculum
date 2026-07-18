@@ -1,0 +1,81 @@
+{
+  "id": "2",
+  "rule_slug": "py_sql-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulnerable-flask-app",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-flask-app",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-flask-app/verification_results/summary_realvuln-vulnerable-flask-app_20260714_151300.json"
+  },
+  "finding": {
+    "rule_id": "py/sql-injection",
+    "message": "This SQL query depends on a [user-provided value](1).",
+    "file": "app/app.py",
+    "start_line": 265,
+    "end_line": 265,
+    "repo_name": "realvuln-vulnerable-flask-app",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-flask-app/realvuln-vulnerable-flask-app.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 248: ControlFlowNode for request",
+      "line 255: ControlFlowNode for content",
+      "line 259: ControlFlowNode for search_term",
+      "line 261: ControlFlowNode for str_query",
+      "line 265: ControlFlowNode for str_query",
+      "--- Flow 2 ---",
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 255: ControlFlowNode for request",
+      "line 255: ControlFlowNode for content",
+      "line 259: ControlFlowNode for search_term",
+      "line 261: ControlFlowNode for str_query",
+      "line 265: ControlFlowNode for str_query"
+    ],
+    "severity": "8.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-89"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "cost_usd": 0.0,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "input_tokens": 16305,
+    "confidence": "High",
+    "cached_input_tokens": 0,
+    "reasoning": "User-controlled input flows directly into a SQL query string via string formatting on line 261, which is then executed on line 265 without any parameterization or sanitization. This is a classic SQL injection vulnerability. The use of '%s' string formatting for SQL queries is inherently unsafe regardless of the specific database engine implementation.",
+    "context_needed": [],
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 1262,
+    "tokens_used": 17567,
+    "data_flow": "request.json (line 255) → content['search'] (line 259) → str_query (line 261) → db.engine.execute(str_query) (line 265)",
+    "answers": [
+      "The EXACT sink statement is: `search_query = db.engine.execute(str_query)` on line 265. The variable passed to it is `str_query`.",
+      "The assignment to `str_query` occurs on line 261: `str_query = \"SELECT first_name, last_name, username FROM customer WHERE username = '%s';\" % search_term`.",
+      "The value of `str_query` derives from user input. The data flow is: `request.json` (line 255) → `content['search']` (line 259, assigned to `search_term`) → `str_query` (line 261).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense sanitizing the value before the sink. The query is constructed using string formatting with '%s', which is vulnerable to SQL injection. The `execute` method is called directly with the tainted string. Even though we couldn't see the implementation of `execute`, the string formatting approach itself is unsafe regardless of the database engine.",
+      "The user-tainted value `search_term` reaches the sink via `str_query` with no sanitization or parameterization. The absence of a defense mechanism confirms this is exploitable."
+    ],
+    "timestamp": "2026-07-14T15:12:55.781629",
+    "elapsed_seconds": 9.697015285491943,
+    "iterations": 3
+  },
+  "function": {
+    "name": "search_customer",
+    "file": "app/app.py",
+    "start_line": 247,
+    "end_line": 281,
+    "scope": ""
+  },
+  "web_params": []
+}

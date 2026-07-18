@@ -1,0 +1,47 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of user_pic function (HttpResponse containing file contents read via the traversed path)",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The return value contains contents of /etc/passwd (e.g., 'root:x:0:0'), confirming successful directory traversal to read an arbitrary file outside the intended base_path",
+    "trigger_patterns": [
+      "root:x:0:0"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_PATH_INJECTION: directory traversal bypass detected — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "../../../etc/passwd",
+      "....//....//....//etc/passwd",
+      "..\\/..\\/..\\/etc/passwd",
+      "../../../../../../etc/hosts",
+      "..%2f..%2f..%2fetc%2fpasswd"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "user_pic",
+    "file": "badguys/vulnerable/views.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def user_pic(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "HttpRequest"
+      }
+    ],
+    "target_id": "py_path_injection_badguys_vulnerable_views_py_42",
+    "finding_id": "2",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-lets-be-bad-guys/verification_results/findings/finding_2_py_path-injection.json"
+  }
+}

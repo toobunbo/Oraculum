@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is _os.system(\"ping -c 1 \" + host) on line 141, which is shell execution with user-controlled input."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; Q1 was true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; Q1 was true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock _os.system on line 141.",
+    "capture": "Capture the full command string argument passed to _os.system, specifically the constructed string \"ping -c 1 \" + host.",
+    "fake_behavior": "Return 0 to simulate a successful ping exit code, allowing execution to continue to the JsonResponse return.",
+    "notes": [
+      "The oracle should inspect the captured command string for the presence of unsanitized user input from request.GET.get(\"host\", ...).",
+      "Verify that no shell escaping or allow-list validation is applied to host before concatenation."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

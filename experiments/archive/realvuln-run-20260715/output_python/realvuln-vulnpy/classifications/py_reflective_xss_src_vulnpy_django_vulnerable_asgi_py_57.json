@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "strategy": "return_value",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "The sink is `return HttpResponse(template)` at line 57, which constructs an HTTP response object without performing network I/O, shell execution, or other dangerous side effects in a test environment."
+    },
+    "q2_observable_after_return": {
+      "answer": true,
+      "evidence": "The function returns `_view` (the HttpResponse object) which contains the concatenated `template` string with unescaped user input, so the XSS violation is inspectable on the returned object."
+    },
+    "q3_result_in_memory": {
+      "answer": true,
+      "evidence": "returns.kind is 'value' with exprs ['_view'], meaning the HttpResponse object is returned directly and its content (the tainted template string) is accessible in memory."
+    }
+  },
+  "mock_guidance": null,
+  "confidence": "high",
+  "warnings": []
+}

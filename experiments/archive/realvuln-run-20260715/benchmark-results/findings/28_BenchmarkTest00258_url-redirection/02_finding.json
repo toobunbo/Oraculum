@@ -1,0 +1,70 @@
+{
+  "id": "28",
+  "rule_slug": "py_url-redirection",
+  "source": {
+    "vhx_root": "/home/tuonglnc/repo/VulnHunterX",
+    "vhx_repo_root": "/home/tuonglnc/repo/VulnHunterX/repos/python/benchmark-python",
+    "vhx_output_root": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python",
+    "summary_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/verification_results/summary_benchmark-python_filtered_20260610_105228.json"
+  },
+  "finding": {
+    "rule_id": "py/url-redirection",
+    "message": "Untrusted URL redirection depends on a [user-provided value](1).",
+    "file": "testcode/BenchmarkTest00258.py",
+    "start_line": 40,
+    "end_line": 40,
+    "repo_name": "benchmark-python",
+    "lang": "python",
+    "sarif_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/benchmark-python.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 31: ControlFlowNode for request",
+      "line 31: ControlFlowNode for values",
+      "line 34: ControlFlowNode for param",
+      "line 36: ControlFlowNode for bar",
+      "line 40: ControlFlowNode for bar"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [],
+    "tags": [
+      "security",
+      "external/cwe/cwe-601"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-06-10T10:46:27.181642",
+    "context_needed": [],
+    "data_flow": "request.form.getlist(\"BenchmarkTest00258\") (line 31) → values[0] (line 34) → param (line 34) → bar (line 36) → flask.redirect(bar) (line 40)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "answers": [
+      "The EXACT flagged line is `return flask.redirect(bar)` on line 40. This line lives in the function `BenchmarkTest00258_post`.",
+      "The redirect sink is `flask.redirect(bar)` on line 40. The URL/target value passed to it is `bar`.",
+      "`param` is assigned from `values[0]` where `values = request.form.getlist(\"BenchmarkTest00258\")` on line 31. This directly derives from user input via `request.form`.",
+      "There are no conditions or reassignments that override the user-tainted value. The code directly assigns and uses the user-provided value without any checks.",
+      "No specific defense is present. There is no validation, sanitization, or allow-list check on the redirect URL.",
+      "The user-tainted value `bar` (derived from `request.form`) reaches the sink `flask.redirect(bar)` without any defense mechanism."
+    ],
+    "confidence_score": 0.3,
+    "iterations": 3,
+    "input_tokens": 8112,
+    "elapsed_seconds": 26.88869571685791,
+    "confidence": "Low",
+    "cached_input_tokens": 0,
+    "tokens_used": 9180,
+    "reasoning": "The user-provided value from `request.form` flows directly to `flask.redirect()` without any validation or sanitization, constituting an open redirect vulnerability. No defensive measures are present in the code path. [confidence downgraded: pattern-matching language without specific file:line citation]",
+    "verdict": "True Positive",
+    "output_tokens": 1068
+  },
+  "function": {
+    "name": "BenchmarkTest00258_post",
+    "file": "testcode/BenchmarkTest00258.py",
+    "start_line": 28,
+    "end_line": 42,
+    "scope": "Function init"
+  }
+}

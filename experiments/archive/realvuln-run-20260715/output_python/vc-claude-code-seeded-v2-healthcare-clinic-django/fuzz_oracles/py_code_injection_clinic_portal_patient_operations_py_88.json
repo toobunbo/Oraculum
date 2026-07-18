@@ -1,0 +1,57 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "clinic_portal.patient_operations.eval",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "the expression string passed as the first argument to eval, originating from user-controlled input",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured first argument to eval contains attribute access patterns (dot notation) or dunder attribute access on the provided local variables, indicating an attempt to escape the restricted eval environment",
+    "trigger_patterns": [
+      "amount\\.__[a-z_]+",
+      "fee\\.__[a-z_]+",
+      "amount\\.__class__",
+      "fee\\.__class__",
+      "\\.__[a-z_]+__\\(",
+      "\\.__mro__",
+      "\\.__subclasses__",
+      "\\.__bases__",
+      "\\.__globals__",
+      "\\.__builtins__"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_CODE_INJECTION: dangerous expression reached eval — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "amount.__class__",
+      "fee.__class__.__mro__",
+      "amount.__class__.__bases__",
+      "(42).__class__.__subclasses__()",
+      "fee.__class__.__bases__[0].__subclasses__()",
+      "amount + fee"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "patient_formula_cast_251",
+    "file": "clinic_portal/patient_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def patient_formula_cast_251(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "HttpRequest"
+      }
+    ],
+    "target_id": "py_code_injection_clinic_portal_patient_operations_py_88",
+    "finding_id": "0",
+    "rule_id": "py/code-injection",
+    "rule_slug": "py_code-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_0_py_code-injection.json"
+  }
+}

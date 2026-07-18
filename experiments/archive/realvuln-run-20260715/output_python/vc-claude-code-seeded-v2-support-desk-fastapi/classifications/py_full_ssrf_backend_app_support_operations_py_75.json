@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is urllib.request.urlopen(endpoint, ...) on line 75, which performs network I/O (HTTP request) to a user-controlled URL."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; decision terminated at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; decision terminated at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock urllib.request.urlopen to prevent actual network I/O during testing.",
+    "capture": "Capture the URL argument passed to urlopen so the test can assert whether it is user-controlled and whether it points to an internal/disallowed address.",
+    "fake_behavior": "Return a fake HTTPResponse-like object (e.g., a BytesIO wrapper) containing a safe dummy body so the calling code can still read and return {'endpoint': endpoint, 'preview': body} without error.",
+    "notes": [
+      "The function returns a dict with 'endpoint' and 'preview' keys, so the mock must provide a .read() method returning bytes.",
+      "Consider parameterizing the mock to return different status codes or bodies to test both success and error paths."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

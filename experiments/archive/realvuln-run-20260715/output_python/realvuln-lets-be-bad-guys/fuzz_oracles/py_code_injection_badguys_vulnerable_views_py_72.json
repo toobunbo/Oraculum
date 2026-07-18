@@ -1,0 +1,53 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "builtins.exec",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "decoded base64 string passed to exec after evaluation by base64.decodestring(bytes(first_name, 'ascii'))",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured argument to exec contains Python code indicative of arbitrary code execution, such as __import__, os.system, open(), eval(), or exec() calls",
+    "trigger_patterns": [
+      "__import__",
+      "os\\.system",
+      "open\\(",
+      "eval\\(",
+      "exec\\(",
+      "subprocess\\.",
+      "pickle\\.loads"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_CODE_INJECTION: arbitrary code passed to exec — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "X19pbXBvcnRfXygnb3MnKS5zeXN0ZW0oJ2lkJyk=",
+      "b3Blbig==",
+      "ZXZhbCg=",
+      "c3VicHJvY2Vzcy5jYWxsKFsnaWQnXSk=",
+      "cGlja2xlLmxvYWRzKGJ5dGVzKDEpKQ=="
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "code_execution",
+    "file": "badguys/vulnerable/views.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def code_execution(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "django.http.HttpRequest"
+      }
+    ],
+    "target_id": "py_code_injection_badguys_vulnerable_views_py_72",
+    "finding_id": "0",
+    "rule_id": "py/code-injection",
+    "rule_slug": "py_code-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-lets-be-bad-guys/verification_results/findings/finding_0_py_code-injection.json"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of get_trigger_view containing the concatenated HTML template with user input",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The returned HTML string contains unescaped script tags or event handler attributes, confirming that user input was concatenated without sanitization",
+    "trigger_patterns": [
+      "<script[\\s>]",
+      "on\\w+\\s*=",
+      "javascript\\s*:"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_REFLECTIVE_XSS: unescaped XSS payload in return value — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "<script>alert(1)</script>",
+      "<img src=x onerror=alert(1)>",
+      "\"><script>alert(1)</script>",
+      "<svg onload=alert(1)>",
+      "javascript:alert(1)",
+      "' onfocus=alert(1) autofocus='"
+    ],
+    "skip_condition": "trigger is None or not isinstance(trigger, str) or len(trigger) == 0"
+  },
+  "_meta": {
+    "function": "get_trigger_view",
+    "file": "src/vulnpy/flask/blueprint.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def get_trigger_view(name, trigger)",
+    "tainted_params": [
+      {
+        "name": "trigger",
+        "index": 1,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_reflective_xss_src_vulnpy_flask_blueprint_py_57",
+    "finding_id": "0",
+    "rule_id": "py/reflective-xss",
+    "rule_slug": "py_reflective-xss",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-vulnpy/verification_results/findings/finding_0_py_reflective-xss.json"
+  }
+}

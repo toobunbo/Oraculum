@@ -1,0 +1,30 @@
+{
+  "stage": "ingest",
+  "repo": "realvuln-dvpwa",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-dvpwa",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-dvpwa",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvpwa/verification_results/summary_realvuln-dvpwa_20260714_145900.json"
+  },
+  "counts": {
+    "total_verdicts": 1,
+    "selected": 1,
+    "enriched": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "findings": [
+    {
+      "id": "0",
+      "rule_id": "py/weak-sensitive-data-hashing",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dvpwa/verification_results/findings/finding_0_py_weak-sensitive-data-hashing.json",
+      "function_name": "check_password"
+    }
+  ],
+  "errors": []
+}

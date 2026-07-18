@@ -1,0 +1,71 @@
+{
+  "id": "8",
+  "rule_slug": "py_reflective-xss",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-djangoat",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/verification_results/summary_realvuln-djangoat_20260714_145404.json"
+  },
+  "finding": {
+    "rule_id": "py/reflective-xss",
+    "message": "Cross-site scripting vulnerability due to a [user-provided value](1).",
+    "file": "app/views/users/views.py",
+    "start_line": 80,
+    "end_line": 80,
+    "repo_name": "realvuln-djangoat",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/realvuln-djangoat.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 65: ControlFlowNode for request",
+      "line 67: ControlFlowNode for form",
+      "line 70: ControlFlowNode for user_id_form",
+      "line 80: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 13278,
+    "output_tokens": 1422,
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "data_flow": "request (line 65) → form (line 67) → user_id_form (line 70) → HttpResponse sink (line 80)",
+    "cost_usd": 0.0,
+    "confidence_score": 0.95,
+    "reasoning": "User-controlled input `user_id_form` flows directly into an `HttpResponse` string on line 80 without escaping or sanitization, constituting a reflective XSS vulnerability. No defenses are visible in the code path, and the missing caller context does not change the fact that the response is directly returning unsanitized user input.",
+    "confidence": "High",
+    "answers": [
+      "The EXACT sink is: `return HttpResponse(\"User \" + str(user_id_form) + \" NOT FOUND\")` on line 80. The value being rendered is `user_id_form`.",
+      "The assignment to `user_id_form` is on line 70: `user_id_form = form['user_id']`. This is the LAST and ONLY assignment to `user_id_form` on the path to the sink.",
+      "The value `user_id_form` derives from user input via `form['user_id']` on line 70, where `form = request.POST` on line 67. The data flow is: `request` (line 65) → `form` (line 67) → `user_id_form` (line 70).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value `user_id_form` before it reaches the sink on line 80.",
+      "There is NO specific defense escaping the value at the sink. No call to `html.escape()`, `markupsafe.escape()`, `bleach.clean()`, or any framework auto-escape mechanism is visible. The value is directly embedded into an `HttpResponse` string without sanitization.",
+      "There is no use of `|safe`, `{% autoescape false %}`, `Markup(...)`, or `mark_safe(...)` in this code path.",
+      "The user-tainted value `user_id_form` clearly reaches the sink on line 80 without any escaping or sanitization. No defense is present."
+    ],
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 12.245275497436523,
+    "timestamp": "2026-07-14T14:53:39.646262",
+    "iterations": 3,
+    "tokens_used": 14700
+  },
+  "function": {
+    "name": "user_view",
+    "file": "app/views/users/views.py",
+    "start_line": 65,
+    "end_line": 101,
+    "scope": ""
+  },
+  "web_params": []
+}

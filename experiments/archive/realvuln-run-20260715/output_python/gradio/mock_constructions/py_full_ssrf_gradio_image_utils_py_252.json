@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "q1_sink_name": "get",
+  "q2_sink_owner": "imported module",
+  "q2_prefix": "httpx",
+  "q2_fqn": "httpx.get",
+  "q3_call_style": "standalone",
+  "q3_mock_type": "standalone",
+  "q3_chained_method": null,
+  "q3_chained_depth": 0,
+  "q4_arg_passing": "positional",
+  "q4_arg_index": 0,
+  "q4_arg_name": null,
+  "q5_return_used": true,
+  "q5_mock_return_spec": "response",
+  "q5_context_var": null,
+  "q5_methods_called": [
+    "raise_for_status"
+  ],
+  "q6_input_source": "direct_call",
+  "q6_input_method": "direct_call",
+  "q7_param_name": "image_file",
+  "q8_call_count": "single",
+  "q8_tainted_call_index": 0,
+  "confidence": "high",
+  "warnings": []
+}

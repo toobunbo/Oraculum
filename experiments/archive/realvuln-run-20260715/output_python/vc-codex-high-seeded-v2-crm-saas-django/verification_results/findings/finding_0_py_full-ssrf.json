@@ -1,0 +1,70 @@
+{
+  "id": "0",
+  "rule_slug": "py_full-ssrf",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/summary_vc-codex-high-seeded-v2-crm-saas-django_20260714_153817.json"
+  },
+  "finding": {
+    "rule_id": "py/full-ssrf",
+    "message": "The full URL of this request depends on a [user-provided value](1).",
+    "file": "config/partner_console.py",
+    "start_line": 52,
+    "end_line": 52,
+    "repo_name": "vc-codex-high-seeded-v2-crm-saas-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django/vc-codex-high-seeded-v2-crm-saas-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 48: ControlFlowNode for request",
+      "line 51: ControlFlowNode for Attribute",
+      "line 51: ControlFlowNode for Attribute()",
+      "line 51: ControlFlowNode for relay_ref",
+      "line 52: ControlFlowNode for relay_ref"
+    ],
+    "severity": "9.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-918"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "verdict": "True Positive",
+    "answers": [
+      "The EXACT HTTP/network sink is `urllib.request.urlopen(relay_ref, timeout=3)` on line 52. The URL value passed to it is `relay_ref`.",
+      "The only assignment to `relay_ref` is on line 51: `relay_ref = request.GET.get(\"url\", \"http://127.0.0.1/status\")`. This is the LAST assignment on the path reaching the sink.",
+      "The value of `relay_ref` derives from user input via `request.GET.get(\"url\", ...)` on line 51. The data-flow chain is: `request` (line 48) → `request.GET.get` (line 51) → `relay_ref` (line 51) → `urllib.request.urlopen` (line 52). The caller context shows the function is not found in analysis scope, but the function signature indicates it receives a `request` parameter suggesting it's an HTTP handler.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense that restricts the URL. No scheme allow-list, host validation, or private IP check is present. The code does not sanitize or validate the user-provided URL before passing it to `urllib.request.urlopen`.",
+      "The user-controlled URL (`relay_ref`) reaches the sink (`urllib.request.urlopen`) with no sanitization or validation. The function appears to be an HTTP handler based on its parameter signature, making this exploitable SSRF."
+    ],
+    "reasoning": "User-controlled URL from HTTP request parameter flows directly to urllib.request.urlopen without any validation or sanitization, creating a server-side request forgery vulnerability. The function signature indicates it's an HTTP handler.",
+    "elapsed_seconds": 10.499492883682251,
+    "context_needed": [],
+    "tokens_used": 12945,
+    "output_tokens": 1106,
+    "cached_input_tokens": 0,
+    "input_tokens": 11839,
+    "timestamp": "2026-07-14T15:37:43.708774",
+    "data_flow": "request (line 48) → request.GET.get(\"url\", ...) (line 51) → relay_ref (line 51) → urllib.request.urlopen(relay_ref, ...) (line 52)",
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence_score": 0.9
+  },
+  "function": {
+    "name": "acct_relay_note_063",
+    "file": "config/partner_console.py",
+    "start_line": 48,
+    "end_line": 54,
+    "scope": ""
+  },
+  "web_params": []
+}

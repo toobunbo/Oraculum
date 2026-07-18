@@ -1,0 +1,68 @@
+{
+  "id": "12",
+  "rule_slug": "py_log-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/summary_vc-codex-high-seeded-v2-education-lms-django_20260714_154006.json"
+  },
+  "finding": {
+    "rule_id": "py/log-injection",
+    "message": "This log entry depends on a [user-provided value](1).",
+    "file": "education_lms/course_operations.py",
+    "start_line": 73,
+    "end_line": 73,
+    "repo_name": "vc-codex-high-seeded-v2-education-lms-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/vc-codex-high-seeded-v2-education-lms-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 69: ControlFlowNode for request",
+      "line 72: ControlFlowNode for body",
+      "line 73: ControlFlowNode for body"
+    ],
+    "severity": "7.8",
+    "precision": "medium",
+    "cwe_ids": [
+      "CWE-117"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:39:58.053746",
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "iterations": 1,
+    "tokens_used": 3593,
+    "cost_usd": 0.0,
+    "answers": [
+      "The log data originates from the request body (line 72: `body = request.body.decode(\"utf-8\", errors=\"replace\")`) and the Authorization header (line 73: `request.headers.get(\"authorization\")`). Both are user-supplied inputs.",
+      "Yes, the data is written to a log via `logger.warning` on line 73 without any sanitization or encoding.",
+      "Yes, an attacker could embed newline characters (\\n, \\r) in the request body. Since the body is decoded as UTF-8 and directly inserted into the log message on line 73, these characters would be interpreted literally, allowing log forging.",
+      "Yes, injected entries could mask real security events or mislead incident responders by creating fake log lines that appear legitimate.",
+      "Not visible in provided context, but it is common for applications to use log aggregation systems like ELK or Splunk, which are vulnerable to such log forging attacks if newlines are not handled.",
+      "Yes, stripping or encoding newlines and control characters from user data before logging would prevent this vulnerability."
+    ],
+    "context_needed": [],
+    "verdict": "True Positive",
+    "data_flow": "request.body (line 72) → body variable (line 72) → logger.warning (line 73)",
+    "elapsed_seconds": 2.946350336074829,
+    "reasoning": "User-controlled input from the request body flows directly into a log message without sanitization (line 73), enabling an attacker to inject fake log entries via newline characters. This satisfies all criteria for log injection (CWE-117).",
+    "cached_input_tokens": 0,
+    "output_tokens": 359,
+    "input_tokens": 3234,
+    "model": "ollama_chat/qwen3-coder:480b-cloud"
+  },
+  "function": {
+    "name": "course_wire_tally_222",
+    "file": "education_lms/course_operations.py",
+    "start_line": 69,
+    "end_line": 74,
+    "scope": ""
+  },
+  "web_params": []
+}

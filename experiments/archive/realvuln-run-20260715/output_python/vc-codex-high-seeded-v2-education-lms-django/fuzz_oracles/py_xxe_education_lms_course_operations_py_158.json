@@ -1,0 +1,50 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "education_lms.course_operations.etree.fromstring",
+    "target_arg_index": 0,
+    "target_arg_name": "text",
+    "capture_what": "XML text/bytes passed to etree.fromstring from request.body",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured XML text contains a DOCTYPE declaration with an ENTITY definition that references an external resource via SYSTEM or PUBLIC with file:// or http:// URI, or a parameter entity (% ) definition",
+    "trigger_patterns": [
+      "<!DOCTYPE[\\s\\S]*?<!ENTITY[\\s\\S]*?SYSTEM\\s+\"file://",
+      "<!DOCTYPE[\\s\\S]*?<!ENTITY[\\s\\S]*?SYSTEM\\s+\"http",
+      "<!DOCTYPE[\\s\\S]*?<!ENTITY[\\s\\S]*?PUBLIC\\s+\"[^\"]*\"\\s+\"file://",
+      "<!ENTITY\\s+%"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_XXE: XXE payload detected in etree.fromstring — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><foo>&xxe;</foo>",
+      "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM \"http://169.254.169.254/latest/meta-data/\">]><foo>&xxe;</foo>",
+      "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY % dtd SYSTEM \"file:///etc/hostname\">%dtd;]><foo>test</foo>",
+      "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe PUBLIC \"-//W3C//TEST//EN\" \"file:///etc/shadow\">]><foo>&xxe;</foo>",
+      "<?xml version=\"1.0\"?><!DOCTYPE data [<!ENTITY xxe SYSTEM \"file:///proc/self/environ\">]><data>&xxe;</data>"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "course_xml_fold_616",
+    "file": "education_lms/course_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def course_xml_fold_616(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "request"
+      }
+    ],
+    "target_id": "py_xxe_education_lms_course_operations_py_158",
+    "finding_id": "6",
+    "rule_id": "py/xxe",
+    "rule_slug": "py_xxe",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/findings/finding_6_py_xxe.json"
+  }
+}

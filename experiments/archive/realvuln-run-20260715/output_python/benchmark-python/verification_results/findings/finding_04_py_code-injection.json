@@ -1,0 +1,89 @@
+{
+  "id": "4",
+  "rule_slug": "py_code-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/",
+    "vhx_repo_root": "/home/trieudai/bench-src",
+    "vhx_output_root": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python",
+    "summary_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/verification_results/summary_benchmark-python_filtered_20260610_105228.json"
+  },
+  "finding": {
+    "rule_id": "py/code-injection",
+    "message": "This code execution depends on a [user-provided value](1).",
+    "file": "testcode/BenchmarkTest00159.py",
+    "start_line": 45,
+    "end_line": 45,
+    "repo_name": "benchmark-python",
+    "lang": "python",
+    "sarif_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/benchmark-python.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 31: ControlFlowNode for request",
+      "line 31: ControlFlowNode for Attribute",
+      "line 31: ControlFlowNode for Attribute()",
+      "line 31: ControlFlowNode for param",
+      "line 39: ControlFlowNode for param",
+      "line 39: [post] ControlFlowNode for lst",
+      "line 42: ControlFlowNode for bar",
+      "line 45: ControlFlowNode for bar",
+      "--- Flow 2 ---",
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 31: ControlFlowNode for request",
+      "line 31: ControlFlowNode for Attribute",
+      "line 31: ControlFlowNode for Attribute()",
+      "line 31: ControlFlowNode for param",
+      "line 39: ControlFlowNode for param",
+      "line 39: [post] ControlFlowNode for lst [List element]",
+      "line 42: ControlFlowNode for lst [List element]",
+      "line 42: ControlFlowNode for Subscript",
+      "line 42: ControlFlowNode for bar",
+      "line 45: ControlFlowNode for bar"
+    ],
+    "severity": "9.3",
+    "precision": "high",
+    "cwe_ids": [],
+    "tags": [
+      "security",
+      "external/cwe/cwe-094",
+      "external/cwe/cwe-095",
+      "external/cwe/cwe-116"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-06-10T10:43:14.163320",
+    "context_needed": [],
+    "data_flow": "param (line 31, user input) → lst.append(param) (line 37) → lst.pop(0) (line 38) → bar = lst[0] (line 42) → exec(bar) (line 45)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "answers": [
+      "The exact sink is `exec(bar)` on line 45.",
+      "The value `bar` is assigned on line 42: `bar = lst[0]`. This is the last and only assignment to `bar` before it reaches the sink.",
+      "The value of `bar` derives from `lst[0]` where `lst` is a list containing user input `param` at index 1 (line 37: `lst.append(param)`). The data flow is: `param` (line 31, user-controlled) → `lst` (lines 34-37) → `bar` (line 42).",
+      "There are no conditions or reassignments that override the user-tainted value. The assignment `bar = lst[0]` (line 42) directly uses a value (`lst[0]`) that is tainted by user input.",
+      "There is no specific defense preventing arbitrary code execution. No sanitization, allow-list, or restricted globals dict is applied to `bar` before it is passed to `exec()`.",
+      "The user-tainted value `param` reaches the sink `exec(bar)` via a clear data flow with no sanitization or defensive checks."
+    ],
+    "confidence_score": 0.95,
+    "iterations": 3,
+    "input_tokens": 8345,
+    "elapsed_seconds": 40.34420418739319,
+    "confidence": "High",
+    "cached_input_tokens": 0,
+    "tokens_used": 9460,
+    "reasoning": "User-controlled input flows directly into `exec()` without any sanitization or defensive checks. The data flow is clear and unmitigated.",
+    "verdict": "True Positive",
+    "output_tokens": 1115
+  },
+  "function": {
+    "name": "BenchmarkTest00159_post",
+    "file": "testcode/BenchmarkTest00159.py",
+    "start_line": 28,
+    "end_line": 51,
+    "scope": "Function init"
+  }
+}

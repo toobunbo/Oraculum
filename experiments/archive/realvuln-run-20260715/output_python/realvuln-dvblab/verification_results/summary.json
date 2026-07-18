@@ -1,0 +1,94 @@
+{
+  "stage": "ingest",
+  "repo": "realvuln-dvblab",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-dvblab",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab/verification_results/summary_realvuln-dvblab_20260714_145756.json"
+  },
+  "counts": {
+    "total_verdicts": 10,
+    "selected": 10,
+    "enriched": 9,
+    "skipped": 0,
+    "failed": 1
+  },
+  "findings": [
+    {
+      "id": "0",
+      "rule_id": "py/stack-trace-exposure",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dvblab/verification_results/findings/finding_0_py_stack-trace-exposure.json",
+      "function_name": "import_profile"
+    },
+    {
+      "id": "1",
+      "rule_id": "py/sql-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dvblab/verification_results/findings/finding_1_py_sql-injection.json",
+      "function_name": "register"
+    },
+    {
+      "id": "2",
+      "rule_id": "py/sql-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dvblab/verification_results/findings/finding_2_py_sql-injection.json",
+      "function_name": "login"
+    },
+    {
+      "id": "3",
+      "rule_id": "py/sql-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dvblab/verification_results/findings/finding_3_py_sql-injection.json",
+      "function_name": "get_transactions"
+    },
+    {
+      "id": "4",
+      "rule_id": "py/sql-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dvblab/verification_results/findings/finding_4_py_sql-injection.json",
+      "function_name": "search_transactions"
+    },
+    {
+      "id": "5",
+      "rule_id": "py/unsafe-deserialization",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dvblab/verification_results/findings/finding_5_py_unsafe-deserialization.json",
+      "function_name": "import_profile"
+    },
+    {
+      "id": "7",
+      "rule_id": "py/weak-sensitive-data-hashing",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dvblab/verification_results/findings/finding_7_py_weak-sensitive-data-hashing.json",
+      "function_name": "register"
+    },
+    {
+      "id": "8",
+      "rule_id": "py/weak-sensitive-data-hashing",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dvblab/verification_results/findings/finding_8_py_weak-sensitive-data-hashing.json",
+      "function_name": "set_password"
+    },
+    {
+      "id": "9",
+      "rule_id": "py/weak-sensitive-data-hashing",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dvblab/verification_results/findings/finding_9_py_weak-sensitive-data-hashing.json",
+      "function_name": "check_password"
+    }
+  ],
+  "errors": [
+    {
+      "id": "6",
+      "rule_id": "py/flask-debug",
+      "file": "backend/app.py",
+      "start_line": 228,
+      "error": "No enclosing function found for finding 6: py/flask-debug @ backend/app.py:228"
+    }
+  ]
+}

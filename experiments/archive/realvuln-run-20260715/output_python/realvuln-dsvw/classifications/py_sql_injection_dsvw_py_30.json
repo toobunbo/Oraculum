@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "cursor.execute is called with a dynamically constructed SQL query, performing DB I/O."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Short-circuited by Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Short-circuited by Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the cursor.execute method to intercept the SQL query execution.",
+    "capture": "Capture the first argument passed to cursor.execute, which is the concatenated SQL query string containing the tainted params[\"id\"] value.",
+    "fake_behavior": "Prevent actual database execution by having the mock return a dummy cursor object or None without raising exceptions, allowing the request handler to continue or exit gracefully.",
+    "notes": [
+      "The oracle should inspect the captured query string to verify it lacks parameterization and contains the raw tainted input.",
+      "Ensure the mock is applied to the specific cursor instance created in the request handler."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

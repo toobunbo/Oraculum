@@ -1,0 +1,51 @@
+{
+  "stage": "ingest",
+  "repo": "realvuln-vulnerable-flask-app",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulnerable-flask-app",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-flask-app",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-flask-app/verification_results/summary_realvuln-vulnerable-flask-app_20260714_151300.json"
+  },
+  "counts": {
+    "total_verdicts": 5,
+    "selected": 4,
+    "enriched": 4,
+    "skipped": 1,
+    "failed": 0
+  },
+  "findings": [
+    {
+      "id": "0",
+      "rule_id": "py/stack-trace-exposure",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-vulnerable-flask-app/verification_results/findings/finding_0_py_stack-trace-exposure.json",
+      "function_name": "search_customer"
+    },
+    {
+      "id": "2",
+      "rule_id": "py/sql-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-vulnerable-flask-app/verification_results/findings/finding_2_py_sql-injection.json",
+      "function_name": "search_customer"
+    },
+    {
+      "id": "3",
+      "rule_id": "py/weak-sensitive-data-hashing",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-vulnerable-flask-app/verification_results/findings/finding_3_py_weak-sensitive-data-hashing.json",
+      "function_name": "reg_customer"
+    },
+    {
+      "id": "4",
+      "rule_id": "py/template-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-vulnerable-flask-app/verification_results/findings/finding_4_py_template-injection.json",
+      "function_name": "pnf"
+    }
+  ],
+  "errors": []
+}

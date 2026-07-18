@@ -1,0 +1,47 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of hash_password function",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "Return value matches the exact 32-character hexadecimal format characteristic of an MD5 hexdigest, confirming use of the insecure MD5 algorithm for password hashing",
+    "trigger_patterns": [
+      "^[a-f0-9]{32}$"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_WEAK_SENSITIVE_DATA_HASHING: insecure MD5 hash detected in return value — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "",
+      "a",
+      "password",
+      "admin",
+      "test123"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "hash_password",
+    "file": "db/create_dummy_data.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def hash_password(password)",
+    "tainted_params": [
+      {
+        "name": "password",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_weak_sensitive_data_hashing_db_create_dummy_data_py_8",
+    "finding_id": "8",
+    "rule_id": "py/weak-sensitive-data-hashing",
+    "rule_slug": "py_weak-sensitive-data-hashing",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-threatbyte/verification_results/findings/finding_8_py_weak-sensitive-data-hashing.json"
+  }
+}

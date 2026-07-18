@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink is xml.dom.minidom.parseString which is an unsafe XML parser that can lead to XML bomb attacks such as billion laughs or quadratic blowup. It involves external entity resolution which is dangerous in a test environment."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "Not evaluated because Q1 was true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated because Q1 was true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "xml.dom.minidom.parseString call",
+    "capture": "The bar argument passed to parseString",
+    "fake_behavior": "Stub the parseString call to avoid actual XML parsing during test execution, potentially returning a mock DOM object",
+    "notes": [
+      "Ensure tests don't actually parse user-provided XML to prevent resource exhaustion",
+      "Capture the input XML string (bar) if needed for validation"
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

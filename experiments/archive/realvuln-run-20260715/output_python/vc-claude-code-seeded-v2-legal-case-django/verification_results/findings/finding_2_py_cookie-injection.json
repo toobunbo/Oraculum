@@ -1,0 +1,74 @@
+{
+  "id": "2",
+  "rule_slug": "py_cookie-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-legal-case-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/verification_results/summary_vc-claude-code-seeded-v2-legal-case-django_20260714_152949.json"
+  },
+  "finding": {
+    "rule_id": "py/cookie-injection",
+    "message": "Cookie is constructed from a [user-supplied input](1).",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 95,
+    "end_line": 95,
+    "repo_name": "vc-claude-code-seeded-v2-legal-case-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/vc-claude-code-seeded-v2-legal-case-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 90: ControlFlowNode for request",
+      "line 93: ControlFlowNode for Attribute",
+      "line 93: ControlFlowNode for Attribute()",
+      "line 93: ControlFlowNode for marker",
+      "line 95: ControlFlowNode for marker"
+    ],
+    "severity": "5.0",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-20"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "answers": [
+      "Step 1: The potentially dangerous data originates from user input via the HTTP request object (line 90). Specifically, it comes from the 'marker' parameter in the GET request (line 93).",
+      "Step 2: The data flows through the following variables with line numbers: request.GET.get() -> marker (line 93), then marker is used in set_cookie() (line 95).",
+      "Step 3: No validation, sanitization, or encoding is applied to the 'marker' variable between its retrieval from the request and its use in setting the cookie. The code directly takes the user input and uses it as a cookie value.",
+      "Step 4: The sink is the set_cookie() method call on the response object (line 95). The specific operation that makes it dangerous is using unsanitized user input as a cookie value, which could lead to cookie injection attacks.",
+      "Step 5: There are no intermediate transformations between the source and sink that would prevent or circumvent sanitization, as no sanitization is performed at all.",
+      "Step 6: Not visible in provided context. The code uses Django's JsonResponse and set_cookie methods, but there's no indication of any automatic protection against cookie injection in the provided code.",
+      "Step 7: The code path requires passing the _wrk_gate() check (line 91), but the authentication/authorization requirements for this gate are not visible in the provided context.",
+      "Step 8: The code does not appear to be in a test file or debug path. It's a regular view function that would execute in production.",
+      "Step 9: The concrete security impact of an attacker controlling this data could be cookie injection, which might lead to session fixation attacks or other client-side vulnerabilities depending on how the cookie is used.",
+      "Step 10: The weakest link in the defense chain is the complete absence of any validation or sanitization of the user-provided 'marker' value before using it as a cookie value. There is no defense mechanism in place to prevent cookie injection."
+    ],
+    "reasoning": "The code takes user input directly from the request (line 93) and uses it as a cookie value without any sanitization (line 95). This represents a clear cookie injection vulnerability where an attacker could inject arbitrary cookie values. The data flow is straightforward with no defensive measures in place.",
+    "cost_usd": 0.0,
+    "iterations": 1,
+    "input_tokens": 4968,
+    "cached_input_tokens": 0,
+    "output_tokens": 588,
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request.GET.get('marker') (line 93) → marker variable (line 93) → response.set_cookie('portal_crumb', marker) (line 95)",
+    "elapsed_seconds": 4.759896516799927,
+    "tokens_used": 5556,
+    "verdict": "True Positive",
+    "confidence": "High",
+    "timestamp": "2026-07-14T15:29:16.369018"
+  },
+  "function": {
+    "name": "case_crumb_lane_291",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 90,
+    "end_line": 96,
+    "scope": ""
+  },
+  "web_params": []
+}

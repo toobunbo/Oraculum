@@ -1,0 +1,73 @@
+{
+  "id": "9",
+  "rule_slug": "py_nosql-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-legal-case-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/verification_results/summary_vc-claude-code-seeded-v2-legal-case-django_20260714_152949.json"
+  },
+  "finding": {
+    "rule_id": "py/nosql-injection",
+    "message": "This NoSQL query contains an unsanitized [user-provided value](1).",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 160,
+    "end_line": 160,
+    "repo_name": "vc-claude-code-seeded-v2-legal-case-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/vc-claude-code-seeded-v2-legal-case-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 154: ControlFlowNode for request",
+      "line 158: ControlFlowNode for BoolExpr",
+      "line 158: ControlFlowNode for Attribute()",
+      "line 158: ControlFlowNode for payload",
+      "line 159: ControlFlowNode for payload",
+      "line 159: ControlFlowNode for Attribute()",
+      "line 159: ControlFlowNode for query",
+      "line 160: ControlFlowNode for query"
+    ],
+    "severity": "8.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-943"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "answers": [
+      "The INPUT originates from `request.body` which is user-controlled (line 158).",
+      "Yes, user input is used directly as a MongoDB query object via the `query` variable (line 159) which is passed to `find_one` (line 160).",
+      "Yes, an attacker could supply JSON operators like `{'$gt': ''}` or `{'$where': 'sleep(1000)'}` because the input is parsed as JSON and used directly in the query without sanitization (lines 158-160).",
+      "No, the input is not validated to ensure it is a scalar value; it can be a dictionary as parsed by `json.loads` (line 158).",
+      "Yes, `pymongo` is used (line 157), but there is no input sanitization middleware or validation shown.",
+      "The impact could include authentication bypass, data exfiltration, or DoS via `$where` expressions due to unsanitized query input."
+    ],
+    "reasoning": "User-controlled input from `request.body` is parsed as JSON and used directly as a MongoDB query without sanitization or validation, allowing NoSQL injection via operators like `$where` or `$gt`. The data flow from source to sink is clear and exploitable.",
+    "cost_usd": 0.0,
+    "iterations": 1,
+    "input_tokens": 4551,
+    "cached_input_tokens": 0,
+    "output_tokens": 393,
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request.body (line 158) → json.loads(request.body) (line 158) → payload.get(\"filter\", payload) (line 159) → query (line 159) → MongoClient(...).ops.records.find_one(query) (line 160)",
+    "elapsed_seconds": 3.018404722213745,
+    "tokens_used": 4944,
+    "verdict": "True Positive",
+    "confidence": "High",
+    "timestamp": "2026-07-14T15:29:30.753170"
+  },
+  "function": {
+    "name": "case_mongo_lane_414",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 154,
+    "end_line": 161,
+    "scope": ""
+  },
+  "web_params": []
+}

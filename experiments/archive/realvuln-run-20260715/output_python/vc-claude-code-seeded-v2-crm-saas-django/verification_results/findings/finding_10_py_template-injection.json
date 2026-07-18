@@ -1,0 +1,70 @@
+{
+  "id": "10",
+  "rule_slug": "py_template-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/summary_vc-claude-code-seeded-v2-crm-saas-django_20260714_152015.json"
+  },
+  "finding": {
+    "rule_id": "py/template-injection",
+    "message": "This template construction depends on a [user-provided value](1).",
+    "file": "crm_project/partner_console.py",
+    "start_line": 134,
+    "end_line": 134,
+    "repo_name": "vc-claude-code-seeded-v2-crm-saas-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/vc-claude-code-seeded-v2-crm-saas-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 129: ControlFlowNode for request",
+      "line 133: ControlFlowNode for Attribute",
+      "line 133: ControlFlowNode for Attribute()",
+      "line 133: ControlFlowNode for fragment",
+      "line 134: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "9.3",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-74"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 16881,
+    "confidence": "High",
+    "iterations": 3,
+    "output_tokens": 1649,
+    "context_needed": [],
+    "reasoning": "User-controlled input from `request.GET['fragment']` is directly embedded into a Jinja2 template string on line 134 without sanitization or sandboxing, creating a Server-Side Template Injection (SSTI) vulnerability. No defenses such as SandboxedEnvironment or auto-escape via render variables are present. The function appears to be an HTTP handler based on the request parameter pattern, and even without seeing the caller, the vulnerability is present in the function itself.",
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:20:13.922255",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request (line 129) → request.GET.get(\"fragment\", ...) (line 133) → fragment (line 133) → \"Result: \" + fragment (line 134) → Template(...).render() (line 134)",
+    "cost_usd": 0.0,
+    "cached_input_tokens": 0,
+    "tokens_used": 18530,
+    "elapsed_seconds": 11.764394998550415,
+    "confidence_score": 0.95,
+    "answers": [
+      "The EXACT flagged line is: `body = Template(\"Result: \" + fragment).render()` on line 134. This line lives in the function `acct_jinja_cast_381`.",
+      "The template-source string passed to the Jinja2 Template is: `\"Result: \" + fragment`.",
+      "The variable `fragment` is assigned on line 133: `fragment = request.GET.get(\"fragment\", \"{{ 7 * 7 }}\")`. This is the LAST assignment to the template source on this path.",
+      "The value of `fragment` derives from user input via `request.GET.get(\"fragment\", \"{{ 7 * 7 }}\")` on line 133. The data-flow chain is: `request` (line 129, function parameter) → `request.GET.get` (line 133) → `fragment` (line 133) → `\"Result: \" + fragment` (line 134).",
+      "There is no specific defense preventing SSTI. The user input is directly embedded into the template string without any sanitization, sandboxing, or use of a SandboxedEnvironment. The input is not passed as a template variable via `render(**ctx)`, which would be safe with auto-escape.",
+      "User-controlled data (`fragment` from `request.GET`) reaches the template SOURCE (`\"Result: \" + fragment`) with concrete line numbers (133 → 134), and there is no defense such as sandboxing, auto-escape via context variables, or constant overrides."
+    ]
+  },
+  "function": {
+    "name": "acct_jinja_cast_381",
+    "file": "crm_project/partner_console.py",
+    "start_line": 129,
+    "end_line": 135,
+    "scope": ""
+  },
+  "web_params": []
+}

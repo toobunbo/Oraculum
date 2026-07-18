@@ -1,0 +1,83 @@
+{
+  "id": "9",
+  "rule_slug": "py_weak-sensitive-data-hashing",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-codex-high-seeded-v2-fintech-lending-fastapi_20260714_154154.json"
+  },
+  "finding": {
+    "rule_id": "py/weak-sensitive-data-hashing",
+    "message": "[Sensitive data (password)](1) is used in a hashing algorithm (SHA256) that is insecure for password hashing, since it is not a computationally expensive hash function.\n[Sensitive data (password)](2) is used in a hashing algorithm (SHA256) that is insecure for password hashing, since it is not a computationally expensive hash function.",
+    "file": "app/security.py",
+    "start_line": 92,
+    "end_line": 92,
+    "repo_name": "vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/vc-codex-high-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 1684: ControlFlowNode for x_api_key",
+      "line 1685: ControlFlowNode for x_api_key",
+      "line 1667: ControlFlowNode for raw_key",
+      "line 1671: ControlFlowNode for raw_key",
+      "line 91: ControlFlowNode for raw_token",
+      "line 92: ControlFlowNode for Attribute()",
+      "--- Flow 2 ---",
+      "line 1684: ControlFlowNode for None",
+      "line 1684: ControlFlowNode for x_api_key",
+      "line 1685: ControlFlowNode for x_api_key",
+      "line 1667: ControlFlowNode for raw_key",
+      "line 1671: ControlFlowNode for raw_key",
+      "line 91: ControlFlowNode for raw_token",
+      "line 92: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-327",
+      "CWE-328",
+      "CWE-916"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "elapsed_seconds": 12.342054605484009,
+    "answers": [
+      "The EXACT crypto call is `hashlib.sha256(raw_token.encode(\"utf-8\")).hexdigest()` on line 92. The algorithm is SHA256.",
+      "The algorithm is specified via a hardcoded method call `hashlib.sha256` on line 92.",
+      "The output of the hash is returned directly from the function `hash_token` on line 92. The function name 'hash_token' and the dataflow from 'x_api_key' suggests this is being used for security purposes, likely for API token hashing.",
+      "SHA256 is not broken for collision resistance, but it is considered insecure for password/token hashing because it is not computationally expensive.",
+      "The specific defense required for sensitive data hashing is to use a computationally expensive function like `bcrypt`, `argon2-cffi`, `hashlib.scrypt`, or `hashlib.pbkdf2_hmac` with sufficient iterations. The code does not implement any of these.",
+      "There is no indication in the provided code that this is for backward compatibility with an external system.",
+      "The function is named 'hash_token' and the dataflow shows it's processing what appears to be an API key, indicating a security-sensitive use case. SHA256 alone is inadequate for protecting sensitive tokens due to its speed, making it vulnerable to brute-force attacks."
+    ],
+    "tokens_used": 15448,
+    "data_flow": "x_api_key (line 1684) → raw_key (line 1667) → raw_token (line 91) → hashlib.sha256().hexdigest() (line 92)",
+    "output_tokens": 1374,
+    "iterations": 3,
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "input_tokens": 14074,
+    "confidence_score": 0.9,
+    "context_needed": [],
+    "timestamp": "2026-07-14T15:41:49.493270",
+    "reasoning": "The function 'hash_token' is used to hash security-sensitive data (API keys) using SHA256, which is insecure for this purpose because it lacks computational expense. This makes the hashed tokens vulnerable to brute-force attacks. No adequate defense mechanism is present in the code.",
+    "cached_input_tokens": 0,
+    "confidence": "High"
+  },
+  "function": {
+    "name": "hash_token",
+    "file": "app/security.py",
+    "start_line": 91,
+    "end_line": 92,
+    "scope": ""
+  },
+  "web_params": []
+}

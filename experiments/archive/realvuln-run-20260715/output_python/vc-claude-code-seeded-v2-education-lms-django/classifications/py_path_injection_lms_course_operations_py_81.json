@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is target.parent.mkdir(parents=True, exist_ok=True) on line 81, a filesystem write operation with path traversal potential, constituting an irreversible side effect."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; decision stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; decision stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock pathlib.Path.mkdir or patch the specific target.parent.mkdir call on line 81.",
+    "capture": "Capture the path argument passed to mkdir (i.e., target.parent) to verify whether it contains traversal sequences like '../' relative to BASE_EXPORT_DIR.",
+    "fake_behavior": "Make the mock a no-op that records the argument but does not create any directories on the filesystem, or raise an exception if detection logic needs to abort.",
+    "notes": [
+      "The function also returns JsonResponse({'path': str(target)}) which reveals the constructed path; mocking mkdir prevents the side effect while still allowing the return value to be checked for traversal artifacts.",
+      "Since BASE_EXPORT_DIR is not defined in the snippet, the mock capture should log the full resolved path so the test can assert it stays within expected bounds."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

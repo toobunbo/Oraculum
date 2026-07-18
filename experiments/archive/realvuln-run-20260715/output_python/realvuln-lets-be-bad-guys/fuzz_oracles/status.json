@@ -1,0 +1,67 @@
+{
+  "stage": "oracle",
+  "repo": "realvuln-lets-be-bad-guys",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/oracle.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/realvuln-lets-be-bad-guys/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 4,
+    "generated": 4,
+    "skipped": 0,
+    "failed": 0
+  },
+  "oracles": [
+    {
+      "id": "0",
+      "target_id": "py_code_injection_badguys_vulnerable_views_py_72",
+      "rule_id": "py/code-injection",
+      "file": "badguys/vulnerable/views.py",
+      "start_line": "72",
+      "function_name": "code_execution",
+      "finding_artifact": "output/python/realvuln-lets-be-bad-guys/verification_results/findings/finding_0_py_code-injection.json",
+      "oracle": "output/python/realvuln-lets-be-bad-guys/fuzz_oracles/py_code_injection_badguys_vulnerable_views_py_72.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "1",
+      "target_id": "py_code_injection_badguys_vulnerable_views_py_76",
+      "rule_id": "py/code-injection",
+      "file": "badguys/vulnerable/views.py",
+      "start_line": "76",
+      "function_name": "code_execution",
+      "finding_artifact": "output/python/realvuln-lets-be-bad-guys/verification_results/findings/finding_1_py_code-injection.json",
+      "oracle": "output/python/realvuln-lets-be-bad-guys/fuzz_oracles/py_code_injection_badguys_vulnerable_views_py_76.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "2",
+      "target_id": "py_path_injection_badguys_vulnerable_views_py_42",
+      "rule_id": "py/path-injection",
+      "file": "badguys/vulnerable/views.py",
+      "start_line": "42",
+      "function_name": "user_pic",
+      "finding_artifact": "output/python/realvuln-lets-be-bad-guys/verification_results/findings/finding_2_py_path-injection.json",
+      "oracle": "output/python/realvuln-lets-be-bad-guys/fuzz_oracles/py_path_injection_badguys_vulnerable_views_py_42.json",
+      "status": "generated",
+      "strategy": "return_value"
+    },
+    {
+      "id": "3",
+      "target_id": "py_url_redirection_badguys_vulnerable_views_py_178",
+      "rule_id": "py/url-redirection",
+      "file": "badguys/vulnerable/views.py",
+      "start_line": "178",
+      "function_name": "unvalidated_redirect",
+      "finding_artifact": "output/python/realvuln-lets-be-bad-guys/verification_results/findings/finding_3_py_url-redirection.json",
+      "oracle": "output/python/realvuln-lets-be-bad-guys/fuzz_oracles/py_url_redirection_badguys_vulnerable_views_py_178.json",
+      "status": "generated",
+      "strategy": "return_value"
+    }
+  ],
+  "errors": []
+}

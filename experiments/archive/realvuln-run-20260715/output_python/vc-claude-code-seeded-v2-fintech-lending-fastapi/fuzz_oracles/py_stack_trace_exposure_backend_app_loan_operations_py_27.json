@@ -1,0 +1,49 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of loan_batch_pulse_007, which is a JSONResponse whose body contains str(exc)",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The returned JSONResponse body contains leaked internal details such as the BASE_EXPORT_DIR variable name or Python traceback file references, confirming stack trace / error message exposure",
+    "trigger_patterns": [
+      "BASE_EXPORT_DIR",
+      "Traceback",
+      "File \".*\\.py\""
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_STACK_TRACE_EXPOSURE: internal error details leaked in response — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "nonexistent_lot",
+      "../../etc/passwd",
+      "../",
+      "test123",
+      "%%invalid%%"
+    ],
+    "skip_condition": "not lot_ref"
+  },
+  "_meta": {
+    "function": "loan_batch_pulse_007",
+    "file": "backend/app/loan_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def loan_batch_pulse_007(lot_ref: str, gate_ref: None)",
+    "tainted_params": [
+      {
+        "name": "lot_ref",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_stack_trace_exposure_backend_app_loan_operations_py_27",
+    "finding_id": "0",
+    "rule_id": "py/stack-trace-exposure",
+    "rule_slug": "py_stack-trace-exposure",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_0_py_stack-trace-exposure.json"
+  }
+}

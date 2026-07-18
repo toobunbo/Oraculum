@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "render_template_string with user-controlled input is an SSTI sink that can achieve Remote Code Execution, an irreversible side effect."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "not evaluated"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "not evaluated"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock render_template_string (e.g., from flask or jinja2) so it does not interpret or execute template expressions.",
+    "capture": "Capture the first positional argument (the template source string) passed to render_template_string to verify it contains unescaped user-controlled data from request.url.",
+    "fake_behavior": "Return a benign placeholder string (e.g., 'MOCKED_TEMPLATE_OUTPUT'); if the surrounding code expects the (rendered_html, 404) tuple shape visible in returns.exprs, return ('MOCKED_TEMPLATE_OUTPUT', 404).",
+    "notes": [
+      "Do not let the real Jinja2 engine process the tainted template string, as it could execute arbitrary Python during the test.",
+      "The mock should be scoped so that only calls within the pnf function are intercepted."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

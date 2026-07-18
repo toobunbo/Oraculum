@@ -1,0 +1,47 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "pathlib.Path.write_text",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "Path object (self) whose string representation contains the tainted file path with potential directory traversal",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured Path object's string representation contains directory traversal sequences (e.g., ../ or ..\\) indicating the user-controlled 'ref' parameter escaped BASE_EXPORT_DIR",
+    "trigger_patterns": [
+      "\\.{2}[/\\\\]",
+      "\\.{3}[/\\\\]"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_PATH_INJECTION: directory traversal detected in write_text path — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "../../etc/passwd",
+      "../../../tmp/evil",
+      "....//....//etc//shadow",
+      "..\\..\\windows\\system32"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "course_vault_stash_234",
+    "file": "lms/course_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def course_vault_stash_234(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "django.http.HttpRequest"
+      }
+    ],
+    "target_id": "py_path_injection_lms_course_operations_py_82",
+    "finding_id": "1",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-education-lms-django/verification_results/findings/finding_1_py_path-injection.json"
+  }
+}

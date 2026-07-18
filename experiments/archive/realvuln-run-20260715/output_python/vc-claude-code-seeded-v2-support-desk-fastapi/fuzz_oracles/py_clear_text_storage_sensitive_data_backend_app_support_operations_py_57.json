@@ -1,0 +1,44 @@
+{
+  "monitor": {
+    "strategy": "filesystem_state",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "files created or modified during ticket_vault_stash_232 execution, specifically checking whether any writes occur outside BASE_EXPORT_DIR",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "Any file written to a path that does not start with the resolved BASE_EXPORT_DIR value, confirming a filesystem boundary violation via the target.write_text() sink",
+    "trigger_patterns": [],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_CLEAR_TEXT_STORAGE_SENSITIVE_DATA: file written outside boundary — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "{\"ssn\": \"123-45-6789\", \"card\": \"4111111111111111\"}",
+      "{\"ssn\": \"000-00-0000\", \"card\": \"5500000000000004\"}",
+      "{\"ssn\": \"999-99-9999\", \"card\": \"340000000000009\"}",
+      "{\"ssn\": \"666-00-1234\", \"card\": \"6011000000000004\"}"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "ticket_vault_stash_232",
+    "file": "backend/app/support_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def ticket_vault_stash_232(request: Request, gate_ref: None)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "Request"
+      }
+    ],
+    "target_id": "py_clear_text_storage_sensitive_data_backend_app_support_operations_py_57",
+    "finding_id": "7",
+    "rule_id": "py/clear-text-storage-sensitive-data",
+    "rule_slug": "py_clear-text-storage-sensitive-data",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_7_py_clear-text-storage-sensitive-data.json"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "app.app.db.engine.execute",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "SQL query string passed to db.engine.execute containing unsanitized user input interpolated via %s formatting",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured SQL query string contains a SQL injection payload that breaks out of the single-quoted username literal and injects SQL keywords (OR, UNION, DROP) indicating successful exploitation",
+    "trigger_patterns": [
+      "username\\s*=\\s*''\\s*OR\\s+1\\s*=\\s*1",
+      "username\\s*=\\s*''\\s*UNION\\s+SELECT",
+      "username\\s*=\\s*''\\s*OR\\s+'",
+      "username\\s*=\\s*'.*';\\s*DROP\\s+"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_SQL_INJECTION: SQL injection payload in db.engine.execute argument — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "' OR 1=1--",
+      "' UNION SELECT null,null,null--",
+      "'; DROP TABLE customer--",
+      "' OR '1'='1",
+      "' OR 1=1#"
+    ],
+    "skip_condition": "not isinstance(search_term, str)"
+  },
+  "_meta": {
+    "function": "search_customer",
+    "file": "app/app.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def search_customer()",
+    "tainted_params": [
+      {
+        "name": "search_term",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_sql_injection_app_app_py_265",
+    "finding_id": "2",
+    "rule_id": "py/sql-injection",
+    "rule_slug": "py_sql-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-vulnerable-flask-app/verification_results/findings/finding_2_py_sql-injection.json"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "The sink for this weak-hashing rule is the md5(...) call, which is a pure computation with no side effects, no network I/O, no shell execution, and no DB write."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "The function returns only True; the MD5 hash value is embedded inside the SQL INSERT statement and is not exposed in the return value, so the violation cannot be observed after return."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not reached; Q2 was NO."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the SQL cursor execute call or the database connection used in init_sql_db to intercept the INSERT statement.",
+    "capture": "Capture the full SQL query string or the parameterized arguments passed to cursor.execute, specifically the password field value to verify it is an MD5 hex digest (32 hex characters, no salt).",
+    "fake_behavior": "Accept any SQL input and return a success result (e.g., mock cursor with rowcount=1) without actually executing against a database.",
+    "notes": [
+      "The violation is that the password is hashed with MD5 instead of bcrypt/scrypt/Argon2/PBKDF2.",
+      "Verification logic should check that the captured password value matches an MD5 hex digest pattern (exactly 32 lowercase hex chars) and lacks salt or key-stretching indicators.",
+      "If the SQL is parameterized, capture the params tuple/list rather than the query template."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

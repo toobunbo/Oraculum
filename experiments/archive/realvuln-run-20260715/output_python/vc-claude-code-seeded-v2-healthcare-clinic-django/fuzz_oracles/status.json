@@ -1,0 +1,134 @@
+{
+  "stage": "oracle",
+  "repo": "vc-claude-code-seeded-v2-healthcare-clinic-django",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/oracle.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 9,
+    "generated": 7,
+    "skipped": 0,
+    "failed": 2
+  },
+  "oracles": [
+    {
+      "id": "0",
+      "target_id": "py_code_injection_clinic_portal_patient_operations_py_88",
+      "rule_id": "py/code-injection",
+      "file": "clinic_portal/patient_operations.py",
+      "start_line": "88",
+      "function_name": "patient_formula_cast_251",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_0_py_code-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/fuzz_oracles/py_code_injection_clinic_portal_patient_operations_py_88.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "1",
+      "target_id": "py_cookie_injection_clinic_portal_patient_operations_py_96",
+      "rule_id": "py/cookie-injection",
+      "file": "clinic_portal/patient_operations.py",
+      "start_line": "96",
+      "function_name": "patient_crumb_lane_289",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_1_py_cookie-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/fuzz_oracles/py_cookie_injection_clinic_portal_patient_operations_py_96.json",
+      "status": "generated",
+      "strategy": "return_value"
+    },
+    {
+      "id": "2",
+      "target_id": "py_xxe_clinic_portal_patient_operations_py_188",
+      "rule_id": "py/xxe",
+      "file": "clinic_portal/patient_operations.py",
+      "start_line": "188",
+      "function_name": "patient_xml_fold_453",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_2_py_xxe.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/fuzz_oracles/py_xxe_clinic_portal_patient_operations_py_188.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "3",
+      "target_id": "py_unsafe_deserialization_clinic_portal_patient_operations_py_70",
+      "rule_id": "py/unsafe-deserialization",
+      "file": "clinic_portal/patient_operations.py",
+      "start_line": "70",
+      "function_name": "patient_bundle_thaw_169",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_3_py_unsafe-deserialization.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/fuzz_oracles/py_unsafe_deserialization_clinic_portal_patient_operations_py_70.json",
+      "status": "failed"
+    },
+    {
+      "id": "4",
+      "target_id": "py_url_redirection_clinic_portal_patient_operations_py_58",
+      "rule_id": "py/url-redirection",
+      "file": "clinic_portal/patient_operations.py",
+      "start_line": "58",
+      "function_name": "patient_return_lane_145",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_4_py_url-redirection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/fuzz_oracles/py_url_redirection_clinic_portal_patient_operations_py_58.json",
+      "status": "generated",
+      "strategy": "return_value"
+    },
+    {
+      "id": "7",
+      "target_id": "py_nosql_injection_clinic_portal_patient_operations_py_156",
+      "rule_id": "py/nosql-injection",
+      "file": "clinic_portal/patient_operations.py",
+      "start_line": "156",
+      "function_name": "patient_mongo_lane_412",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_7_py_nosql-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/fuzz_oracles/py_nosql_injection_clinic_portal_patient_operations_py_156.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "8",
+      "target_id": "py_command_line_injection_clinic_portal_patient_operations_py_138",
+      "rule_id": "py/command-line-injection",
+      "file": "clinic_portal/patient_operations.py",
+      "start_line": "138",
+      "function_name": "patient_shell_probe_395",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_8_py_command-line-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/fuzz_oracles/py_command_line_injection_clinic_portal_patient_operations_py_138.json",
+      "status": "failed"
+    },
+    {
+      "id": "9",
+      "target_id": "py_template_injection_clinic_portal_patient_operations_py_130",
+      "rule_id": "py/template-injection",
+      "file": "clinic_portal/patient_operations.py",
+      "start_line": "130",
+      "function_name": "patient_jinja_cast_383",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_9_py_template-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/fuzz_oracles/py_template_injection_clinic_portal_patient_operations_py_130.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "10",
+      "target_id": "py_jinja2_autoescape_false_clinic_portal_patient_operations_py_130",
+      "rule_id": "py/jinja2/autoescape-false",
+      "file": "clinic_portal/patient_operations.py",
+      "start_line": "130",
+      "function_name": "patient_jinja_cast_383",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_10_py_jinja2_autoescape-false.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/fuzz_oracles/py_jinja2_autoescape_false_clinic_portal_patient_operations_py_130.json",
+      "status": "generated",
+      "strategy": "return_value"
+    }
+  ],
+  "errors": [
+    {
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_3_py_unsafe-deserialization.json",
+      "error": "LLM output not valid JSON:\n```json\n{\n  \"monitor\": {\n    \"strategy\": \"recorded_call\",\n    \"patch_target\": \"pickle.loads\",\n    \"target_arg_index\": 0,\n    \"target_arg_name\": null,\n    \"capture_what\": \"raw bytes argument passed to pickle.loads, which is the base64-decoded user input\",\n    \"additional_imports\":"
+    },
+    {
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_8_py_command-line-injection.json",
+      "error": "monitor.strategy invalid: 'patch_call'. Must be one of {'filesystem_state', 'recorded_call', 'return_value'}"
+    }
+  ]
+}

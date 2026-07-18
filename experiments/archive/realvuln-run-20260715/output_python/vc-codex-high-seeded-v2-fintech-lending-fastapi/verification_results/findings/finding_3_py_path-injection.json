@@ -1,0 +1,73 @@
+{
+  "id": "3",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-codex-high-seeded-v2-fintech-lending-fastapi_20260714_154154.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "app/loan_operations.py",
+    "start_line": 122,
+    "end_line": 122,
+    "repo_name": "vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/vc-codex-high-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 119: ControlFlowNode for name",
+      "line 121: ControlFlowNode for target",
+      "line 122: ControlFlowNode for Attribute"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "elapsed_seconds": 16.414808988571167,
+    "answers": [
+      "The EXACT file-operation sink is `target.parent.mkdir(parents=True, exist_ok=True)` on line 122. The path value passed to it is `target.parent`, where `target` is derived from `BASE_EXPORT_DIR / name` (line 121).",
+      "The assignments to the path value are: \n- Line 121: `target = BASE_EXPORT_DIR / name` (LAST assignment)\n- Line 119: `name` is a parameter with a default value of `\"packet.bin\"`, but it can be user-controlled via the request.",
+      "The value of `target` derives from user input. Specifically:\n- Line 119: `name: str = \"packet.bin\"` is a user-provided parameter.\n- Line 121: `target = BASE_EXPORT_DIR / name` constructs the path using the user-provided `name`.\n- Line 122: `target.parent.mkdir(...)` uses the parent directory of `target`, which is influenced by the user-controlled `name`.\nThis constitutes a data flow from user input (`name`) to the path used in `mkdir`.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The value of `name` directly influences `target`, and no sanitization or validation is performed on `name` before it is used in the path construction.",
+      "There is no specific defense mechanism applied to the path. No functions like `secure_filename`, `Path.resolve()`, or `is_relative_to()` are used to prevent directory traversal. The code does not enforce any constraints on the `name` parameter to ensure it remains within a safe directory. The global `BASE_EXPORT_DIR` definition is not available, so we cannot determine if it provides any protection.",
+      "The user-tainted value (`name`) reaches the sink (`target.parent.mkdir`) without any visible sanitization or validation. There is no evidence of a defense mechanism that would prevent directory traversal. Since we cannot see the definition of BASE_EXPORT_DIR, we must assume it does not provide adequate protection."
+    ],
+    "tokens_used": 25785,
+    "data_flow": "name (line 119) → target = BASE_EXPORT_DIR / name (line 121) → target.parent.mkdir (line 122)",
+    "output_tokens": 2040,
+    "iterations": 4,
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "input_tokens": 23745,
+    "confidence_score": 0.85,
+    "context_needed": [],
+    "timestamp": "2026-07-14T15:41:28.588383",
+    "reasoning": "The user-provided `name` parameter is directly used to construct a file path, which is then used in a `mkdir` operation. There is no sanitization or validation to prevent directory traversal, making this a clear path injection vulnerability. While we cannot see BASE_EXPORT_DIR, the lack of any visible protection mechanisms on the user-controlled input constitutes a true positive.",
+    "cached_input_tokens": 0,
+    "confidence": "High"
+  },
+  "function": {
+    "name": "loan_dock_shelf_594",
+    "file": "app/loan_operations.py",
+    "start_line": 119,
+    "end_line": 124,
+    "scope": ""
+  },
+  "web_params": []
+}

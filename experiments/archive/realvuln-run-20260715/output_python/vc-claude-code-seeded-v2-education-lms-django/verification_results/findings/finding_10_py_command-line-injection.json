@@ -1,0 +1,72 @@
+{
+  "id": "10",
+  "rule_slug": "py_command-line-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-education-lms-django/verification_results/summary_vc-claude-code-seeded-v2-education-lms-django_20260714_152145.json"
+  },
+  "finding": {
+    "rule_id": "py/command-line-injection",
+    "message": "This command line depends on a [user-provided value](1).",
+    "file": "lms/course_operations.py",
+    "start_line": 141,
+    "end_line": 141,
+    "repo_name": "vc-claude-code-seeded-v2-education-lms-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-education-lms-django/vc-claude-code-seeded-v2-education-lms-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 136: ControlFlowNode for request",
+      "line 140: ControlFlowNode for Attribute",
+      "line 140: ControlFlowNode for Attribute()",
+      "line 140: ControlFlowNode for host",
+      "line 141: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-78",
+      "CWE-88"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:21:40.024881",
+    "cost_usd": 0.0,
+    "verdict": "True Positive",
+    "context_needed": [],
+    "data_flow": "request (line 136) → request.GET.get(\"host\", ...) (line 140) → host (line 140) → \"ping -c 1 \" + host (line 141) → _os.system(...) (line 141)",
+    "answers": [
+      "The EXACT sink is `_os.system(\"ping -c 1 \" + host)` on line 141. The value passed as the command argument is the string `\"ping -c 1 \" + host`.",
+      "The value `host` is assigned on line 140: `host = request.GET.get(\"host\", \"127.0.0.1\")`. This is the only assignment to `host` on the path to the sink.",
+      "The value of `host` derives from user input via `request.GET.get(\"host\", \"127.0.0.1\")` on line 140. The data-flow chain is: `request` (line 136) → `request.GET.get(...)` (line 140) → `host` (line 140) → `\"ping -c 1 \" + host` (line 141). The caller context is missing, but the rule has already established that `request` is a source of external input.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense sanitizing the value. No escaping, quoting, or allow-list validation is applied to `host` before it is concatenated into the command string. The functions `_wrk_gate` and the caller of `course_shell_probe_400` are not visible, so we cannot assume any upstream protection.",
+      "The user-tainted value `host` clearly reaches the sink with concrete line numbers (140→141), and there is an absence of every defense mechanism (no quoting, no allow-list, no shell=False pattern)."
+    ],
+    "output_tokens": 1354,
+    "tokens_used": 13423,
+    "confidence": "High",
+    "iterations": 3,
+    "reasoning": "User-controlled input (`host`) is directly concatenated into a shell command string and passed to `os.system()` without sanitization. The missing caller/_wrk_gate context does not change the fact that the data flow is clearly exploitable as shown, with no visible defenses.",
+    "cached_input_tokens": 0,
+    "confidence_score": 0.95,
+    "input_tokens": 12069,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 12.038731336593628
+  },
+  "function": {
+    "name": "course_shell_probe_400",
+    "file": "lms/course_operations.py",
+    "start_line": 136,
+    "end_line": 142,
+    "scope": ""
+  },
+  "web_params": []
+}

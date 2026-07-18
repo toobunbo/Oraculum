@@ -1,0 +1,52 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "lms.course_operations.Template",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "template-source string passed to Jinja2 Template constructor containing unsanitized user input",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured template-source string must contain Jinja2 expression delimiters {{ ... }} wrapping Python dunder attribute access or arithmetic, confirming the user-controlled fragment was embedded directly into the template source without sanitization",
+    "trigger_patterns": [
+      "\\{\\{.*__class__.*\\}\\}",
+      "\\{\\{.*__mro__.*\\}\\}",
+      "\\{\\{.*__subclasses__.*\\}\\}",
+      "\\{\\{.*__init__.*\\}\\}",
+      "\\{\\{.*__globals__.*\\}\\}",
+      "\\{\\{\\s*7\\s*\\*\\s*7\\s*\\}\\}"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_TEMPLATE_INJECTION: unsanitized user input in Jinja2 template source — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "{{ 7 * 7 }}",
+      "{{ self.__class__.__mro__[1].__subclasses__() }}",
+      "{{ ''.__class__.__mro__[1].__subclasses__() }}",
+      "{{ self.__init__.__globals__ }}",
+      "{{ config.__class__.__init__.__globals__['os'].popen('id').read() }}"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "course_jinja_cast_382",
+    "file": "lms/course_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def course_jinja_cast_382(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "django.http.HttpRequest"
+      }
+    ],
+    "target_id": "py_template_injection_lms_course_operations_py_124",
+    "finding_id": "11",
+    "rule_id": "py/template-injection",
+    "rule_slug": "py_template-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-education-lms-django/verification_results/findings/finding_11_py_template-injection.json"
+  }
+}

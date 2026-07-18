@@ -1,0 +1,71 @@
+{
+  "id": "13",
+  "rule_slug": "py_unsafe-deserialization",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-djangoat",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/verification_results/summary_realvuln-djangoat_20260714_145404.json"
+  },
+  "finding": {
+    "rule_id": "py/unsafe-deserialization",
+    "message": "Unsafe deserialization depends on a [user-provided value](1).",
+    "file": "app/views/password_resets/views.py",
+    "start_line": 84,
+    "end_line": 84,
+    "repo_name": "realvuln-djangoat",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/realvuln-djangoat.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 53: ControlFlowNode for request",
+      "line 57: ControlFlowNode for request",
+      "line 81: ControlFlowNode for request",
+      "line 83: ControlFlowNode for encoded_user",
+      "line 84: ControlFlowNode for Attribute()"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-502"
+    ],
+    "tags": [
+      "security",
+      "serialization"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 12015,
+    "output_tokens": 949,
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "data_flow": "request.POST['user'] (line 83) → base64.b64decode(encoded_user) (line 84) → pickle.loads (line 84)",
+    "cost_usd": 0.0,
+    "confidence_score": 0.95,
+    "reasoning": "User-provided data flows directly to `pickle.loads()` without any sanitization, validation, or security measures, which is a known unsafe deserialization vulnerability (CWE-502).",
+    "confidence": "High",
+    "answers": [
+      "The EXACT deserialization sink is `pickle.loads(base64.b64decode(encoded_user))` on line 84. The bytes value passed to it is `base64.b64decode(encoded_user)`.",
+      "The value `encoded_user` is assigned on line 83: `encoded_user = request.POST['user']`. This is the only assignment.",
+      "The value `encoded_user` derives from user input via `request.POST['user']` on line 83. The data flow is: request (external source) → request.POST['user'] (line 83) → encoded_user (line 83) → sink (line 84). The CodeQL dataflow already established that the request is an external source.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense preventing code execution. The code uses `pickle.loads()` directly on user-provided data without any validation, sanitization, or HMAC verification.",
+      "The user-controlled data from `request.POST['user']` reaches the unsafe `pickle.loads()` sink directly with no defenses present."
+    ],
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 10.465624809265137,
+    "timestamp": "2026-07-14T14:53:50.115859",
+    "iterations": 3,
+    "tokens_used": 12964
+  },
+  "function": {
+    "name": "reset_password",
+    "file": "app/views/password_resets/views.py",
+    "start_line": 81,
+    "end_line": 94,
+    "scope": ""
+  },
+  "web_params": []
+}

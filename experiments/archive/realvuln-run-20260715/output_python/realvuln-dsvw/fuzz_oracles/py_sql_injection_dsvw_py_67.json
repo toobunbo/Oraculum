@@ -1,0 +1,45 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "dsvw.ReqHandler.do_GET.cursor.execute",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "SQL query string passed to execute",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "SQL query contains unsanitized user input patterns that bypass weak regex filtering",
+    "trigger_patterns": [
+      "SELECT \\* FROM users WHERE username='[^']*' AND password='[^']*'",
+      "SELECT \\* FROM users WHERE username='.*' OR '.*'=.*",
+      "SELECT \\* FROM users WHERE username='.*';.*",
+      "SELECT \\* FROM users WHERE username='.*' UNION SELECT .*",
+      "SELECT \\* FROM users WHERE username='.*'--.*"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_SQL-INJECTION: SQL injection detected - captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "admin'--",
+      "admin' OR '1'='1",
+      "admin'; DROP TABLE users; --",
+      "admin' UNION SELECT username, password FROM admins--",
+      "admin' OR 1=1--"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "do_GET",
+    "file": "dsvw.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def do_GET(self)",
+    "tainted_params": [],
+    "target_id": "py_sql_injection_dsvw_py_67",
+    "finding_id": "9",
+    "rule_id": "py/sql-injection",
+    "rule_slug": "py_sql-injection",
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "/home/trieudai/Oraculum/output/python/realvuln-dsvw/verification_results/findings/finding_9_py_sql-injection.json"
+  }
+}

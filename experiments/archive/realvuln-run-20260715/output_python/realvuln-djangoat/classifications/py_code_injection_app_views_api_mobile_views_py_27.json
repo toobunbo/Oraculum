@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is eval(classname) on line 27 with user-controlled input, which is arbitrary code execution (RCE)."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the built-in eval function to intercept the call on line 27.",
+    "capture": "Capture the exact value of the classname argument passed to eval to verify it matches the tainted request.GET.get('class') input.",
+    "fake_behavior": "Return a harmless, predictable value (e.g., a known class reference or dummy object) that allows the surrounding code to proceed without raising an exception, so the data flow through the function can be exercised safely.",
+    "notes": [
+      "Since eval is a Python built-in, mocking typically requires patching builtins.eval (e.g., unittest.mock.patch('builtins.eval')).",
+      "Ensure the fake return value is compatible with any subsequent usage of the eval result in the function."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

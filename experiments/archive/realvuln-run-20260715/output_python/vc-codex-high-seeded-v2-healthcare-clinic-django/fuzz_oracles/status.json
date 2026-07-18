@@ -1,0 +1,31 @@
+{
+  "stage": "oracle",
+  "repo": "vc-codex-high-seeded-v2-healthcare-clinic-django",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/oracle.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/vc-codex-high-seeded-v2-healthcare-clinic-django/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 1,
+    "generated": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "oracles": [
+    {
+      "id": "1",
+      "target_id": "py_cookie_injection_clinic_portal_patient_operations_py_96",
+      "rule_id": "py/cookie-injection",
+      "file": "clinic_portal/patient_operations.py",
+      "start_line": "96",
+      "function_name": "patient_crumb_lane_297",
+      "finding_artifact": "output/python/vc-codex-high-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_1_py_cookie-injection.json",
+      "oracle": "output/python/vc-codex-high-seeded-v2-healthcare-clinic-django/fuzz_oracles/py_cookie_injection_clinic_portal_patient_operations_py_96.json",
+      "status": "generated",
+      "strategy": "return_value"
+    }
+  ],
+  "errors": []
+}

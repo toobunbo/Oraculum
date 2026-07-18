@@ -1,0 +1,75 @@
+{
+  "id": "16",
+  "rule_slug": "py_reflective-xss",
+  "source": {
+    "vhx_root": "/home/tuonglnc/repo/VulnHunterX",
+    "vhx_repo_root": "/home/tuonglnc/repo/VulnHunterX/repos/python/benchmark-python",
+    "vhx_output_root": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python",
+    "summary_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/verification_results/summary_benchmark-python_filtered_20260610_105228.json"
+  },
+  "finding": {
+    "rule_id": "py/reflective-xss",
+    "message": "Cross-site scripting vulnerability due to a [user-provided value](1).",
+    "file": "testcode/BenchmarkTest00256.py",
+    "start_line": 48,
+    "end_line": 48,
+    "repo_name": "benchmark-python",
+    "lang": "python",
+    "sarif_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/benchmark-python.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 31: ControlFlowNode for request",
+      "line 31: ControlFlowNode for values",
+      "line 34: ControlFlowNode for param",
+      "line 41: ControlFlowNode for bar",
+      "line 48: ControlFlowNode for Tuple"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [],
+    "tags": [
+      "security",
+      "external/cwe/cwe-079",
+      "external/cwe/cwe-116"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-06-10T10:44:45.504997",
+    "context_needed": [],
+    "data_flow": "request.form.getlist(\"BenchmarkTest00256\") (line 4) → values[0] (line 6) → param (line 6) → bar (line 15) → make_response header (line 22)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "answers": [
+      "Step 1: The potentially dangerous data originates from user input via the HTTP request form data. Specifically, it comes from `request.form.getlist(\"BenchmarkTest00256\")` on line 4.",
+      "Step 2: The data flows through the following variables with line numbers: `values` (line 4) → `param` (line 6) → `bar` (line 13 or 15) → `RESPONSE` (line 20) → sink (line 22).",
+      "Step 3: There is NO validation, sanitization, or encoding applied to the data at any step. The value from `param` is directly assigned to `bar` on line 15 without any checks or transformations.",
+      "Step 4: The sink is the `make_response` call on line 22, where `bar` is included in a custom HTTP response header. This is dangerous because injecting malicious content into HTTP headers can lead to header injection or XSS if the client interprets the header as HTML/JS.",
+      "Step 5: No intermediate transformations are present. The data flows directly from source to sink without any encoding or decoding steps.",
+      "Step 6: Not visible in provided context. However, based on the use of `request.form` and `make_response`, this appears to be a Flask-like framework. Flask does not automatically escape values placed in custom headers, so no automatic protection is provided here.",
+      "Step 7: The code does not enforce any authentication or authorization checks. An unauthenticated attacker can trigger this code path by submitting a form with the parameter `BenchmarkTest00256`.",
+      "Step 8: The code is part of a function named `BenchmarkTest00256_post`, which suggests it is a test case or benchmark. However, there is no explicit indication that it is debug-only or dead code. It could execute in production if routed.",
+      "Step 9: If an attacker controls `bar`, they can inject arbitrary HTTP headers. This could lead to response splitting, session fixation, or XSS if the header value is reflected in the response body or interpreted by the client as script.",
+      "Step 10: The weakest link is the complete absence of input sanitization or output encoding. The user-supplied value `param` is directly used in an HTTP header without any validation or escaping, making it vulnerable to header injection or XSS."
+    ],
+    "confidence_score": 0.95,
+    "iterations": 1,
+    "input_tokens": 2204,
+    "elapsed_seconds": 14.260185956954956,
+    "confidence": "High",
+    "cached_input_tokens": 0,
+    "tokens_used": 2867,
+    "reasoning": "The user-controlled input `param` flows directly into an HTTP response header without any sanitization or encoding, creating a reflective XSS or header injection vulnerability. The high precision of the rule and the clear data flow support this conclusion.",
+    "verdict": "True Positive",
+    "output_tokens": 663
+  },
+  "function": {
+    "name": "BenchmarkTest00256_post",
+    "file": "testcode/BenchmarkTest00256.py",
+    "start_line": 28,
+    "end_line": 51,
+    "scope": "Function init"
+  }
+}

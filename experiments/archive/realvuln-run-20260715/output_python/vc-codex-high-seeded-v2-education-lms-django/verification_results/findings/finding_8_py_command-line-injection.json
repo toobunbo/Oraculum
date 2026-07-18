@@ -1,0 +1,72 @@
+{
+  "id": "8",
+  "rule_slug": "py_command-line-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/summary_vc-codex-high-seeded-v2-education-lms-django_20260714_154006.json"
+  },
+  "finding": {
+    "rule_id": "py/command-line-injection",
+    "message": "This command line depends on a [user-provided value](1).",
+    "file": "education_lms/course_operations.py",
+    "start_line": 174,
+    "end_line": 174,
+    "repo_name": "vc-codex-high-seeded-v2-education-lms-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/vc-codex-high-seeded-v2-education-lms-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 169: ControlFlowNode for request",
+      "line 173: ControlFlowNode for Attribute",
+      "line 173: ControlFlowNode for Attribute()",
+      "line 173: ControlFlowNode for host",
+      "line 174: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-78",
+      "CWE-88"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:39:55.105818",
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "iterations": 3,
+    "tokens_used": 13178,
+    "cost_usd": 0.0,
+    "answers": [
+      "The EXACT sink is `_os.system(\"ping -c 1 \" + host)` on line 174. The value passed as the command argument is the string `\"ping -c 1 \" + host`.",
+      "The value `host` is assigned on line 173: `host = request.GET.get(\"host\", \"127.0.0.1\")`. This is the only assignment to `host` on the path to the sink.",
+      "The value of `host` derives from user input via `request.GET.get(\"host\", \"127.0.0.1\")` on line 173. The data-flow chain is: `request` (line 169) → `request.GET.get(...)` (line 173) → `host` (line 173) → `\"ping -c 1 \" + host` (line 174).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value `host` on the path to the sink.",
+      "There is no specific defense sanitizing the value. No use of `shlex.quote()`, no argv list with `shell=False`, and no allow-list validation is visible. The code directly concatenates user input into a shell command.",
+      "The user-tainted value `host` clearly reaches the sink at line 174 via line 173, and there is no visible sanitization or defense mechanism. Although the caller is not visible, the function signature and use of `request.GET` strongly imply this is an HTTP handler, making the input remotely controllable."
+    ],
+    "context_needed": [],
+    "verdict": "True Positive",
+    "data_flow": "request (line 169) → request.GET.get(\"host\", ...) (line 173) → host (line 173) → \"ping -c 1 \" + host (line 174)",
+    "elapsed_seconds": 10.739726305007935,
+    "reasoning": "User-controlled input (`host`) is directly concatenated into a shell command via `_os.system()` without any sanitization or validation, leading to command injection. The function signature and use of `request.GET` indicate remote reachability.",
+    "cached_input_tokens": 0,
+    "output_tokens": 1239,
+    "input_tokens": 11939,
+    "model": "ollama_chat/qwen3-coder:480b-cloud"
+  },
+  "function": {
+    "name": "course_shell_probe_634",
+    "file": "education_lms/course_operations.py",
+    "start_line": 169,
+    "end_line": 175,
+    "scope": ""
+  },
+  "web_params": []
+}

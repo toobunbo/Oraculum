@@ -1,0 +1,55 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "builtins.print",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "decoded CVV string passed to print() on line 17",
+    "additional_imports": [
+      "builtins"
+    ]
+  },
+  "oracle_check": {
+    "condition_description": "The argument passed to print() contains a 3-4 digit numeric string consistent with a CVV value, confirming clear-text logging of sensitive payment card data",
+    "trigger_patterns": [
+      "\\d{3,4}"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_CLEAR_TEXT_LOGGING_SENSITIVE_DATA: CVV logged in cleartext via print() — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "123",
+      "4567",
+      "000",
+      "9999",
+      "732",
+      "1234"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "crack_cvv",
+    "file": "utils/crack-cvv.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def crack_cvv(algorithm, digest)",
+    "tainted_params": [
+      {
+        "name": "algorithm",
+        "index": 0,
+        "type": "str"
+      },
+      {
+        "name": "digest",
+        "index": 1,
+        "type": "bytes"
+      }
+    ],
+    "target_id": "py_clear_text_logging_sensitive_data_utils_crack_cvv_py_17",
+    "finding_id": "7",
+    "rule_id": "py/clear-text-logging-sensitive-data",
+    "rule_slug": "py_clear-text-logging-sensitive-data",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-vulpy/verification_results/findings/finding_7_py_clear-text-logging-sensitive-data.json"
+  }
+}

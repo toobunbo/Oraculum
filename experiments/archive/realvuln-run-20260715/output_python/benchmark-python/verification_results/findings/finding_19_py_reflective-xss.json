@@ -1,0 +1,75 @@
+{
+  "id": "19",
+  "rule_slug": "py_reflective-xss",
+  "source": {
+    "vhx_root": "/home/trieudai/",
+    "vhx_repo_root": "/home/trieudai/bench-src",
+    "vhx_output_root": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python",
+    "summary_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/verification_results/summary_benchmark-python_filtered_20260610_105228.json"
+  },
+  "finding": {
+    "rule_id": "py/reflective-xss",
+    "message": "Cross-site scripting vulnerability due to a [user-provided value](1).\nCross-site scripting vulnerability due to a [user-provided value](1).",
+    "file": "testcode/BenchmarkTest01083.py",
+    "start_line": 45,
+    "end_line": 45,
+    "repo_name": "benchmark-python",
+    "lang": "python",
+    "sarif_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/benchmark-python.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 31: ControlFlowNode for request",
+      "line 31: ControlFlowNode for parts",
+      "line 32: ControlFlowNode for param",
+      "line 38: ControlFlowNode for bar",
+      "line 45: ControlFlowNode for Tuple"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [],
+    "tags": [
+      "security",
+      "external/cwe/cwe-079",
+      "external/cwe/cwe-116"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-06-10T10:44:52.299750",
+    "context_needed": [],
+    "data_flow": "request.path (line 4) → parts (line 4) → param (line 5) → bar (line 11) → make_response (line 45)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "answers": [
+      "Step 1: The potentially dangerous data originates from `request.path` (line 4), which is user-provided input from the HTTP request path.",
+      "Step 2: The data flows through the following variables with line numbers: `request.path` (line 4) → `parts` (line 4) → `param` (line 5) → `bar` (line 11).",
+      "Step 3: There is no validation, sanitization, or encoding applied to the data at any step. The code directly extracts and processes the user input without any checks.",
+      "Step 4: The sink is the `make_response` call (line 45), where `bar` is included in a custom HTTP header. This is dangerous because it allows an attacker to inject malicious header content.",
+      "Step 5: There are no intermediate transformations that sanitize or encode the data. The data is split and reassigned but remains unsanitized.",
+      "Step 6: Not visible in provided context. However, the use of `make_response` with a custom header suggests manual header construction, which bypasses automatic protections.",
+      "Step 7: Not visible in provided context. However, since this is a POST request handler, it is likely accessible to unauthenticated users.",
+      "Step 8: The function name `BenchmarkTest01083_post` and the structure suggest this is part of a benchmark or test suite, but there is no explicit indication it is dead or debug-only code.",
+      "Step 9: The concrete security impact is Cross-Site Scripting (XSS) via header injection, which could lead to session hijacking or malicious redirects.",
+      "Step 10: The weakest link is the complete absence of sanitization or encoding for the `bar` variable before it is included in the HTTP response header."
+    ],
+    "confidence_score": 0.95,
+    "iterations": 1,
+    "input_tokens": 2187,
+    "elapsed_seconds": 6.790138244628906,
+    "confidence": "High",
+    "cached_input_tokens": 0,
+    "tokens_used": 2706,
+    "reasoning": "The user-controlled input from `request.path` flows directly into `bar` without sanitization, and is then used in an HTTP response header via `make_response`, creating a reflective XSS vulnerability.",
+    "verdict": "True Positive",
+    "output_tokens": 519
+  },
+  "function": {
+    "name": "BenchmarkTest01083_post",
+    "file": "testcode/BenchmarkTest01083.py",
+    "start_line": 28,
+    "end_line": 48,
+    "scope": "Function init"
+  }
+}

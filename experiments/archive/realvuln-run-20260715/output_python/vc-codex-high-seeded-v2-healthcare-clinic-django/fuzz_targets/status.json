@@ -1,0 +1,35 @@
+{
+  "stage": "harness",
+  "repo": "vc-codex-high-seeded-v2-healthcare-clinic-django",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/harness.yaml",
+  "source": {
+    "oracle_status_path": "output/python/vc-codex-high-seeded-v2-healthcare-clinic-django/fuzz_oracles/status.json"
+  },
+  "counts": {
+    "selected": 1,
+    "generated": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "harnesses": [
+    {
+      "id": "1",
+      "target_id": "py_cookie_injection_clinic_portal_patient_operations_py_96",
+      "rule_id": "py/cookie-injection",
+      "file": "clinic_portal/patient_operations.py",
+      "start_line": "96",
+      "function_name": "patient_crumb_lane_297",
+      "harness": "output/python/vc-codex-high-seeded-v2-healthcare-clinic-django/fuzz_targets/py_cookie_injection_clinic_portal_patient_operations_py_96.py",
+      "oracle": "output/python/vc-codex-high-seeded-v2-healthcare-clinic-django/fuzz_oracles/py_cookie_injection_clinic_portal_patient_operations_py_96.json",
+      "finding_artifact": "output/python/vc-codex-high-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_1_py_cookie-injection.json",
+      "corpus": "output/python/vc-codex-high-seeded-v2-healthcare-clinic-django/fuzz_corpus/py_cookie_injection_clinic_portal_patient_operations_py_96",
+      "strategy": "return_value",
+      "status": "generated",
+      "seed_count": 5,
+      "errors": ""
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is file.save(filepath) on line 264, a filesystem write operation that is an irreversible side effect."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; Q1 answered YES."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; Q1 answered YES."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the file.save(filepath) call on line 264.",
+    "capture": "Capture the filepath argument passed to file.save() to verify it contains path traversal sequences (e.g., '../') derived from the unsanitized request.files['file'].filename.",
+    "fake_behavior": "Replace file.save with a no-op or a function that records its argument and returns None, preventing any actual filesystem write.",
+    "notes": [
+      "Provide a mock file object whose .filename attribute contains a path traversal payload (e.g., '../../../etc/passwd').",
+      "Assert that the captured filepath argument is not properly restricted to UPLOAD_FOLDER.",
+      "Ensure UPLOAD_FOLDER is set to a known value in the test so the full resolved path can be inspected."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

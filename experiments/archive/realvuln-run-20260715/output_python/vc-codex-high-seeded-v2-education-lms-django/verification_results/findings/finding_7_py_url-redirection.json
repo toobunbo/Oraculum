@@ -1,0 +1,70 @@
+{
+  "id": "7",
+  "rule_slug": "py_url-redirection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/summary_vc-codex-high-seeded-v2-education-lms-django_20260714_154006.json"
+  },
+  "finding": {
+    "rule_id": "py/url-redirection",
+    "message": "Untrusted URL redirection depends on a [user-provided value](1).",
+    "file": "education_lms/course_operations.py",
+    "start_line": 67,
+    "end_line": 67,
+    "repo_name": "vc-codex-high-seeded-v2-education-lms-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/vc-codex-high-seeded-v2-education-lms-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 63: ControlFlowNode for request",
+      "line 66: ControlFlowNode for Attribute",
+      "line 66: ControlFlowNode for Attribute()",
+      "line 66: ControlFlowNode for lane",
+      "line 67: ControlFlowNode for lane"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-601"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:39:52.035631",
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "iterations": 3,
+    "tokens_used": 13929,
+    "cost_usd": 0.0,
+    "answers": [
+      "The EXACT redirect sink is `return redirect(lane)` on line 67. The URL/target value passed to it is `lane`.",
+      "The assignment to `lane` is on line 66: `lane = request.GET.get(\"lane\") or request.POST.get(\"lane\") or \"/\"`. This is the only assignment.",
+      "The value of `lane` derives from user input via `request.GET.get(\"lane\")` or `request.POST.get(\"lane\")`, which are user-provided values from query parameters or form data. If both are absent, it defaults to the constant `\"/\"`. The data-flow chain is: `request` (line 63) → `request.GET.get(\"lane\")` or `request.POST.get(\"lane\")` (line 66) → `lane` (line 66).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The value of `lane` is directly derived from user input or defaults to a constant if no input is provided.",
+      "There is no specific defense visible in the code that validates or restricts the redirect URL. No domain validation, allow-list, or safe-host check is performed on the `lane` variable before it is passed to `redirect()`.",
+      "The user-tainted value `lane` reaches the sink `redirect(lane)` on line 67 without any visible sanitization or validation. The absence of any defense mechanism confirms the vulnerability. The fact that no caller is found doesn't change the analysis since the function itself directly handles user input."
+    ],
+    "context_needed": [],
+    "verdict": "True Positive",
+    "data_flow": "request (line 63) → request.GET.get(\"lane\") or request.POST.get(\"lane\") (line 66) → lane (line 66) → redirect(lane) (line 67)",
+    "elapsed_seconds": 10.856534719467163,
+    "reasoning": "The user-controlled input `lane` is directly passed to `redirect()` without any validation or sanitization, allowing an attacker to redirect users to an arbitrary URL. The data flow from request to sink is clear, and no defenses are present. The absence of caller information doesn't change the fact that this function directly processes user input.",
+    "cached_input_tokens": 0,
+    "output_tokens": 1237,
+    "input_tokens": 12692,
+    "model": "ollama_chat/qwen3-coder:480b-cloud"
+  },
+  "function": {
+    "name": "course_return_lane_162",
+    "file": "education_lms/course_operations.py",
+    "start_line": 63,
+    "end_line": 67,
+    "scope": ""
+  },
+  "web_params": []
+}

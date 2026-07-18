@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Template().render() with user-controlled template source enables SSTI, which can lead to RCE in Jinja2 without sandboxing."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Skipped: Q1 was true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Skipped: Q1 was true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the jinja2.Template constructor or its render method to intercept the call on line 90.",
+    "capture": "Capture the template source string argument passed to Template(), specifically the concatenated \"Result: \" + fragment, to verify user input reaches the template source unsanitized.",
+    "fake_behavior": "Return a harmless placeholder string (e.g., 'mocked_render_output') from render() to allow execution to continue and reach the HTMLResponse return.",
+    "notes": [
+      "Do not execute the real Template constructor or render method, as unsanitized user input in the template source can achieve RCE.",
+      "Ensure the mock records the exact string passed to Template() for assertion that the tainted fragment is embedded directly."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

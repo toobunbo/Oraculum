@@ -1,0 +1,75 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "target": "pickle.loads",
+    "module": "pickle",
+    "capture": {
+      "argument_index": 0,
+      "argument_name": null
+    },
+    "patch_target": "pickle.pickle.loads",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "captured value",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "predicate": null,
+    "regex": ".*",
+    "match_type": "any",
+    "condition_description": "oracle condition",
+    "trigger_patterns": [
+      ".*"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "ORACULUM_VIOLATION: captured={captured}"
+  },
+  "fuzz_guidance": {
+    "fake_behavior": "return {'mocked': True}",
+    "notes": [
+      "The captured argument is the result of `base64.urlsafe_b64decode(bar)`, where `bar` is derived from user input.",
+      "Mock prevents actual deserialization and code execution.",
+      "Application can continue with dummy return value."
+    ],
+    "seed_corpus": [],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "aliasing_risks": [
+      "Ensure `pickle.loads` is not aliased or imported as another name within the scope."
+    ],
+    "import_risks": [
+      "Verify that `pickle` is not imported via `from pickle import loads` or similar aliasing."
+    ],
+    "async_risks": [],
+    "classification_strategy": "recorded_call",
+    "classification_confidence": "high",
+    "mock_guidance": {
+      "required": true,
+      "target": "Mock the `pickle.loads()` call to prevent actual deserialization of user-controlled input.",
+      "capture": "Capture the argument passed to `pickle.loads()`, which is `base64.urlsafe_b64decode(bar)`.",
+      "fake_behavior": "Return a safe dummy object or raise an exception to simulate the deserialization without executing it.",
+      "notes": [
+        "Ensure the mock prevents code execution while allowing the test to proceed.",
+        "The base64 decoding step should also be mocked or stubbed if necessary for safety."
+      ]
+    },
+    "target_id": "py_unsafe_deserialization_testcode_BenchmarkTest00164_py_47",
+    "finding_id": "21",
+    "rule_id": "py/unsafe-deserialization",
+    "rule_slug": "py_unsafe-deserialization",
+    "file": "testcode/BenchmarkTest00164.py",
+    "function": "BenchmarkTest00164_post",
+    "input_strategy": "flask_view",
+    "function_signature": "def BenchmarkTest00164_post()",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": -1,
+        "type": "flask_request"
+      }
+    ],
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "output/python/benchmark-python/verification_results/findings/finding_21_py_unsafe-deserialization.json"
+  }
+}

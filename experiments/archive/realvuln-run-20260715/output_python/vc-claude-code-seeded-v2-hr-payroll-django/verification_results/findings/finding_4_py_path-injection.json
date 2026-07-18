@@ -1,0 +1,76 @@
+{
+  "id": "4",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/summary_vc-claude-code-seeded-v2-hr-payroll-django_20260714_152802.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 147,
+    "end_line": 147,
+    "repo_name": "vc-claude-code-seeded-v2-hr-payroll-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/vc-claude-code-seeded-v2-hr-payroll-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 142: ControlFlowNode for request",
+      "line 145: ControlFlowNode for Attribute",
+      "line 145: ControlFlowNode for Attribute()",
+      "line 145: ControlFlowNode for name",
+      "line 146: ControlFlowNode for target",
+      "line 147: ControlFlowNode for Attribute"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "data_flow": "request.GET (line 145) → name (line 145) → target (line 146) → target.parent (line 147) → mkdir (line 147)",
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "tokens_used": 13621,
+    "timestamp": "2026-07-14T15:27:37.825080",
+    "input_tokens": 12417,
+    "output_tokens": 1204,
+    "confidence_score": 0.95,
+    "elapsed_seconds": 11.382543802261353,
+    "reasoning": "User-controlled input (`name`) is used to construct a file path without sanitization or validation, leading to a directory traversal vulnerability when `target.parent.mkdir()` is called. No defenses are present to prevent this, and the additional context does not reveal any protective measures.",
+    "cost_usd": 0.0,
+    "answers": [
+      "The EXACT flagged line is: `target.parent.mkdir(parents=True, exist_ok=True)` on line 147. This line resides within the function `payroll_dock_shelf_391` in the file `hr_portal/payroll_operations.py`.",
+      "The assignments to the path value are: Line 145: `name = request.GET.get(\"name\", \"packet.bin\")`, Line 146: `target = BASE_EXPORT_DIR / name`.",
+      "The last assignment is `target = BASE_EXPORT_DIR / name` on line 146. The value of `name` derives from user input via `request.GET.get(\"name\", \"packet.bin\")` on line 145. This means `target` is constructed using user-provided input.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. No defensive code is present to neutralize or constrain the user input before it is used in the path construction.",
+      "There is no specific defense mechanism applied to the path. The code does not use `secure_filename`, `Path.resolve()` with containment checks, or any allow-list or block-list validation on the user-provided `name`.",
+      "The user-tainted value `name` is directly used in constructing the path `target`, which is then used in a file system operation (`mkdir`). No sanitization or validation is performed to prevent directory traversal."
+    ],
+    "cached_input_tokens": 0,
+    "context_needed": []
+  },
+  "function": {
+    "name": "payroll_dock_shelf_391",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 142,
+    "end_line": 149,
+    "scope": ""
+  },
+  "web_params": []
+}

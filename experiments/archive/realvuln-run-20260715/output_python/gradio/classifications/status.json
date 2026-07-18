@@ -1,0 +1,36 @@
+{
+  "stage": "classification",
+  "repo": "gradio",
+  "lang": "python",
+  "model": "ollama/qwen3-coder:480b-cloud",
+  "config": "config/classification.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/gradio/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 1,
+    "generated": 0,
+    "skipped": 0,
+    "failed": 1
+  },
+  "classifications": [
+    {
+      "id": "1",
+      "target_id": "py_full_ssrf_gradio_image_utils_py_252",
+      "rule_id": "py/full-ssrf",
+      "file": "gradio/image_utils.py",
+      "start_line": "252",
+      "function_name": "extract_svg_content",
+      "finding_artifact": "output/python/gradio/verification_results/findings/finding_1_py_full-ssrf.json",
+      "classification": "output/python/gradio/classifications/py_full_ssrf_gradio_image_utils_py_252.json",
+      "status": "failed",
+      "errors": "classification.decision.q2_observable_after_return.evidence must be a string"
+    }
+  ],
+  "errors": [
+    {
+      "finding_artifact": "output/python/gradio/verification_results/findings/finding_1_py_full-ssrf.json",
+      "error": "classification.decision.q2_observable_after_return.evidence must be a string"
+    }
+  ]
+}

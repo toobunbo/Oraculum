@@ -1,0 +1,70 @@
+{
+  "id": "0",
+  "rule_slug": "py_full-ssrf",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/summary_vc-claude-code-seeded-v2-crm-saas-django_20260714_152015.json"
+  },
+  "finding": {
+    "rule_id": "py/full-ssrf",
+    "message": "The full URL of this request depends on a [user-provided value](1).",
+    "file": "crm_project/partner_console.py",
+    "start_line": 52,
+    "end_line": 52,
+    "repo_name": "vc-claude-code-seeded-v2-crm-saas-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/vc-claude-code-seeded-v2-crm-saas-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 48: ControlFlowNode for request",
+      "line 51: ControlFlowNode for Attribute",
+      "line 51: ControlFlowNode for Attribute()",
+      "line 51: ControlFlowNode for relay_ref",
+      "line 52: ControlFlowNode for relay_ref"
+    ],
+    "severity": "9.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-918"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 11866,
+    "confidence": "High",
+    "iterations": 3,
+    "output_tokens": 1152,
+    "context_needed": [],
+    "reasoning": "The user-controlled URL `relay_ref` from `request.GET` is directly passed to `urllib.request.urlopen` without any validation or sanitization, constituting a clear SSRF vulnerability. The function takes a request parameter indicating it's externally reachable.",
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:19:52.817893",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request (line 48) → request.GET.get(\"url\", ...) (line 51) → relay_ref (line 51) → urllib.request.urlopen(relay_ref, ...) (line 52)",
+    "cost_usd": 0.0,
+    "cached_input_tokens": 0,
+    "tokens_used": 13018,
+    "elapsed_seconds": 9.392611503601074,
+    "confidence_score": 0.95,
+    "answers": [
+      "The EXACT flagged line is: `with urllib.request.urlopen(relay_ref, timeout=3) as response:` on line 52. This line lives in the function `acct_vendor_ping_003`.",
+      "The only assignment to `relay_ref` is on line 51: `relay_ref = request.GET.get(\"url\", \"http://127.0.0.1/status\")`.",
+      "The value of `relay_ref` derives from user input via `request.GET.get(\"url\", ...)` on line 51. The data-flow chain is: request (line 48) → request.GET.get (line 51) → relay_ref (line 51). The source is explicitly identified as user-provided in the data flow path.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense that restricts the URL. No scheme allow-list, host validation, or other URL sanitization is present.",
+      "The user-controlled URL `relay_ref` reaches the sink `urllib.request.urlopen` on line 52 without any sanitization or validation. The function appears to be externally reachable as it takes a request parameter and the data flow shows the URL comes from request.GET."
+    ]
+  },
+  "function": {
+    "name": "acct_vendor_ping_003",
+    "file": "crm_project/partner_console.py",
+    "start_line": 48,
+    "end_line": 54,
+    "scope": ""
+  },
+  "web_params": []
+}

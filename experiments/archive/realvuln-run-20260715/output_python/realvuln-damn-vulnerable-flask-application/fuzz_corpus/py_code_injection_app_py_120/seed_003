@@ -1,0 +1,1 @@
+getattr(__builtins__, '__import__')('os').popen('ls').read()

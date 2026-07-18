@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is eval(expr, {\"__builtins__\": {}}, {\"amount\": 42, \"fee\": 7}) on line 87, which executes arbitrary Python expressions from user input, constituting code injection / RCE."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Skipped: Q1 answered true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Skipped: Q1 answered true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the built-in eval function or wrap the eval call on line 87 to intercept execution.",
+    "capture": "Capture the exact string value of the expr argument passed to eval to verify it matches user input from request.GET.get(\"expr\").",
+    "fake_behavior": "Return a safe default value such as 49 (the result of the default expression \"amount + fee\") or a fixed numeric value, allowing the function to proceed to the JsonResponse without executing the tainted expression.",
+    "notes": [
+      "Even with __builtins__ restricted, eval can still execute dangerous expressions, so the call must not actually execute in tests.",
+      "If the test framework supports it, assert that eval is called and capture its arguments without invoking the real eval."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

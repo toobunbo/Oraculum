@@ -1,0 +1,22 @@
+{
+  "stage": "ingest",
+  "repo": "realvuln-vampi",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vampi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vampi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vampi/verification_results/summary_realvuln-vampi_20260714_151101.json"
+  },
+  "counts": {
+    "total_verdicts": 3,
+    "selected": 0,
+    "enriched": 0,
+    "skipped": 3,
+    "failed": 0
+  },
+  "findings": [],
+  "errors": []
+}

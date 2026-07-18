@@ -1,0 +1,49 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "config.partner_console._os.system",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "full command string passed to _os.system(), which is 'ping -c 1 ' + user-controlled host value",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured command string contains shell metacharacters (;, |, &, $, backticks) after the 'ping -c 1 ' prefix, indicating command injection via unsanitized host parameter",
+    "trigger_patterns": [
+      "ping -c 1 [^ ;|&$`\n]*[;|&$`]",
+      "ping -c 1 [^ ;|&$`\n]*\\$\\(",
+      "ping -c 1 [^ ;|&$`\n]*`[^`]+`"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_COMMAND-LINE-INJECTION: command injection detected in _os.system argument — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "127.0.0.1; id",
+      "127.0.0.1|cat /etc/passwd",
+      "127.0.0.1&&whoami",
+      "127.0.0.1$(sleep 5)",
+      "127.0.0.1`uname -a`"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "acct_shell_probe_633",
+    "file": "config/partner_console.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def acct_shell_probe_633(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "django.http.HttpRequest"
+      }
+    ],
+    "target_id": "py_command_line_injection_config_partner_console_py_185",
+    "finding_id": "9",
+    "rule_id": "py/command-line-injection",
+    "rule_slug": "py_command-line-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_9_py_command-line-injection.json"
+  }
+}

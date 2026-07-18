@@ -1,0 +1,72 @@
+{
+  "id": "8",
+  "rule_slug": "py_command-line-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/summary_vc-claude-code-seeded-v2-healthcare-clinic-django_20260714_152609.json"
+  },
+  "finding": {
+    "rule_id": "py/command-line-injection",
+    "message": "This command line depends on a [user-provided value](1).",
+    "file": "clinic_portal/patient_operations.py",
+    "start_line": 138,
+    "end_line": 138,
+    "repo_name": "vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/vc-claude-code-seeded-v2-healthcare-clinic-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 133: ControlFlowNode for request",
+      "line 137: ControlFlowNode for Attribute",
+      "line 137: ControlFlowNode for Attribute()",
+      "line 137: ControlFlowNode for host",
+      "line 138: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-78",
+      "CWE-88"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "User-controlled input (`host`) is directly concatenated into a shell command via `_os.system()` without any sanitization or validation, fulfilling the criteria for OS command injection (CWE-78). The function signature indicates it handles HTTP requests, making this vulnerability exploitable.",
+    "cost_usd": 0.0,
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 1203,
+    "tokens_used": 13142,
+    "elapsed_seconds": 10.101590633392334,
+    "cached_input_tokens": 0,
+    "timestamp": "2026-07-14T15:25:57.124234",
+    "iterations": 3,
+    "input_tokens": 11939,
+    "context_needed": [],
+    "data_flow": "request (line 133) → request.GET.get(\"host\", ...) (line 137) → \"ping -c 1 \" + host (line 138) → _os.system(...) (line 138)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "answers": [
+      "The EXACT sink is `_os.system(\"ping -c 1 \" + host)` on line 138. The value passed as the command argument is the string expression `\"ping -c 1 \" + host`.",
+      "The only assignment to `host` is on line 137: `host = request.GET.get(\"host\", \"127.0.0.1\")`. This is the LAST assignment on the path reaching the sink.",
+      "The value of `host` derives from user input via `request.GET.get(\"host\", ...)` on line 137. The data-flow chain is: request (line 133) → request.GET (line 137) → host (line 137). The additional context shows no callers are found, but the function signature indicates it receives a `request` parameter, suggesting it's an HTTP handler.",
+      "No constant-time conditions or reassignments override the user-tainted value. The default fallback in `get()` is not sufficient to prevent exploitation if a malicious value is provided.",
+      "There is NO specific defense sanitizing the value. No use of `shlex.quote()`, no list-based invocation (`shell=False`), and no allow-list validation is visible.",
+      "The user-tainted value `host` reaches the sink `_os.system(...)` on line 138 without any sanitization or defense mechanism. The code constructs a shell command using unsanitized user input, which is a classic case of OS command injection."
+    ]
+  },
+  "function": {
+    "name": "patient_shell_probe_395",
+    "file": "clinic_portal/patient_operations.py",
+    "start_line": 133,
+    "end_line": 139,
+    "scope": ""
+  },
+  "web_params": []
+}

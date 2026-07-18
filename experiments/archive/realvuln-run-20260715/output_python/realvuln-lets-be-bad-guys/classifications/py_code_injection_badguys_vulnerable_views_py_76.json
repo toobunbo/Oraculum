@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is exec(base64.decodestring(first_name)) on line 76, which is arbitrary code execution (RCE)."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; decision terminated at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; decision terminated at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the built-in exec() call on line 76 to intercept the code string argument.",
+    "capture": "Capture the exact string passed to exec(), which is the result of base64.decodestring(first_name), to assert it contains user-controlled input from request.POST.get('first_name', '').",
+    "fake_behavior": "Replace exec with a no-op or a recording function that stores the argument but does not execute it, allowing the function to continue and return the rendered response.",
+    "notes": [
+      "exec() is RCE and must never be invoked with untrusted input in a test environment.",
+      "The mock should be applied per-test or scoped to the code_execution function to avoid affecting other tests.",
+      "Consider using unittest.mock.patch('builtins.exec') or the equivalent test framework mock."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

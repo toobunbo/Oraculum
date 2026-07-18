@@ -1,0 +1,77 @@
+{
+  "id": "3",
+  "rule_slug": "py_unsafe-deserialization",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/summary_vc-claude-code-seeded-v2-healthcare-clinic-django_20260714_152609.json"
+  },
+  "finding": {
+    "rule_id": "py/unsafe-deserialization",
+    "message": "Unsafe deserialization depends on a [user-provided value](1).",
+    "file": "clinic_portal/patient_operations.py",
+    "start_line": 70,
+    "end_line": 70,
+    "repo_name": "vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/vc-claude-code-seeded-v2-healthcare-clinic-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 60: ControlFlowNode for request",
+      "line 65: ControlFlowNode for raw",
+      "line 70: ControlFlowNode for raw",
+      "--- Flow 2 ---",
+      "line 60: ControlFlowNode for request",
+      "line 65: ControlFlowNode for Attribute",
+      "line 65: ControlFlowNode for Attribute()",
+      "line 65: ControlFlowNode for raw",
+      "line 67: ControlFlowNode for raw",
+      "line 70: ControlFlowNode for raw"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-502"
+    ],
+    "tags": [
+      "security",
+      "serialization"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "User-controlled input flows directly to `pickle.loads()` without adequate sanitization or defense. Although a default value is assigned when `raw` is falsy, this does not prevent exploitation when user input produces a truthy `raw`. The function appears to be self-contained and directly processes HTTP request data.",
+    "cost_usd": 0.0,
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 1467,
+    "tokens_used": 14141,
+    "elapsed_seconds": 12.395969867706299,
+    "cached_input_tokens": 0,
+    "timestamp": "2026-07-14T15:25:47.019701",
+    "iterations": 3,
+    "input_tokens": 12674,
+    "context_needed": [],
+    "data_flow": "request.body or request.GET.get(\"blob\") (line 65) → raw (line 65) → base64.b64decode(raw) (line 67) → raw (line 67) → pickle.loads(raw) (line 70)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "answers": [
+      "The EXACT deserialization sink is `pickle.loads(raw)` on line 70. The bytes value passed to it is `raw`.",
+      "The assignments to `raw` are: line 65: `raw = request.body or request.GET.get(\"blob\", \"\").encode(\"utf-8\")`, line 67: `raw = base64.b64decode(raw)`, and line 69: `raw = b\"\\x80\\x04}q\\x00.\"` (conditional). The last assignment on the path where `raw` reaches the sink is line 67 or 69, depending on conditions.",
+      "The value of `raw` derives from user input: `request.body` (line 65) or `request.GET.get(\"blob\", \"\")` (line 65), which are HTTP request components. It may be transformed by base64 decoding (line 67) or replaced by a constant (line 69).",
+      "Yes, there is a constant-time condition on line 69: `if not raw: raw = b\"\\x80\\x04}q\\x00.\"`. This overrides the user-tainted value if `raw` is falsy after line 67.",
+      "There is no specific defense preventing code execution. The code uses `pickle.loads()` directly on data that can be user-controlled. The conditional override on line 69 sets a default constant, but this does not sanitize user-provided paths that result in a truthy `raw`.",
+      "The data flow shows user input (`request.body` or `request.GET[\"blob\"]`) reaching `pickle.loads()` via `raw`. There is no visible defense like `yaml.safe_load()`, HMAC verification, or schema validation. The conditional assignment on line 69 is not sufficient to prevent all user-controlled paths from reaching the sink."
+    ]
+  },
+  "function": {
+    "name": "patient_bundle_thaw_169",
+    "file": "clinic_portal/patient_operations.py",
+    "start_line": 60,
+    "end_line": 71,
+    "scope": ""
+  },
+  "web_params": []
+}

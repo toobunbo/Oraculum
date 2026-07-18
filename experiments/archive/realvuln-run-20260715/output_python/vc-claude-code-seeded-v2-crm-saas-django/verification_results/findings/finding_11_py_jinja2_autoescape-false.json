@@ -1,0 +1,65 @@
+{
+  "id": "11",
+  "rule_slug": "py_jinja2_autoescape-false",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/summary_vc-claude-code-seeded-v2-crm-saas-django_20260714_152015.json"
+  },
+  "finding": {
+    "rule_id": "py/jinja2/autoescape-false",
+    "message": "Using jinja2 templates with autoescape=False can potentially allow XSS attacks.",
+    "file": "crm_project/partner_console.py",
+    "start_line": 134,
+    "end_line": 134,
+    "repo_name": "vc-claude-code-seeded-v2-crm-saas-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/vc-claude-code-seeded-v2-crm-saas-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [],
+    "severity": "6.1",
+    "precision": "medium",
+    "cwe_ids": [
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 16366,
+    "confidence": "High",
+    "iterations": 3,
+    "output_tokens": 1386,
+    "context_needed": [],
+    "reasoning": "User-controlled input from `request.GET.get` flows directly into a Jinja2 template string without escaping, and the template is rendered with autoescape disabled by default. The resulting HTML is returned in an HttpResponse, creating an XSS vulnerability. The absence of a caller confirms this function is likely a directly accessible endpoint.",
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:20:15.095291",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request.GET.get(\"fragment\", ...) (line 133) → Template(\"Result: \" + fragment).render() (line 134) → HttpResponse(body, ...) (line 135)",
+    "cost_usd": 0.0,
+    "cached_input_tokens": 0,
+    "tokens_used": 17752,
+    "elapsed_seconds": 10.858294010162354,
+    "confidence_score": 0.95,
+    "answers": [
+      "The EXACT sink is line 134: `body = Template(\"Result: \" + fragment).render()`. The value being rendered is `fragment` within the template string.",
+      "The assignment to `fragment` is on line 133: `fragment = request.GET.get(\"fragment\", \"{{ 7 * 7 }}\")`. This is the LAST assignment on the path to the sink.",
+      "The value `fragment` derives from user input via `request.GET.get(\"fragment\", ...)` on line 133, which is a source of external, attacker-controllable data.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value `fragment` on the path from its assignment to the sink.",
+      "There is no specific defense escaping the value at the sink. The Jinja2 Template is created without explicit autoescape enabled, which means it defaults to `autoescape=False`.",
+      "The Jinja2 Template is instantiated without enabling autoescape on line 134: `Template(\"Result: \" + fragment)`. This implies `autoescape=False` by default, which disables escaping.",
+      "The user-tainted value `fragment` reaches the sink without escaping, and there is no visible defense to prevent XSS. The additional context shows no caller was found, meaning this function is likely directly accessible as an endpoint."
+    ]
+  },
+  "function": {
+    "name": "acct_jinja_cast_381",
+    "file": "crm_project/partner_console.py",
+    "start_line": 129,
+    "end_line": 135,
+    "scope": ""
+  },
+  "web_params": []
+}

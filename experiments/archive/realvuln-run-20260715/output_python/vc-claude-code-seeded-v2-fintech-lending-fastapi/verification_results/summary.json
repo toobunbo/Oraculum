@@ -1,0 +1,128 @@
+{
+  "stage": "ingest",
+  "repo": "vc-claude-code-seeded-v2-fintech-lending-fastapi",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-claude-code-seeded-v2-fintech-lending-fastapi_20260714_152421.json"
+  },
+  "counts": {
+    "total_verdicts": 21,
+    "selected": 15,
+    "enriched": 15,
+    "skipped": 6,
+    "failed": 0
+  },
+  "findings": [
+    {
+      "id": "0",
+      "rule_id": "py/stack-trace-exposure",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_0_py_stack-trace-exposure.json",
+      "function_name": "loan_batch_pulse_007"
+    },
+    {
+      "id": "1",
+      "rule_id": "py/cookie-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_1_py_cookie-injection.json",
+      "function_name": "loan_crumb_lane_288"
+    },
+    {
+      "id": "2",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_2_py_path-injection.json",
+      "function_name": "loan_vault_stash_235"
+    },
+    {
+      "id": "3",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_3_py_path-injection.json",
+      "function_name": "loan_vault_stash_235"
+    },
+    {
+      "id": "4",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_4_py_path-injection.json",
+      "function_name": "loan_dock_shelf_390"
+    },
+    {
+      "id": "5",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_5_py_path-injection.json",
+      "function_name": "loan_dock_shelf_390"
+    },
+    {
+      "id": "11",
+      "rule_id": "py/clear-text-storage-sensitive-data",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_11_py_clear-text-storage-sensitive-data.json",
+      "function_name": "loan_vault_stash_235"
+    },
+    {
+      "id": "12",
+      "rule_id": "py/clear-text-storage-sensitive-data",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_12_py_clear-text-storage-sensitive-data.json",
+      "function_name": "create_user"
+    },
+    {
+      "id": "13",
+      "rule_id": "py/xxe",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_13_py_xxe.json",
+      "function_name": "loan_xml_fold_449"
+    },
+    {
+      "id": "14",
+      "rule_id": "py/unsafe-deserialization",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_14_py_unsafe-deserialization.json",
+      "function_name": "loan_bundle_thaw_168"
+    },
+    {
+      "id": "15",
+      "rule_id": "py/url-redirection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_15_py_url-redirection.json",
+      "function_name": "loan_return_lane_009"
+    },
+    {
+      "id": "16",
+      "rule_id": "py/command-line-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_16_py_command-line-injection.json",
+      "function_name": "loan_shell_probe_401"
+    },
+    {
+      "id": "17",
+      "rule_id": "py/template-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_17_py_template-injection.json",
+      "function_name": "loan_jinja_cast_379"
+    },
+    {
+      "id": "19",
+      "rule_id": "py/jinja2/autoescape-false",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_19_py_jinja2_autoescape-false.json",
+      "function_name": "loan_jinja_cast_379"
+    },
+    {
+      "id": "20",
+      "rule_id": "py/log-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_20_py_log-injection.json",
+      "function_name": "loan_wire_tally_008"
+    }
+  ],
+  "errors": []
+}

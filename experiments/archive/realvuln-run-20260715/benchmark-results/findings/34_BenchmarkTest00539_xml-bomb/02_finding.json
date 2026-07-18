@@ -1,0 +1,73 @@
+{
+  "id": "34",
+  "rule_slug": "py_xml-bomb",
+  "source": {
+    "vhx_root": "/home/tuonglnc/repo/VulnHunterX",
+    "vhx_repo_root": "/home/tuonglnc/repo/VulnHunterX/repos/python/benchmark-python",
+    "vhx_output_root": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python",
+    "summary_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/verification_results/summary_benchmark-python_filtered_20260610_105228.json"
+  },
+  "finding": {
+    "rule_id": "py/xml-bomb",
+    "message": "XML parsing depends on a [user-provided value](1) without guarding against uncontrolled entity expansion.",
+    "file": "testcode/BenchmarkTest00539.py",
+    "start_line": 49,
+    "end_line": 49,
+    "repo_name": "benchmark-python",
+    "lang": "python",
+    "sarif_path": "/home/tuonglnc/repo/VulnHunterX/output/python/benchmark-python/benchmark-python.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 18: ControlFlowNode for ImportMember",
+      "line 18: ControlFlowNode for request",
+      "line 32: ControlFlowNode for request",
+      "line 32: ControlFlowNode for headers",
+      "line 35: ControlFlowNode for param",
+      "line 38: ControlFlowNode for string25731",
+      "line 39: ControlFlowNode for string25731",
+      "line 40: ControlFlowNode for bar",
+      "line 49: ControlFlowNode for bar"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [],
+    "tags": [
+      "security",
+      "external/cwe/cwe-776",
+      "external/cwe/cwe-400"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-06-10T10:48:09.152614",
+    "context_needed": [],
+    "data_flow": "request.headers.getlist(\"BenchmarkTest00539\") (line 32) → headers[0] (line 35) → param (line 35) → string25731 += param (line 38) → string25731[4:-17] (line 40) → bar (line 40) → xml.dom.minidom.parseString(bar, parser) (line 49)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "answers": [
+      "The EXACT XML-parse sink is `xml.dom.minidom.parseString(bar, parser)` on line 49. The XML-source value passed to it is `bar`.",
+      "The assignments to `bar` are: `bar = string25731[4:-17]` on line 40. This is the LAST assignment to `bar` on the path reaching the sink.",
+      "The value of `bar` derives from user input. The data flow chain is: `headers = request.headers.getlist(\"BenchmarkTest00539\")` (line 32) → `param = headers[0]` (line 35) → `string25731 += param` (line 38) → `bar = string25731[4:-17]` (line 40). The initial source is from HTTP request headers.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense neutralizing billion-laughs or quadratic-blowup. The code creates a SAX parser with `xml.sax.make_parser()` (line 44) but does not configure it with security options. The parser is then passed to `xml.dom.minidom.parseString`, but this does not inherently prevent entity expansion. No `defusedxml` library is used, and no explicit secure configuration like `resolve_entities=False` or `feature_external_ges`/`feature_external_pes` disabling is applied.",
+      "The user-controlled XML data (`bar`) reaches an unsafe parser (`xml.dom.minidom.parseString`) without adequate defenses against entity expansion attacks."
+    ],
+    "confidence_score": 0.95,
+    "iterations": 3,
+    "input_tokens": 8867,
+    "elapsed_seconds": 48.72961974143982,
+    "confidence": "High",
+    "cached_input_tokens": 0,
+    "tokens_used": 10163,
+    "reasoning": "User-controlled input flows directly into an XML parser without any mitigation against entity expansion attacks. The parser is not configured securely, and no defensive library like defusedxml is used.",
+    "verdict": "True Positive",
+    "output_tokens": 1296
+  },
+  "function": {
+    "name": "BenchmarkTest00539_post",
+    "file": "testcode/BenchmarkTest00539.py",
+    "start_line": 28,
+    "end_line": 68,
+    "scope": "Function init"
+  }
+}

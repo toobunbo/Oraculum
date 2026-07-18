@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is target.write_text(...) on line 92, a filesystem write that could write arbitrary files via path traversal in untested directories."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; Q1 was true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; Q1 was true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock pathlib.Path.write_text on the target object constructed from BASE_EXPORT_DIR / f\"{ref}.json\".",
+    "capture": "Capture the full resolved file path (target) and the JSON payload argument passed to write_text. Assert the path stays within BASE_EXPORT_DIR and does not contain traversal sequences.",
+    "fake_behavior": "Return None to allow execution to continue without performing actual disk I/O.",
+    "notes": [
+      "The function also returns JsonResponse({'path': str(target)}), so the mock must not alter the target object itself to keep the return value accurate.",
+      "Consider using unittest.mock.patch on pathlib.Path.write_text or replacing the Path instance."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

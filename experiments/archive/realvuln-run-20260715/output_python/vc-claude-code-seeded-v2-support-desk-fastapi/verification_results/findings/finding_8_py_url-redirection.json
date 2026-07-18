@@ -1,0 +1,67 @@
+{
+  "id": "8",
+  "rule_slug": "py_url-redirection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/summary_vc-claude-code-seeded-v2-support-desk-fastapi_20260714_153638.json"
+  },
+  "finding": {
+    "rule_id": "py/url-redirection",
+    "message": "Untrusted URL redirection depends on a [user-provided value](1).",
+    "file": "backend/app/support_operations.py",
+    "start_line": 42,
+    "end_line": 42,
+    "repo_name": "vc-claude-code-seeded-v2-support-desk-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/vc-claude-code-seeded-v2-support-desk-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 41: ControlFlowNode for lane",
+      "line 42: ControlFlowNode for lane"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-601"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 16828,
+    "cached_input_tokens": 0,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "reasoning": "The function directly uses the user-provided `lane` parameter in a redirect without any validation or sanitization. Even though we can't see the caller, the function itself contains a vulnerable pattern where any URL provided by the user will be redirected to.",
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 1205,
+    "tokens_used": 18033,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "answers": [
+      "The redirect sink is `RedirectResponse(lane)` on line 42. The URL/target value passed to it is the `lane` parameter.",
+      "The `lane` parameter is assigned from the query parameter `lane` on line 41, which is the last and only assignment on the path reaching the sink.",
+      "The value of `lane` derives from user input via the query parameter `lane` in the HTTP request. The data-flow chain is: user-provided query parameter `lane` (line 41) → `lane` variable (line 41) → `RedirectResponse(lane)` (line 42).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path. The value of `lane` is directly used in the redirect without any intermediate sanitization or override.",
+      "There is no specific defense mechanism in place to contain the redirect. No validation, sanitization, or allow-list check is performed on the `lane` parameter before it is used in the redirect.",
+      "The user-tainted value `lane` reaches the sink directly without any defense mechanism. The absence of caller context doesn't change the fact that the function is vulnerable as written - there's no validation of the redirect URL."
+    ],
+    "elapsed_seconds": 8.953078508377075,
+    "timestamp": "2026-07-14T15:36:27.616852",
+    "context_needed": [],
+    "iterations": 3,
+    "data_flow": "user-provided query parameter `lane` (line 41) → `lane` variable (line 41) → `RedirectResponse(lane)` (line 42)"
+  },
+  "function": {
+    "name": "ticket_return_lane_148",
+    "file": "backend/app/support_operations.py",
+    "start_line": 41,
+    "end_line": 42,
+    "scope": ""
+  },
+  "web_params": []
+}

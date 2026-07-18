@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -28,6 +29,8 @@ from oraculum.classification.prompt_builder import (
 )
 from oraculum.classification.returns import analyze_returns
 from oraculum.oracle.paths import target_id_for_artifact
+
+logger = logging.getLogger(__name__)
 
 
 class ClassificationError(ValueError):
@@ -333,20 +336,31 @@ def _generate_classification(
     user_prompt = build_user_prompt(payload, prompts_dir)
     if on_llm_exchange is not None:
         on_llm_exchange(index, total, artifact, system_prompt, user_prompt, None)
-    raw = call_llm(
-        system_prompt,
-        user_prompt,
-        model,
-        float(config.get("temperature", 0.0)),
-        int(config.get("max_tokens", 4096)),
-        int(config.get("timeout", 120)),
-        ollama_key_state_path=ollama_key_state_path,
-    )
-    if on_llm_exchange is not None:
-        on_llm_exchange(index, total, artifact, system_prompt, user_prompt, raw)
-    spec = normalize_classification(parse_classification(raw))
-    validate_classification(spec)
-    return spec
+    last_error: Exception | None = None
+    for attempt in range(1, 4):
+        try:
+            raw = call_llm(
+                system_prompt,
+                user_prompt,
+                model,
+                float(config.get("temperature", 0.0)),
+                int(config.get("max_tokens", 8192)),
+                int(config.get("timeout", 120)),
+                ollama_key_state_path=ollama_key_state_path,
+            )
+            if on_llm_exchange is not None:
+                on_llm_exchange(index, total, artifact, system_prompt, user_prompt, raw)
+            spec = normalize_classification(parse_classification(raw))
+            validate_classification(spec)
+            return spec
+        except ValueError as e:
+            last_error = e
+            if attempt < 3:
+                logger.warning(
+                    "Classification failed (attempt %d/3): %s; retrying...",
+                    attempt, e,
+                )
+    raise ClassificationError(str(last_error)) from last_error
 
 
 def _entry_base(

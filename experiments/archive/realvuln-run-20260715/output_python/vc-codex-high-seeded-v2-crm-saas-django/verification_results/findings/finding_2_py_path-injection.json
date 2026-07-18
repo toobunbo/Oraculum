@@ -1,0 +1,76 @@
+{
+  "id": "2",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/summary_vc-codex-high-seeded-v2-crm-saas-django_20260714_153817.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "config/partner_console.py",
+    "start_line": 91,
+    "end_line": 91,
+    "repo_name": "vc-codex-high-seeded-v2-crm-saas-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django/vc-codex-high-seeded-v2-crm-saas-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 86: ControlFlowNode for request",
+      "line 89: ControlFlowNode for Attribute",
+      "line 89: ControlFlowNode for Attribute()",
+      "line 89: ControlFlowNode for ref",
+      "line 90: ControlFlowNode for target",
+      "line 91: ControlFlowNode for Attribute"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "cost_usd": 0.0,
+    "confidence": "Medium",
+    "verdict": "True Positive",
+    "answers": [
+      "The EXACT flagged line is: `target.parent.mkdir(parents=True, exist_ok=True)` on line 91. This line is located in the function `acct_vault_stash_244`.",
+      "The path value `target` is assigned on line 90: `target = BASE_EXPORT_DIR / f'{ref}.json'`. This is the only assignment to `target` on the reaching path.",
+      "The value of `target` derives from `ref`, which is assigned on line 89: `ref = request.GET.get('ref', 'daily')`. This directly derives from user input via `request.GET`.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value `ref` on the reaching path.",
+      "No specific defense is present in the code to prevent path traversal. The `BASE_EXPORT_DIR` global variable definition is not available, so we cannot determine if it provides any protection.",
+      "The user-tainted value `ref` from `request.GET` reaches the sink `target.parent.mkdir` without any sanitization. Without knowing the value of `BASE_EXPORT_DIR`, we cannot definitively determine if this is exploitable, but the pattern is dangerous."
+    ],
+    "reasoning": "User-controlled input `ref` is used directly in a file path construction that leads to a `mkdir` call. While we don't know the exact value of `BASE_EXPORT_DIR`, the pattern of using unsanitized user input in path construction with `parents=True` is inherently dangerous and can lead to directory traversal. The absence of any visible sanitization makes this a likely vulnerability.",
+    "elapsed_seconds": 13.954281091690063,
+    "context_needed": [],
+    "tokens_used": 25105,
+    "output_tokens": 1703,
+    "cached_input_tokens": 0,
+    "input_tokens": 23402,
+    "timestamp": "2026-07-14T15:37:45.677868",
+    "data_flow": "request.GET['ref'] (line 89) → ref (line 89) → target (line 90) → target.parent (line 91) → mkdir (line 91)",
+    "iterations": 4,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence_score": 0.75
+  },
+  "function": {
+    "name": "acct_vault_stash_244",
+    "file": "config/partner_console.py",
+    "start_line": 86,
+    "end_line": 93,
+    "scope": ""
+  },
+  "web_params": []
+}

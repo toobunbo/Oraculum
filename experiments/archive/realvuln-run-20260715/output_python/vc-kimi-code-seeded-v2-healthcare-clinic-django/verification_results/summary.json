@@ -1,0 +1,22 @@
+{
+  "stage": "ingest",
+  "repo": "vc-kimi-code-seeded-v2-healthcare-clinic-django",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-kimi-code-seeded-v2-healthcare-clinic-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-kimi-code-seeded-v2-healthcare-clinic-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-kimi-code-seeded-v2-healthcare-clinic-django/verification_results/summary_vc-kimi-code-seeded-v2-healthcare-clinic-django_20260714_160954.json"
+  },
+  "counts": {
+    "total_verdicts": 11,
+    "selected": 0,
+    "enriched": 0,
+    "skipped": 11,
+    "failed": 0
+  },
+  "findings": [],
+  "errors": []
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is os.system(cmd) on line 43, which is shell execution."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock os.system to prevent actual shell execution during testing.",
+    "capture": "Capture the exact string argument passed to os.system, storing it for assertion so the injected command payload can be verified.",
+    "fake_behavior": "Return 0 (success) without executing the command, allowing the function under test to complete normally.",
+    "notes": [
+      "Since os.system is the direct sink, patching it at the os module level (e.g., unittest.mock.patch('os.system')) is sufficient.",
+      "Assert that the captured argument contains the malicious payload derived from user_input to confirm the vulnerability."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

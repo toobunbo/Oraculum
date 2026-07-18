@@ -1,0 +1,72 @@
+{
+  "id": "0",
+  "rule_slug": "py_code-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/summary_vc-claude-code-seeded-v2-healthcare-clinic-django_20260714_152609.json"
+  },
+  "finding": {
+    "rule_id": "py/code-injection",
+    "message": "This code execution depends on a [user-provided value](1).",
+    "file": "clinic_portal/patient_operations.py",
+    "start_line": 88,
+    "end_line": 88,
+    "repo_name": "vc-claude-code-seeded-v2-healthcare-clinic-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/vc-claude-code-seeded-v2-healthcare-clinic-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 84: ControlFlowNode for request",
+      "line 87: ControlFlowNode for Attribute",
+      "line 87: ControlFlowNode for Attribute()",
+      "line 87: ControlFlowNode for expr",
+      "line 88: ControlFlowNode for expr"
+    ],
+    "severity": "9.3",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-94",
+      "CWE-95"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "The user-controlled input `expr` from `request.GET` is passed directly to `eval()` on line 88. Although `__builtins__` is restricted, the expression can still perform attribute access and method calls on the provided local variables, which could lead to code injection. The data flow is clear and the sink is exploitable. The additional context did not reveal any framework protections or caller-side sanitization.",
+    "cost_usd": 0.0,
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 1338,
+    "tokens_used": 13370,
+    "elapsed_seconds": 10.495854377746582,
+    "cached_input_tokens": 0,
+    "timestamp": "2026-07-14T15:25:44.948603",
+    "iterations": 3,
+    "input_tokens": 12032,
+    "context_needed": [],
+    "data_flow": "request (line 84) → request.GET.get(\"expr\", \"amount + fee\") (line 87) → expr (line 87) → eval(expr, {\"__builtins__\": {}}, {\"amount\": 42, \"fee\": 7}) (line 88)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "answers": [
+      "The EXACT sink is `eval(expr, {\"__builtins__\": {}}, {\"amount\": 42, \"fee\": 7})` on line 88. The value passed to it is `expr`.",
+      "The only assignment to `expr` is on line 87: `expr = request.GET.get(\"expr\", \"amount + fee\")`.",
+      "The LAST assignment to `expr` derives from user input via `request.GET.get(\"expr\", \"amount + fee\")` on line 87. The data flow is: request (line 84) → request.GET.get (line 87) → expr (line 87) → eval (line 88).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "The defense present is the restricted globals dictionary `{\"__builtins__\": {}}`, which prevents access to built-in functions and modules. However, this does not prevent all forms of code injection, as the expression can still perform attribute access and call methods on the provided local variables.",
+      "The user-tainted value `expr` reaches the sink `eval` on line 88. Although the builtins are restricted, the expression can still access and call methods on the provided local variables (`amount` and `fee`), which could potentially be exploited. For example, if `amount` or `fee` were objects with dangerous methods, the expression could invoke them."
+    ]
+  },
+  "function": {
+    "name": "patient_formula_cast_251",
+    "file": "clinic_portal/patient_operations.py",
+    "start_line": 84,
+    "end_line": 89,
+    "scope": ""
+  },
+  "web_params": []
+}

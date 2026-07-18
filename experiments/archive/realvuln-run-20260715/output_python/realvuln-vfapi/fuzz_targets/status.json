@@ -1,0 +1,56 @@
+{
+  "stage": "harness",
+  "repo": "realvuln-vfapi",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/harness.yaml",
+  "source": {
+    "oracle_status_path": "output/python/realvuln-vfapi/fuzz_oracles/status.json"
+  },
+  "counts": {
+    "selected": 2,
+    "generated": 1,
+    "skipped": 0,
+    "failed": 1
+  },
+  "harnesses": [
+    {
+      "id": "0",
+      "target_id": "py_weak_sensitive_data_hashing_main_py_113",
+      "rule_id": "py/weak-sensitive-data-hashing",
+      "file": "main.py",
+      "start_line": "113",
+      "function_name": "init_sql_db",
+      "harness": "output/python/realvuln-vfapi/fuzz_targets/py_weak_sensitive_data_hashing_main_py_113.py",
+      "oracle": "output/python/realvuln-vfapi/fuzz_oracles/py_weak_sensitive_data_hashing_main_py_113.json",
+      "finding_artifact": "output/python/realvuln-vfapi/verification_results/findings/finding_0_py_weak-sensitive-data-hashing.json",
+      "corpus": "output/python/realvuln-vfapi/fuzz_corpus/py_weak_sensitive_data_hashing_main_py_113",
+      "strategy": "recorded_call",
+      "status": "generated",
+      "seed_count": 5,
+      "errors": ""
+    },
+    {
+      "id": "1",
+      "target_id": "py_weak_sensitive_data_hashing_main_py_187",
+      "rule_id": "py/weak-sensitive-data-hashing",
+      "file": "main.py",
+      "start_line": "187",
+      "function_name": "put_user",
+      "harness": "output/python/realvuln-vfapi/fuzz_targets/py_weak_sensitive_data_hashing_main_py_187.py",
+      "oracle": "output/python/realvuln-vfapi/fuzz_oracles/py_weak_sensitive_data_hashing_main_py_187.json",
+      "finding_artifact": "output/python/realvuln-vfapi/verification_results/findings/finding_1_py_weak-sensitive-data-hashing.json",
+      "corpus": "output/python/realvuln-vfapi/fuzz_corpus/py_weak_sensitive_data_hashing_main_py_187",
+      "status": "failed",
+      "errors": "litellm.Timeout: APITimeoutError - Request timed out. Error_str: Request timed out."
+    }
+  ],
+  "errors": [
+    {
+      "target_id": "py_weak_sensitive_data_hashing_main_py_187",
+      "oracle": "output/python/realvuln-vfapi/fuzz_oracles/py_weak_sensitive_data_hashing_main_py_187.json",
+      "finding_artifact": "output/python/realvuln-vfapi/verification_results/findings/finding_1_py_weak-sensitive-data-hashing.json",
+      "error": "litellm.Timeout: APITimeoutError - Request timed out. Error_str: Request timed out."
+    }
+  ]
+}

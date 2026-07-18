@@ -1,0 +1,52 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of the sayhi Flask view function, which is the rendered output of render_template_string",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The return value contains introspection attributes (e.g., __class__, __mro__, __subclasses__, __globals__, __builtins__) or Flask config markers (<Config) that prove the injected Jinja2 expression was evaluated by the template engine, confirming SSTI.",
+    "trigger_patterns": [
+      "__class__",
+      "__mro__",
+      "__subclasses__",
+      "__globals__",
+      "__builtins__",
+      "<Config"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_TEMPLATE_INJECTION: SSTI payload evaluated in render_template_string output — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "{{ config }}",
+      "{{ ''.__class__.__mro__ }}",
+      "{{ ().__class__.__bases__[0].__subclasses__() }}",
+      "{{ self.__init__.__globals__ }}",
+      "{{ ''.__class__.__mro__[1].__subclasses__() }}"
+    ],
+    "skip_condition": "not name"
+  },
+  "_meta": {
+    "function": "sayhi",
+    "file": "app.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def sayhi()",
+    "tainted_params": [
+      {
+        "name": "name",
+        "index": -1,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_template_injection_app_py_205",
+    "finding_id": "4",
+    "rule_id": "py/template-injection",
+    "rule_slug": "py_template-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-damn-vulnerable-flask-application/verification_results/findings/finding_4_py_template-injection.json"
+  }
+}

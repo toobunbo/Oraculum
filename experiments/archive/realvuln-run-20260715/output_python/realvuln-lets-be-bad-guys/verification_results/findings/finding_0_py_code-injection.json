@@ -1,0 +1,72 @@
+{
+  "id": "0",
+  "rule_slug": "py_code-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-lets-be-bad-guys",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-lets-be-bad-guys",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-lets-be-bad-guys/verification_results/summary_realvuln-lets-be-bad-guys_20260714_150402.json"
+  },
+  "finding": {
+    "rule_id": "py/code-injection",
+    "message": "This code execution depends on a [user-provided value](1).",
+    "file": "badguys/vulnerable/views.py",
+    "start_line": 72,
+    "end_line": 72,
+    "repo_name": "realvuln-lets-be-bad-guys",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-lets-be-bad-guys/realvuln-lets-be-bad-guys.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 56: ControlFlowNode for request",
+      "line 68: ControlFlowNode for Attribute",
+      "line 68: ControlFlowNode for Attribute()",
+      "line 68: ControlFlowNode for first_name",
+      "line 72: ControlFlowNode for Attribute()"
+    ],
+    "severity": "9.3",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-94",
+      "CWE-95"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "answers": [
+      "The exact sink is `exec(base64.decodestring(bytes(first_name, 'ascii')))` on line 72. The value passed to it is `base64.decodestring(bytes(first_name, 'ascii'))`.",
+      "The assignments to `first_name` are: line 59 (`first_name = ''`), and line 68 (`first_name = request.POST.get('first_name', '')`). The last assignment on the path reaching the sink is line 68.",
+      "The value of `first_name` on line 68 derives from user input via `request.POST.get('first_name', '')`, which is explicitly tainted as per the dataflow path from line 56 (`request`) → line 68 (`first_name`).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value `first_name` before it reaches the sink on line 72.",
+      "There is no specific defense preventing arbitrary code execution. The code decodes a base64-encoded string provided by the user and directly executes it using `exec`. No sanitization, allow-list, or restricted environment is applied.",
+      "The user-tainted value `first_name` is clearly passed through base64 decoding to `exec()` on line 72, with no defenses visible in the code."
+    ],
+    "reasoning": "User-controlled input (`first_name`) is base64-decoded and passed directly to `exec()` on line 72 with no sanitization or sandboxing, constituting a clear code injection vulnerability. No caller or callee context changes this assessment.",
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "verdict": "True Positive",
+    "elapsed_seconds": 11.145492553710938,
+    "timestamp": "2026-07-14T15:03:59.278605",
+    "iterations": 3,
+    "cost_usd": 0.0,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "input_tokens": 12901,
+    "output_tokens": 1123,
+    "confidence": "High",
+    "data_flow": "request (line 56) → first_name = request.POST.get('first_name', '') (line 68) → exec(base64.decodestring(bytes(first_name, 'ascii'))) (line 72)",
+    "tokens_used": 14024,
+    "cached_input_tokens": 0
+  },
+  "function": {
+    "name": "code_execution",
+    "file": "badguys/vulnerable/views.py",
+    "start_line": 56,
+    "end_line": 89,
+    "scope": ""
+  },
+  "web_params": []
+}

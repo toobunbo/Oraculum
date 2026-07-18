@@ -1,0 +1,66 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "target": "flask.make_response",
+    "capture": {
+      "argument_index": 0,
+      "taint_origin": "request.form.getlist(\"BenchmarkTest00256\")"
+    },
+    "patch_target": "flask.make_response",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "captured value",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "predicate": "lambda captured: '<script>' in captured or '\\n' in captured or '\\r' in captured",
+    "type": "regex_match",
+    "condition_description": "lambda captured: '<script>' in captured or '\\n' in captured or '\\r' in captured",
+    "trigger_patterns": [
+      "[\\s\\S]+"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "ORACULUM_VIOLATION: captured={captured}"
+  },
+  "fuzz_guidance": {
+    "sink_behavior": "Return a mock Response object with no real HTTP side effects",
+    "payload_focus": "Taint the form input BenchmarkTest00256 to flow into the header value",
+    "validation": "Ensure captured header value is checked for XSS or header injection patterns",
+    "seed_corpus": [],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "aliasing_risk": "flask.make_response may be aliased or imported as a different name",
+    "import_risk": "Verify the actual import path in the target module",
+    "async_risk": "None - Flask view functions are synchronous in this context",
+    "classification_strategy": "recorded_call",
+    "classification_confidence": "high",
+    "mock_guidance": {
+      "required": true,
+      "target": "mock the `make_response` call to prevent actual header injection",
+      "capture": "capture the value of `bar` being set in the response header",
+      "fake_behavior": "return a safe, stubbed response object without setting dangerous headers",
+      "notes": [
+        "Ensure the mock prevents real HTTP response manipulation during testing.",
+        "Capture the header value for inspection but do not allow it to be rendered in actual responses."
+      ]
+    },
+    "target_id": "py_reflective_xss_testcode_BenchmarkTest00256_py_48",
+    "finding_id": "16",
+    "rule_id": "py/reflective-xss",
+    "rule_slug": "py_reflective-xss",
+    "file": "testcode/BenchmarkTest00256.py",
+    "function": "BenchmarkTest00256_post",
+    "input_strategy": "flask_view",
+    "function_signature": "def BenchmarkTest00256_post()",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": -1,
+        "type": "flask_request"
+      }
+    ],
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "output/python/benchmark-python/verification_results/findings/finding_16_py_reflective-xss.json"
+  }
+}

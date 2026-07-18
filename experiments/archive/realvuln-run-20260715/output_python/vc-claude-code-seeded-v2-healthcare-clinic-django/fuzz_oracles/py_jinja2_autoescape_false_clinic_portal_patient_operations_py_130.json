@@ -1,0 +1,51 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of patient_jinja_cast_383 containing the rendered Jinja2 template output",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The rendered template output contains raw, unescaped XSS payloads (HTML tags, event handlers, or javascript: URIs) confirming autoescape=False allows injection to survive rendering",
+    "trigger_patterns": [
+      "<script",
+      "onerror\\s*=",
+      "javascript\\s*:",
+      "<img[^>]+src\\s*=",
+      "<svg[^>]+onload\\s*="
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_JINJA2_AUTOESCAPE_FALSE: unescaped XSS payload in rendered output — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "<script>alert(1)</script>",
+      "<img src=x onerror=alert(1)>",
+      "<svg onload=alert(1)>",
+      "javascript:alert(1)",
+      "<a href=\"javascript:alert(1)\">click</a>"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "patient_jinja_cast_383",
+    "file": "clinic_portal/patient_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def patient_jinja_cast_383(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "HttpRequest"
+      }
+    ],
+    "target_id": "py_jinja2_autoescape_false_clinic_portal_patient_operations_py_130",
+    "finding_id": "10",
+    "rule_id": "py/jinja2/autoescape-false",
+    "rule_slug": "py_jinja2_autoescape-false",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-healthcare-clinic-django/verification_results/findings/finding_10_py_jinja2_autoescape-false.json"
+  }
+}

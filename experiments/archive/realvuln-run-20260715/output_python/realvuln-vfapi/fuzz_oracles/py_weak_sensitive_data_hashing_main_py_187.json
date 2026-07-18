@@ -1,0 +1,47 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "main.cursor.execute",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "SQL INSERT query string containing the MD5-hashed password value",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured SQL INSERT query string contains a 32-character hexadecimal sequence (MD5 hex digest) in the password column value, confirming insecure MD5 hashing was used for password storage",
+    "trigger_patterns": [
+      "[a-f0-9]{32}"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_WEAK_SENSITIVE_DATA_HASHING: MD5 hex digest found in SQL INSERT — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "password",
+      "admin123",
+      "test",
+      "P@ssw0rd!",
+      "12345678"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "put_user",
+    "file": "main.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def put_user(user: User)",
+    "tainted_params": [
+      {
+        "name": "user",
+        "index": 0,
+        "type": "User"
+      }
+    ],
+    "target_id": "py_weak_sensitive_data_hashing_main_py_187",
+    "finding_id": "1",
+    "rule_id": "py/weak-sensitive-data-hashing",
+    "rule_slug": "py_weak-sensitive-data-hashing",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-vfapi/verification_results/findings/finding_1_py_weak-sensitive-data-hashing.json"
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "target": "yaml.load",
+    "module": "yaml",
+    "call_signature": "yaml.load(bar, Loader=yaml.Loader)",
+    "capture_args": [
+      {
+        "index": 0,
+        "name": "stream",
+        "tainted": true,
+        "predicate": "lambda x: isinstance(x, str) and '_SafeStuff' in x"
+      }
+    ],
+    "patch_target": "yaml.yaml.load",
+    "target_arg_index": 0,
+    "target_arg_name": "stream",
+    "capture_what": "stream",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "assertion": "captured_call_count > 0 and any('_SafeStuff' in arg for arg in captured_args if isinstance(arg, str))",
+    "type": "custom",
+    "description": "Verify that yaml.load was called with a string argument containing '_SafeStuff', indicating user-controlled input reached the unsafe deserialization sink",
+    "condition_description": "Verify that yaml.load was called with a string argument containing '_SafeStuff', indicating user-controlled input reached the unsafe deserialization sink",
+    "trigger_patterns": [
+      "[\\s\\S]+"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "ORACULUM_VIOLATION: captured={captured}"
+  },
+  "fuzz_guidance": {
+    "payloads": [
+      "!!python/object/apply:os.system ['echo vulnerable']",
+      "!!python/object/apply:eval [('1+1')]",
+      "!!python/object/apply:exec [('print(\"exploit\")')]"
+    ],
+    "prefix": "",
+    "suffix": "_SafeStuff",
+    "encoding": "utf-8",
+    "seed_corpus": [],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "aliasing_risk": "Low - yaml.load is directly imported from yaml module",
+    "import_risk": "yaml module may be imported as different alias; consider mocking yaml globally",
+    "async_risk": "Not applicable - synchronous Flask view function",
+    "notes": [
+      "Sink mocked at module level to prevent any unsafe loader usage",
+      "Predicate checks for '_SafeStuff' suffix to confirm user input reached sink",
+      "Fake behavior raises exception to prevent actual deserialization"
+    ],
+    "classification_strategy": "recorded_call",
+    "classification_confidence": "high",
+    "mock_guidance": {
+      "required": true,
+      "target": "yaml.load(bar, Loader=yaml.Loader) call on line 41",
+      "capture": "The bar argument passed to yaml.load, which contains the user-controlled input with '_SafeStuff' suffix",
+      "fake_behavior": "Stub yaml.load to prevent actual deserialization and return a safe mock object or raise an exception to simulate failure",
+      "notes": [
+        "Must mock yaml.load to prevent arbitrary code execution during testing",
+        "The bar variable contains user input from request.form.getlist(\"BenchmarkTest00270\")",
+        "Consider mocking yaml module entirely to prevent any unsafe loader usage"
+      ]
+    },
+    "target_id": "py_unsafe_deserialization_testcode_BenchmarkTest00270_py_41",
+    "finding_id": "22",
+    "rule_id": "py/unsafe-deserialization",
+    "rule_slug": "py_unsafe-deserialization",
+    "file": "testcode/BenchmarkTest00270.py",
+    "function": "BenchmarkTest00270_post",
+    "input_strategy": "flask_view",
+    "function_signature": "def BenchmarkTest00270_post()",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": -1,
+        "type": "flask_request"
+      }
+    ],
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "output/python/benchmark-python/verification_results/findings/finding_22_py_unsafe-deserialization.json"
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "id": "5",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/summary_vc-codex-high-seeded-v2-crm-saas-django_20260714_153817.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "config/partner_console.py",
+    "start_line": 151,
+    "end_line": 151,
+    "repo_name": "vc-codex-high-seeded-v2-crm-saas-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django/vc-codex-high-seeded-v2-crm-saas-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 145: ControlFlowNode for request",
+      "line 148: ControlFlowNode for Attribute",
+      "line 148: ControlFlowNode for Attribute()",
+      "line 148: ControlFlowNode for name",
+      "line 149: ControlFlowNode for target",
+      "line 151: ControlFlowNode for target"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "verdict": "True Positive",
+    "answers": [
+      "The exact file-operation sink is `target.write_bytes(request.body)` on line 151. The path value passed to it is `target`, which is derived from `BASE_EXPORT_DIR / name`.",
+      "The assignments to the path value `target` are: Line 149: `target = BASE_EXPORT_DIR / name`.",
+      "The value of `target` derives from user input. Specifically: Line 148 assigns `name = request.GET.get(\"name\", \"packet.bin\")`, which retrieves the `name` parameter from the GET request. Then, line 149 constructs `target = BASE_EXPORT_DIR / name`, so `target` is directly influenced by the user-provided `name`.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The value of `name` is taken directly from the request and used to construct the path without any filtering or sanitization.",
+      "There is no specific defense in place. The code does not use any path sanitization or validation such as `os.path.commonpath`, `Path.resolve()`, or `secure_filename`. The user-provided `name` is directly used to construct the file path, which could allow directory traversal.",
+      "The user-tainted value `name` reaches the sink at line 151 as part of the `target` path. There is no evidence of any defense mechanism preventing directory traversal or path manipulation. The additional context does not change this conclusion, as we still cannot verify the safety of `BASE_EXPORT_DIR` or the function's exposure."
+    ],
+    "reasoning": "User-controlled input 'name' is used to construct a file path that is then written to, without any sanitization or validation, allowing for potential directory traversal. The additional context does not provide any safeguards or indicate otherwise.",
+    "elapsed_seconds": 14.201639890670776,
+    "context_needed": [],
+    "tokens_used": 13721,
+    "output_tokens": 1265,
+    "cached_input_tokens": 0,
+    "input_tokens": 12456,
+    "timestamp": "2026-07-14T15:37:59.576633",
+    "data_flow": "request.GET['name'] (line 148) → target = BASE_EXPORT_DIR / name (line 149) → target.write_bytes(...) (line 151)",
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence_score": 0.9
+  },
+  "function": {
+    "name": "acct_dock_shelf_592",
+    "file": "config/partner_console.py",
+    "start_line": 145,
+    "end_line": 152,
+    "scope": ""
+  },
+  "web_params": []
+}

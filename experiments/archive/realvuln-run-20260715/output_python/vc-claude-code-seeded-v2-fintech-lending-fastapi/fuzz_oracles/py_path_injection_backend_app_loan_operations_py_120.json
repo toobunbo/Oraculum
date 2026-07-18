@@ -1,0 +1,51 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "pathlib.Path.mkdir",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "Path instance (self) representing target.parent, which includes the user-controlled name in its path traversal",
+    "additional_imports": [
+      "pathlib"
+    ]
+  },
+  "oracle_check": {
+    "condition_description": "The captured Path string contains '..' traversal sequences indicating the user-supplied name caused directory creation outside BASE_EXPORT_DIR",
+    "trigger_patterns": [
+      "\\.{2}[\\/]",
+      "\\.{2}$"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_PATH-INJECTION: path traversal detected in mkdir call — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "../../etc/evil",
+      "../../../tmp/x",
+      "foo/../../bar",
+      "..\\..\\windows\\system32",
+      "normal.txt",
+      "a/b/../../../etc/passwd"
+    ],
+    "skip_condition": "'..' not in name"
+  },
+  "_meta": {
+    "function": "loan_dock_shelf_390",
+    "file": "backend/app/loan_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def loan_dock_shelf_390(request: Request, name: str, gate_ref: None)",
+    "tainted_params": [
+      {
+        "name": "name",
+        "index": 1,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_path_injection_backend_app_loan_operations_py_120",
+    "finding_id": "4",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_4_py_path-injection.json"
+  }
+}

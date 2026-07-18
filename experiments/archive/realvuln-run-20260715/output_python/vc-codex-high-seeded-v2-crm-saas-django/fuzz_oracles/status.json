@@ -1,0 +1,170 @@
+{
+  "stage": "oracle",
+  "repo": "vc-codex-high-seeded-v2-crm-saas-django",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/oracle.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 12,
+    "generated": 10,
+    "skipped": 0,
+    "failed": 2
+  },
+  "oracles": [
+    {
+      "id": "0",
+      "target_id": "py_full_ssrf_config_partner_console_py_52",
+      "rule_id": "py/full-ssrf",
+      "file": "config/partner_console.py",
+      "start_line": "52",
+      "function_name": "acct_relay_note_063",
+      "finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_0_py_full-ssrf.json",
+      "oracle": "output/python/vc-codex-high-seeded-v2-crm-saas-django/fuzz_oracles/py_full_ssrf_config_partner_console_py_52.json",
+      "status": "failed"
+    },
+    {
+      "id": "1",
+      "target_id": "py_path_injection_config_partner_console_py_42",
+      "rule_id": "py/path-injection",
+      "file": "config/partner_console.py",
+      "start_line": "42",
+      "function_name": "acct_vaultlet_pull_062",
+      "finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_1_py_path-injection.json",
+      "oracle": "output/python/vc-codex-high-seeded-v2-crm-saas-django/fuzz_oracles/py_path_injection_config_partner_console_py_42.json",
+      "status": "generated",
+      "strategy": "return_value"
+    },
+    {
+      "id": "2",
+      "target_id": "py_path_injection_config_partner_console_py_91",
+      "rule_id": "py/path-injection",
+      "file": "config/partner_console.py",
+      "start_line": "91",
+      "function_name": "acct_vault_stash_244",
+      "finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_2_py_path-injection.json",
+      "oracle": "output/python/vc-codex-high-seeded-v2-crm-saas-django/fuzz_oracles/py_path_injection_config_partner_console_py_91.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "3",
+      "target_id": "py_path_injection_config_partner_console_py_92",
+      "rule_id": "py/path-injection",
+      "file": "config/partner_console.py",
+      "start_line": "92",
+      "function_name": "acct_vault_stash_244",
+      "finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_3_py_path-injection.json",
+      "oracle": "output/python/vc-codex-high-seeded-v2-crm-saas-django/fuzz_oracles/py_path_injection_config_partner_console_py_92.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "4",
+      "target_id": "py_path_injection_config_partner_console_py_150",
+      "rule_id": "py/path-injection",
+      "file": "config/partner_console.py",
+      "start_line": "150",
+      "function_name": "acct_dock_shelf_592",
+      "finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_4_py_path-injection.json",
+      "oracle": "output/python/vc-codex-high-seeded-v2-crm-saas-django/fuzz_oracles/py_path_injection_config_partner_console_py_150.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "5",
+      "target_id": "py_path_injection_config_partner_console_py_151",
+      "rule_id": "py/path-injection",
+      "file": "config/partner_console.py",
+      "start_line": "151",
+      "function_name": "acct_dock_shelf_592",
+      "finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_5_py_path-injection.json",
+      "oracle": "output/python/vc-codex-high-seeded-v2-crm-saas-django/fuzz_oracles/py_path_injection_config_partner_console_py_151.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "6",
+      "target_id": "py_clear_text_storage_sensitive_data_config_partner_console_py_92",
+      "rule_id": "py/clear-text-storage-sensitive-data",
+      "file": "config/partner_console.py",
+      "start_line": "92",
+      "function_name": "acct_vault_stash_244",
+      "finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_6_py_clear-text-storage-sensitive-data.json",
+      "oracle": "output/python/vc-codex-high-seeded-v2-crm-saas-django/fuzz_oracles/py_clear_text_storage_sensitive_data_config_partner_console_py_92.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "7",
+      "target_id": "py_url_redirection_config_partner_console_py_73",
+      "rule_id": "py/url-redirection",
+      "file": "config/partner_console.py",
+      "start_line": "73",
+      "function_name": "acct_return_lane_161",
+      "finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_7_py_url-redirection.json",
+      "oracle": "output/python/vc-codex-high-seeded-v2-crm-saas-django/fuzz_oracles/py_url_redirection_config_partner_console_py_73.json",
+      "status": "generated",
+      "strategy": "return_value"
+    },
+    {
+      "id": "8",
+      "target_id": "py_nosql_injection_config_partner_console_py_169",
+      "rule_id": "py/nosql-injection",
+      "file": "config/partner_console.py",
+      "start_line": "169",
+      "function_name": "acct_mongo_lane_613",
+      "finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_8_py_nosql-injection.json",
+      "oracle": "output/python/vc-codex-high-seeded-v2-crm-saas-django/fuzz_oracles/py_nosql_injection_config_partner_console_py_169.json",
+      "status": "failed"
+    },
+    {
+      "id": "9",
+      "target_id": "py_command_line_injection_config_partner_console_py_185",
+      "rule_id": "py/command-line-injection",
+      "file": "config/partner_console.py",
+      "start_line": "185",
+      "function_name": "acct_shell_probe_633",
+      "finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_9_py_command-line-injection.json",
+      "oracle": "output/python/vc-codex-high-seeded-v2-crm-saas-django/fuzz_oracles/py_command_line_injection_config_partner_console_py_185.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "10",
+      "target_id": "py_template_injection_config_partner_console_py_142",
+      "rule_id": "py/template-injection",
+      "file": "config/partner_console.py",
+      "start_line": "142",
+      "function_name": "acct_jinja_cast_585",
+      "finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_10_py_template-injection.json",
+      "oracle": "output/python/vc-codex-high-seeded-v2-crm-saas-django/fuzz_oracles/py_template_injection_config_partner_console_py_142.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "11",
+      "target_id": "py_jinja2_autoescape_false_config_partner_console_py_142",
+      "rule_id": "py/jinja2/autoescape-false",
+      "file": "config/partner_console.py",
+      "start_line": "142",
+      "function_name": "acct_jinja_cast_585",
+      "finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_11_py_jinja2_autoescape-false.json",
+      "oracle": "output/python/vc-codex-high-seeded-v2-crm-saas-django/fuzz_oracles/py_jinja2_autoescape_false_config_partner_console_py_142.json",
+      "status": "generated",
+      "strategy": "return_value"
+    }
+  ],
+  "errors": [
+    {
+      "finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_0_py_full-ssrf.json",
+      "error": "monitor.strategy invalid: 'patch_call'. Must be one of {'return_value', 'recorded_call', 'filesystem_state'}"
+    },
+    {
+      "finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_8_py_nosql-injection.json",
+      "error": "_meta missing field: 'tainted_params'"
+    }
+  ]
+}

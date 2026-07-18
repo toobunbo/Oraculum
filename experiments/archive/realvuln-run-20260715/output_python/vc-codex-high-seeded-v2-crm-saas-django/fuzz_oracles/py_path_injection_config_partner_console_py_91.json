@@ -1,0 +1,49 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "pathlib.Path.mkdir",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "the Path object (self) representing the directory path on which mkdir is invoked",
+    "additional_imports": [
+      "pathlib"
+    ]
+  },
+  "oracle_check": {
+    "condition_description": "The string representation of the Path object passed as self to mkdir contains a path traversal component (..) indicating the directory to be created escapes the intended base directory",
+    "trigger_patterns": [
+      "(?:^|/|\\\\)\\.\\.(?:/|\\\\|$)"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_PATH-INJECTION: path traversal in mkdir call — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "../../etc/shadow",
+      "../../../tmp/evil",
+      "..\\..\\windows\\system32",
+      "....//....//etc/passwd",
+      "foo/../../bar/baz"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "acct_vault_stash_244",
+    "file": "config/partner_console.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def acct_vault_stash_244(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "django.http.HttpRequest"
+      }
+    ],
+    "target_id": "py_path_injection_config_partner_console_py_91",
+    "finding_id": "2",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_2_py_path-injection.json"
+  }
+}

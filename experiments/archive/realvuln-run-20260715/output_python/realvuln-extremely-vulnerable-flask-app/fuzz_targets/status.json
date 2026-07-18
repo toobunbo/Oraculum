@@ -1,0 +1,67 @@
+{
+  "stage": "harness",
+  "repo": "realvuln-extremely-vulnerable-flask-app",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/harness.yaml",
+  "source": {
+    "oracle_status_path": "output/python/realvuln-extremely-vulnerable-flask-app/fuzz_oracles/status.json"
+  },
+  "counts": {
+    "selected": 3,
+    "generated": 3,
+    "skipped": 0,
+    "failed": 0
+  },
+  "harnesses": [
+    {
+      "id": "0",
+      "target_id": "py_sql_injection_routes_account_py_33",
+      "rule_id": "py/sql-injection",
+      "file": "routes/account.py",
+      "start_line": "33",
+      "function_name": "search",
+      "harness": "output/python/realvuln-extremely-vulnerable-flask-app/fuzz_targets/py_sql_injection_routes_account_py_33.py",
+      "oracle": "output/python/realvuln-extremely-vulnerable-flask-app/fuzz_oracles/py_sql_injection_routes_account_py_33.json",
+      "finding_artifact": "output/python/realvuln-extremely-vulnerable-flask-app/verification_results/findings/finding_0_py_sql-injection.json",
+      "corpus": "output/python/realvuln-extremely-vulnerable-flask-app/fuzz_corpus/py_sql_injection_routes_account_py_33",
+      "strategy": "recorded_call",
+      "status": "generated",
+      "seed_count": 6,
+      "errors": ""
+    },
+    {
+      "id": "1",
+      "target_id": "py_unsafe_deserialization_routes_account_py_118",
+      "rule_id": "py/unsafe-deserialization",
+      "file": "routes/account.py",
+      "start_line": "118",
+      "function_name": "before_request",
+      "harness": "output/python/realvuln-extremely-vulnerable-flask-app/fuzz_targets/py_unsafe_deserialization_routes_account_py_118.py",
+      "oracle": "output/python/realvuln-extremely-vulnerable-flask-app/fuzz_oracles/py_unsafe_deserialization_routes_account_py_118.json",
+      "finding_artifact": "output/python/realvuln-extremely-vulnerable-flask-app/verification_results/findings/finding_1_py_unsafe-deserialization.json",
+      "corpus": "output/python/realvuln-extremely-vulnerable-flask-app/fuzz_corpus/py_unsafe_deserialization_routes_account_py_118",
+      "strategy": "recorded_call",
+      "status": "generated",
+      "seed_count": 5,
+      "errors": ""
+    },
+    {
+      "id": "2",
+      "target_id": "py_template_injection_app_py_32",
+      "rule_id": "py/template-injection",
+      "file": "app.py",
+      "start_line": "32",
+      "function_name": "page_not_found",
+      "harness": "output/python/realvuln-extremely-vulnerable-flask-app/fuzz_targets/py_template_injection_app_py_32.py",
+      "oracle": "output/python/realvuln-extremely-vulnerable-flask-app/fuzz_oracles/py_template_injection_app_py_32.json",
+      "finding_artifact": "output/python/realvuln-extremely-vulnerable-flask-app/verification_results/findings/finding_2_py_template-injection.json",
+      "corpus": "output/python/realvuln-extremely-vulnerable-flask-app/fuzz_corpus/py_template_injection_app_py_32",
+      "strategy": "recorded_call",
+      "status": "generated",
+      "seed_count": 6,
+      "errors": ""
+    }
+  ],
+  "errors": []
+}

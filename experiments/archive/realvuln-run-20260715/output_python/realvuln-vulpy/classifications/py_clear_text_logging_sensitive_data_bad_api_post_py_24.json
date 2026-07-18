@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "print statement (line 24) is not dangerous in a test environment"
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "stdout output from print is not observable as persistent state after the function returns"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "N/A"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the print function or capture stdout during execution of cmd_api_client",
+    "capture": "Capture the arguments passed to the print statement on line 24 to verify the api_key is logged in cleartext",
+    "fake_behavior": "Allow execution to continue without actually writing to stdout",
+    "notes": [
+      "The violation is clear-text logging, so the print call itself must be intercepted to observe the sensitive data flow."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

@@ -1,0 +1,51 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "pathlib.Path.mkdir",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "The Path instance (implicit self) representing target.parent, whose string form reveals the full directory path including any traversal components derived from user input 'ref'",
+    "additional_imports": [
+      "pathlib"
+    ]
+  },
+  "oracle_check": {
+    "condition_description": "The captured Path object's string representation contains directory traversal sequences (..) indicating the user-controlled 'ref' parameter escaped BASE_EXPORT_DIR",
+    "trigger_patterns": [
+      "\\.[\\.\\/\\\\]+\\.",
+      "\\.{2}[\\/\\\\]\\.{2}"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_PATH_INJECTION: directory traversal in mkdir path — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "../../etc",
+      "../../../tmp/evil",
+      "..\\..\\windows\\system32",
+      "foo/../../etc/passwd",
+      "normal",
+      "..%2f..%2fetc"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "course_vault_stash_245",
+    "file": "education_lms/course_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def course_vault_stash_245(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "HttpRequest"
+      }
+    ],
+    "target_id": "py_path_injection_education_lms_course_operations_py_81",
+    "finding_id": "0",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/findings/finding_0_py_path-injection.json"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is target.parent.mkdir(parents=True, exist_ok=True) on line 97, a filesystem write operation that is an irreversible side effect"
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "N/A - decision stopped at Q1"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "N/A - decision stopped at Q1"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock pathlib.Path.parent.mkdir or the Path object used in target.parent.mkdir on line 97",
+    "capture": "Capture the full path string passed to mkdir, specifically checking whether it escapes BASE_EXPORT_DIR via traversal sequences like ../ in the user-controlled name parameter",
+    "fake_behavior": "Make the mocked mkdir behave as a no-op (return None) without actually creating directories, allowing execution to continue to the return statement",
+    "notes": [
+      "The return value {'stored': str(target), 'bytes': len(body)} can still be inspected after the mock to verify the injected path appears in the stored key",
+      "Ensure the mock is scoped to the Path instance derived from BASE_EXPORT_DIR / name to avoid affecting unrelated filesystem calls"
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

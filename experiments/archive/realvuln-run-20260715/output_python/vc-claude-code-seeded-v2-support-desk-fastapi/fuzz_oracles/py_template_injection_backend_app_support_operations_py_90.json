@@ -1,0 +1,49 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "backend.app.support_operations.Template",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "template source string passed to Template(), which is 'Result: ' + fragment",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured template source string contains Jinja2 expression or statement delimiters ({{ or {%) beyond any constant prefix, indicating user-controlled fragment was embedded unsanitized into the template source.",
+    "trigger_patterns": [
+      "\\{\\{[^}]",
+      "\\{%[^%]"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_TEMPLATE_INJECTION: unsanitized Jinja2 syntax in template source — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "{{ config }}",
+      "{% for x in ().__class__.__mro__ %}{{ x }}{% endfor %}",
+      "{{ ''.__class__.__mro__[1].__subclasses__() }}",
+      "{{ 7 * 7 }}",
+      "{% if True %}pwned{% endif %}",
+      "{{ request.application.__globals__ }}"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "ticket_jinja_cast_378",
+    "file": "backend/app/support_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def ticket_jinja_cast_378(fragment: str, gate_ref: None)",
+    "tainted_params": [
+      {
+        "name": "fragment",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_template_injection_backend_app_support_operations_py_90",
+    "finding_id": "11",
+    "rule_id": "py/template-injection",
+    "rule_slug": "py_template-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_11_py_template-injection.json"
+  }
+}

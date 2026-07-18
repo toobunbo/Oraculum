@@ -1,0 +1,69 @@
+{
+  "id": "3",
+  "rule_slug": "py_command-line-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-dsvpwa",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvpwa",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvpwa/verification_results/summary_realvuln-dsvpwa_20260714_145612.json"
+  },
+  "finding": {
+    "rule_id": "py/command-line-injection",
+    "message": "This command line depends on a [user-provided value](1).",
+    "file": "dsvpwa/handlers.py",
+    "start_line": 184,
+    "end_line": 184,
+    "repo_name": "realvuln-dsvpwa",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvpwa/realvuln-dsvpwa.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 177: ControlFlowNode for self",
+      "line 184: ControlFlowNode for Subscript"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-78",
+      "CWE-88"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "confidence_score": 0.95,
+    "answers": [
+      "The exact sink is `subprocess.check_output(self.path[1:], shell=True, ...)` on line 184. The command argument is `self.path[1:]`.",
+      "The value `self.path` is assigned on line 198: `self.path = self.path.split('?', 1)[0]`. This is the only assignment to `self.path` that affects the sink.",
+      "The value of `self.path` originates from `self.path` on line 177 (function parameter), which is derived from user input (HTTP request path). The data flow is: user-controlled HTTP path → `self.path` (line 177) → `self.path.split(...)` (line 198) → `self.path[1:]` (line 184).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path. The value flows directly from the user input to the subprocess call.",
+      "There is no specific defense sanitizing the value. No use of `shlex.quote()`, no allow-list, and no safe subprocess invocation pattern (e.g., `shell=False` with a list). The code directly uses `shell=True` with a user-controlled string.",
+      "The user-tainted value `self.path[1:]` reaches the sink `subprocess.check_output` on line 184 without any sanitization or defense. The use of `shell=True` makes this a clear command injection vulnerability."
+    ],
+    "data_flow": "user input (line 177) → self.path.split (line 198) → self.path[1:] (line 184) → subprocess.check_output (line 184)",
+    "timestamp": "2026-07-14T14:56:01.138313",
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cached_input_tokens": 0,
+    "reasoning": "User-controlled input (`self.path`) flows directly into a subprocess call with `shell=True` and no sanitization, creating a command injection vulnerability. The data flow is clear and unmitigated.",
+    "context_needed": [],
+    "input_tokens": 12606,
+    "verdict": "True Positive",
+    "output_tokens": 1280,
+    "tokens_used": 13886,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "elapsed_seconds": 11.493141651153564
+  },
+  "function": {
+    "name": "do_BDR",
+    "file": "dsvpwa/handlers.py",
+    "start_line": 177,
+    "end_line": 194,
+    "scope": "VulnHTTPRequestHandler"
+  },
+  "web_params": []
+}

@@ -1,0 +1,69 @@
+{
+  "id": "6",
+  "rule_slug": "py_clear-text-storage-sensitive-data",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/verification_results/summary_vc-claude-code-seeded-v2-crm-saas-django_20260714_152015.json"
+  },
+  "finding": {
+    "rule_id": "py/clear-text-storage-sensitive-data",
+    "message": "This expression stores [sensitive data (private)](1) as clear text.",
+    "file": "crm_project/partner_console.py",
+    "start_line": 92,
+    "end_line": 92,
+    "repo_name": "vc-claude-code-seeded-v2-crm-saas-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-crm-saas-django/vc-claude-code-seeded-v2-crm-saas-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 92: ControlFlowNode for Attribute()",
+      "line 92: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-312",
+      "CWE-315",
+      "CWE-359"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 4726,
+    "confidence": "High",
+    "iterations": 1,
+    "output_tokens": 335,
+    "context_needed": [],
+    "reasoning": "The code stores sensitive PII (SSN) and credit card data in cleartext JSON files without any encryption or hashing, making it directly readable if the file system is compromised. The data flows directly from the request to the file storage with no sanitization.",
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:19:57.321108",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request.GET.get(\"ssn\") and request.GET.get(\"card\") (line 92) → json.dumps() → target.write_text() (line 92)",
+    "cost_usd": 0.0,
+    "cached_input_tokens": 0,
+    "tokens_used": 5061,
+    "elapsed_seconds": 3.040672540664673,
+    "confidence_score": 0.95,
+    "answers": [
+      "The sensitive data being stored includes PII (SSN) and credit card information (line 92).",
+      "The data is stored in a file on the filesystem, specifically in a JSON file under BASE_EXPORT_DIR (line 90-92).",
+      "The data is not encrypted or hashed before storage; it is stored in cleartext as part of a JSON dump (line 92).",
+      "Yes, an attacker with access to the storage medium (file system) could read the sensitive data directly from the JSON file (line 92).",
+      "The storage is reachable in production as it is part of a web request handler (line 86) and writes to a directory that appears to be for exports (line 90).",
+      "The blast radius is high as exposure of SSN and credit card information can lead to identity theft, financial fraud, and regulatory violations."
+    ]
+  },
+  "function": {
+    "name": "acct_vault_stash_233",
+    "file": "crm_project/partner_console.py",
+    "start_line": 86,
+    "end_line": 93,
+    "scope": ""
+  },
+  "web_params": []
+}

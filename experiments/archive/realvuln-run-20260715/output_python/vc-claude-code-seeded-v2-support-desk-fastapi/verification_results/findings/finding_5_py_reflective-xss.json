@@ -1,0 +1,70 @@
+{
+  "id": "5",
+  "rule_slug": "py_reflective-xss",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/summary_vc-claude-code-seeded-v2-support-desk-fastapi_20260714_153638.json"
+  },
+  "finding": {
+    "rule_id": "py/reflective-xss",
+    "message": "Cross-site scripting vulnerability due to a [user-provided value](1).",
+    "file": "backend/app/support_operations.py",
+    "start_line": 25,
+    "end_line": 25,
+    "repo_name": "vc-claude-code-seeded-v2-support-desk-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/vc-claude-code-seeded-v2-support-desk-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 23: ControlFlowNode for copyline",
+      "line 24: ControlFlowNode for body",
+      "line 25: ControlFlowNode for body"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 12426,
+    "cached_input_tokens": 0,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "reasoning": "User-controlled input `copyline` is directly embedded into an HTML string and returned via `HTMLResponse` without escaping or sanitization. Even though the exact implementation of `HTMLResponse` is not visible, the pattern of concatenating user input directly into HTML markup and returning it as an HTML response is a classic XSS vulnerability.",
+    "verdict": "True Positive",
+    "confidence_score": 0.9,
+    "output_tokens": 1187,
+    "tokens_used": 13613,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "answers": [
+      "The EXACT sink is `return HTMLResponse(body)` on line 25. The value being rendered is `body`.",
+      "The assignment to `body` is on line 24: `body = \"<section><h2>\" + copyline + \"</h2><p>Preview generated for operations.</p></section>\"`. This is the ONLY assignment on the path to the sink.",
+      "The value of `body` derives from `copyline` which is a user-provided query parameter. The data-flow chain is: `copyline` (line 23, SOURCE) → `body` (line 24, TRANSFORM) → `HTMLResponse(body)` (line 25, SINK).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is NO specific defense such as `html.escape()`, `markupsafe.escape()`, or any framework auto-escape mechanism applied to `body` or `copyline` before rendering. The code directly concatenates the user input into an HTML string and returns it via `HTMLResponse` without escaping.",
+      "The code does NOT use `|safe`, `{% autoescape false %}`, `Markup(...)`, or `mark_safe(...)` to disable escaping. However, the absence of escaping is itself the issue here.",
+      "The user-tainted value `copyline` reaches the sink `HTMLResponse(body)` without any escaping or sanitization. The additional context confirms that we cannot determine if `HTMLResponse` provides any automatic escaping, but the pattern of directly concatenating user input into HTML and returning it is inherently dangerous."
+    ],
+    "elapsed_seconds": 13.987965822219849,
+    "timestamp": "2026-07-14T15:36:27.890407",
+    "context_needed": [],
+    "iterations": 3,
+    "data_flow": "copyline (line 23) → body (line 24) → HTMLResponse(body) (line 25)"
+  },
+  "function": {
+    "name": "ticket_copy_badge_028",
+    "file": "backend/app/support_operations.py",
+    "start_line": 23,
+    "end_line": 25,
+    "scope": ""
+  },
+  "web_params": []
+}

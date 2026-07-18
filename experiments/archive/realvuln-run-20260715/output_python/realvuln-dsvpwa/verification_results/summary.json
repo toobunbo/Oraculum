@@ -1,0 +1,58 @@
+{
+  "stage": "ingest",
+  "repo": "realvuln-dsvpwa",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-dsvpwa",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvpwa",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dsvpwa/verification_results/summary_realvuln-dsvpwa_20260714_145612.json"
+  },
+  "counts": {
+    "total_verdicts": 5,
+    "selected": 5,
+    "enriched": 5,
+    "skipped": 0,
+    "failed": 0
+  },
+  "findings": [
+    {
+      "id": "0",
+      "rule_id": "py/http-response-splitting",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dsvpwa/verification_results/findings/finding_0_py_http-response-splitting.json",
+      "function_name": "do_GET"
+    },
+    {
+      "id": "1",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dsvpwa/verification_results/findings/finding_1_py_path-injection.json",
+      "function_name": "find"
+    },
+    {
+      "id": "2",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dsvpwa/verification_results/findings/finding_2_py_path-injection.json",
+      "function_name": "find"
+    },
+    {
+      "id": "3",
+      "rule_id": "py/command-line-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dsvpwa/verification_results/findings/finding_3_py_command-line-injection.json",
+      "function_name": "do_BDR"
+    },
+    {
+      "id": "4",
+      "rule_id": "py/insecure-protocol",
+      "verdict": "True Positive",
+      "artifact": "output/python/realvuln-dsvpwa/verification_results/findings/finding_4_py_insecure-protocol.json",
+      "function_name": "main"
+    }
+  ],
+  "errors": []
+}

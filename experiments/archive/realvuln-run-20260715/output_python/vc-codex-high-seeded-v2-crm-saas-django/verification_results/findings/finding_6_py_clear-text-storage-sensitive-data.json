@@ -1,0 +1,69 @@
+{
+  "id": "6",
+  "rule_slug": "py_clear-text-storage-sensitive-data",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/summary_vc-codex-high-seeded-v2-crm-saas-django_20260714_153817.json"
+  },
+  "finding": {
+    "rule_id": "py/clear-text-storage-sensitive-data",
+    "message": "This expression stores [sensitive data (private)](1) as clear text.",
+    "file": "config/partner_console.py",
+    "start_line": 92,
+    "end_line": 92,
+    "repo_name": "vc-codex-high-seeded-v2-crm-saas-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-crm-saas-django/vc-codex-high-seeded-v2-crm-saas-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 92: ControlFlowNode for Attribute()",
+      "line 92: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-312",
+      "CWE-315",
+      "CWE-359"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "verdict": "True Positive",
+    "answers": [
+      "The sensitive data being stored includes a Social Security Number (SSN) and a credit card number (line 92).",
+      "The data is stored in a file, specifically a JSON file constructed using the 'ref' parameter and saved to a directory defined by BASE_EXPORT_DIR (line 90-92).",
+      "No, the data is not encrypted or hashed before storage; it is stored in cleartext as part of a JSON dump (line 92).",
+      "Yes, an attacker with access to the file system or a backup containing the file could read the sensitive data directly since it's stored in cleartext (line 92).",
+      "Not visible in provided context, but the function is a Django-style view (based on request object usage), and such views are typically reachable if exposed by a route. No explicit indication it's test-only.",
+      "The blast radius is high as exposure of SSN and credit card numbers can lead to identity theft, financial fraud, and regulatory violations (line 92)."
+    ],
+    "reasoning": "The code stores sensitive PII (SSN) and financial data (credit card number) in cleartext in a file without any encryption or hashing. An attacker with file access can directly read this data, constituting a clear violation of CWE-312 (Cleartext Storage of Sensitive Information).",
+    "elapsed_seconds": 3.2401511669158936,
+    "context_needed": [],
+    "tokens_used": 5099,
+    "output_tokens": 381,
+    "cached_input_tokens": 0,
+    "input_tokens": 4718,
+    "timestamp": "2026-07-14T15:37:48.920518",
+    "data_flow": "request.GET.get(\"ssn\") and request.GET.get(\"card\") (line 92) → json.dumps(...) (line 92) → target.write_text(...) (line 92)",
+    "iterations": 1,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence_score": 0.95
+  },
+  "function": {
+    "name": "acct_vault_stash_244",
+    "file": "config/partner_console.py",
+    "start_line": 86,
+    "end_line": 93,
+    "scope": ""
+  },
+  "web_params": []
+}

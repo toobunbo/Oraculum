@@ -1,0 +1,72 @@
+{
+  "id": "9",
+  "rule_slug": "py_command-line-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/summary_vc-claude-code-seeded-v2-hr-payroll-django_20260714_152802.json"
+  },
+  "finding": {
+    "rule_id": "py/command-line-injection",
+    "message": "This command line depends on a [user-provided value](1).",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 156,
+    "end_line": 156,
+    "repo_name": "vc-claude-code-seeded-v2-hr-payroll-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/vc-claude-code-seeded-v2-hr-payroll-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 151: ControlFlowNode for request",
+      "line 155: ControlFlowNode for Attribute",
+      "line 155: ControlFlowNode for Attribute()",
+      "line 155: ControlFlowNode for host",
+      "line 156: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-78",
+      "CWE-88"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "data_flow": "request (line 151) → request.GET.get(\"host\", \"127.0.0.1\") (line 155) → \"ping -c 1 \" + host (line 156) → _os.system(...) (line 156)",
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "tokens_used": 13270,
+    "timestamp": "2026-07-14T15:27:52.139849",
+    "input_tokens": 12015,
+    "output_tokens": 1255,
+    "confidence_score": 0.95,
+    "elapsed_seconds": 9.96915340423584,
+    "reasoning": "User-controlled input (`host`) is directly concatenated into a shell command string and executed via `os.system`, with no sanitization or defense. The additional context does not reveal any protective measures, and the request object follows standard patterns for HTTP request handling.",
+    "cost_usd": 0.0,
+    "answers": [
+      "The EXACT sink is `_os.system(\"ping -c 1 \" + host)` on line 156. The value passed as the command argument is the string `\"ping -c 1 \" + host`.",
+      "The only assignment to `host` is on line 155: `host = request.GET.get(\"host\", \"127.0.0.1\")`.",
+      "The value of `host` derives from user input via `request.GET.get(\"host\", \"127.0.0.1\")`, which retrieves the `host` parameter from the HTTP GET request. This is confirmed by the data-flow path from `request` (line 151) to `host` (line 155). The request object follows standard Django/Flask naming conventions for HTTP request objects.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value of `host` on the path to the sink. The functions `_wrk_gate` and `_nope` are not shown to provide any sanitization or safe handling of the input.",
+      "There is no specific defense such as `shlex.quote()` or use of a subprocess list API (`shell=False`). The code directly concatenates the user-provided `host` into a shell command string without any sanitization.",
+      "The user-tainted value `host` reaches the sink `_os.system(...)` on line 156 without any sanitization or defense mechanisms. The additional context does not show any protective measures in `_wrk_gate` or `_nope`."
+    ],
+    "cached_input_tokens": 0,
+    "context_needed": []
+  },
+  "function": {
+    "name": "payroll_shell_probe_402",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 151,
+    "end_line": 157,
+    "scope": ""
+  },
+  "web_params": []
+}

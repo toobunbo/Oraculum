@@ -1,0 +1,1 @@
+amount.__class__.__mro__[1].__subclasses__()[X].__init__.__globals__

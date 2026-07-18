@@ -1,0 +1,76 @@
+{
+  "id": "1",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/summary_vc-codex-high-seeded-v2-education-lms-django_20260714_154006.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "education_lms/course_operations.py",
+    "start_line": 82,
+    "end_line": 82,
+    "repo_name": "vc-codex-high-seeded-v2-education-lms-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/vc-codex-high-seeded-v2-education-lms-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 76: ControlFlowNode for request",
+      "line 79: ControlFlowNode for Attribute",
+      "line 79: ControlFlowNode for Attribute()",
+      "line 79: ControlFlowNode for ref",
+      "line 80: ControlFlowNode for target",
+      "line 82: ControlFlowNode for target"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:39:38.322490",
+    "confidence": "High",
+    "confidence_score": 0.9,
+    "iterations": 3,
+    "tokens_used": 19100,
+    "cost_usd": 0.0,
+    "answers": [
+      "The exact file-operation sink is `target.write_text(...)` on line 82. The path value passed to it is `target`, which is derived from `BASE_EXPORT_DIR / f\"{ref}.json\"` on line 80.",
+      "The path value `target` is assigned on line 80: `target = BASE_EXPORT_DIR / f\"{ref}.json\"`. The variable `ref` used in this assignment is assigned on line 79: `ref = request.GET.get(\"ref\", \"daily\")`.",
+      "The value of `ref` on line 79 derives from user input via `request.GET.get(\"ref\", \"daily\")`. This means `ref` is directly sourced from the `ref` query parameter in the HTTP request, making it user-controllable. The data flow is: `request.GET.get(\"ref\", \"daily\")` (line 79) → `ref` (line 79) → `f\"{ref}.json\"` (line 80) → `target` (line 80) → `target.write_text(...)` (line 82).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value of `ref` on the path to the sink. No defensive code is present that would neutralize or constrain the user input before it is used in the file path.",
+      "There is no specific defense mechanism in place to contain the path. No sanitization, validation, or path resolution checks (e.g., `Path.resolve()`, `os.path.commonpath`, or `secure_filename`) are applied to `ref` or the resulting `target` path. The value of `BASE_EXPORT_DIR` is unknown, so we cannot determine if it provides any containment.",
+      "The user-tainted value `ref` from `request.GET` flows directly into the file path used by `target.write_text(...)` without any sanitization or validation. No defense mechanism is visible to prevent directory traversal or path manipulation. Since `BASE_EXPORT_DIR` is not visible, we cannot confirm if it provides adequate protection."
+    ],
+    "context_needed": [],
+    "verdict": "True Positive",
+    "data_flow": "request.GET.get(\"ref\", \"daily\") (line 79) → ref (line 79) → f\"{ref}.json\" (line 80) → target (line 80) → target.write_text(...) (line 82)",
+    "elapsed_seconds": 12.933416604995728,
+    "reasoning": "User-controlled input `ref` is used directly in a file path without sanitization or validation, allowing potential directory traversal. The data flow from source to sink is clear and exploitable. The unknown value of `BASE_EXPORT_DIR` does not provide sufficient evidence of protection.",
+    "cached_input_tokens": 0,
+    "output_tokens": 1652,
+    "input_tokens": 17448,
+    "model": "ollama_chat/qwen3-coder:480b-cloud"
+  },
+  "function": {
+    "name": "course_vault_stash_245",
+    "file": "education_lms/course_operations.py",
+    "start_line": 76,
+    "end_line": 83,
+    "scope": ""
+  },
+  "web_params": []
+}

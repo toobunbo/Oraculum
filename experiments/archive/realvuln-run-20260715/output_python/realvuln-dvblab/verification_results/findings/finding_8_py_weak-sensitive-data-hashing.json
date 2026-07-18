@@ -1,0 +1,75 @@
+{
+  "id": "8",
+  "rule_slug": "py_weak-sensitive-data-hashing",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-dvblab",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab/verification_results/summary_realvuln-dvblab_20260714_145756.json"
+  },
+  "finding": {
+    "rule_id": "py/weak-sensitive-data-hashing",
+    "message": "[Sensitive data (password)](1) is used in a hashing algorithm (MD5) that is insecure for password hashing, since it is not a computationally expensive hash function.\n[Sensitive data (password)](2) is used in a hashing algorithm (MD5) that is insecure for password hashing, since it is not a computationally expensive hash function.",
+    "file": "backend/models.py",
+    "start_line": 24,
+    "end_line": 24,
+    "repo_name": "realvuln-dvblab",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab/realvuln-dvblab.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 176: ControlFlowNode for Subscript",
+      "line 23: ControlFlowNode for password",
+      "line 24: ControlFlowNode for Attribute()",
+      "--- Flow 2 ---",
+      "line 23: ControlFlowNode for password",
+      "line 24: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-327",
+      "CWE-328",
+      "CWE-916"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "The code uses MD5 for password hashing which is insecure due to its lack of computational cost and vulnerability to collision and preimage attacks. It is used in a security-sensitive context (password storage and verification), and no adequate defense (e.g., salt, slow hash) is present. The additional context did not reveal any mitigating factors.",
+    "elapsed_seconds": 23.52307939529419,
+    "answers": [
+      "The EXACT crypto call is `hashlib.md5(password.encode()).hexdigest()` on line 24. The algorithm is MD5.",
+      "The algorithm name is specified via a direct call to `hashlib.md5`, which is a hardcoded reference to the MD5 hashing function. Quote: `hashlib.md5(...)` on line 24.",
+      "The output of the MD5 hash is used for password storage in the `set_password` method (line 24) and password verification in the `check_password` method (line 27). This is a SECURITY use-case: password hashing for authentication. Quote: `self.password_hash = hashlib.md5(password.encode()).hexdigest()` (line 24) and `return self.password_hash == hashlib.md5(password.encode()).hexdigest()` (line 27).",
+      "Yes, collision resistance is required here because the hash is used for password authentication. MD5 is broken for collision resistance and is also vulnerable to preimage attacks, making it insecure for password hashing.",
+      "There is NO adequate defense or safe alternative present. The code uses plain MD5 without salt or computational cost, which is insecure for password hashing. The required defense would be to use a secure password hashing algorithm like `bcrypt`, `argon2`, `scrypt`, or `pbkdf2_hmac` with sufficient iterations.",
+      "Not visible in provided context.",
+      "The code is used for password hashing (a SECURITY use-case) and uses MD5 without any visible defenses like salt or a slow hashing function. Therefore, it is a real vulnerability."
+    ],
+    "cached_input_tokens": 0,
+    "tokens_used": 15100,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence_score": 0.95,
+    "timestamp": "2026-07-14T14:57:56.386151",
+    "context_needed": [],
+    "data_flow": "password (line 23) → hashlib.md5(password.encode()).hexdigest() (line 24) → self.password_hash (line 24)",
+    "output_tokens": 1446,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "iterations": 3,
+    "verdict": "True Positive",
+    "input_tokens": 13654
+  },
+  "function": {
+    "name": "set_password",
+    "file": "backend/models.py",
+    "start_line": 23,
+    "end_line": 24,
+    "scope": "User"
+  },
+  "web_params": []
+}

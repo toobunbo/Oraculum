@@ -1,0 +1,76 @@
+{
+  "id": "2",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/summary_vc-codex-high-seeded-v2-education-lms-django_20260714_154006.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "education_lms/course_operations.py",
+    "start_line": 140,
+    "end_line": 140,
+    "repo_name": "vc-codex-high-seeded-v2-education-lms-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/vc-codex-high-seeded-v2-education-lms-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 135: ControlFlowNode for request",
+      "line 138: ControlFlowNode for Attribute",
+      "line 138: ControlFlowNode for Attribute()",
+      "line 138: ControlFlowNode for name",
+      "line 139: ControlFlowNode for target",
+      "line 140: ControlFlowNode for Attribute"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:39:44.362261",
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "iterations": 3,
+    "tokens_used": 13829,
+    "cost_usd": 0.0,
+    "answers": [
+      "The EXACT flagged line is: `target.parent.mkdir(parents=True, exist_ok=True)` on line 140. This line resides in the function `course_dock_shelf_593`.",
+      "The path value passed to the sink is `target.parent`, where `target` is assigned on line 139 as `BASE_EXPORT_DIR / name`. The value of `name` originates from user input via `request.GET.get(\"name\", \"packet.bin\")` on line 138.",
+      "The user-tainted value `name` flows directly into the path construction without any reassignment or sanitization. No constant-time conditions override the user input.",
+      "No specific defense (e.g., `secure_filename`, `Path.resolve()`, or `is_relative_to`) is applied to the path.",
+      "The user-tainted value `name` flows directly into the path construction and is used in a filesystem operation (`mkdir`) without sanitization.",
+      "The user-tainted value reaches the sink, and no defense is visible in the provided code."
+    ],
+    "context_needed": [],
+    "verdict": "True Positive",
+    "data_flow": "request (line 135) → request.GET.get(\"name\", ...) (line 138) → name (line 138) → target = BASE_EXPORT_DIR / name (line 139) → target.parent.mkdir(...) (line 140)",
+    "elapsed_seconds": 17.157460927963257,
+    "reasoning": "User-controlled input (`name`) is used to construct a file path without sanitization or validation, allowing potential directory traversal. The path is then used in a filesystem operation (`mkdir`), which confirms the vulnerability. The additional context does not provide any safeguards or indicate that `BASE_EXPORT_DIR` mitigates the risk.",
+    "cached_input_tokens": 0,
+    "output_tokens": 1273,
+    "input_tokens": 12556,
+    "model": "ollama_chat/qwen3-coder:480b-cloud"
+  },
+  "function": {
+    "name": "course_dock_shelf_593",
+    "file": "education_lms/course_operations.py",
+    "start_line": 135,
+    "end_line": 142,
+    "scope": ""
+  },
+  "web_params": []
+}

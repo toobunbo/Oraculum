@@ -58,7 +58,7 @@ def cmd_ingest(args: argparse.Namespace) -> int:
         f"failed={result.failed}"
     )
     print(f"Output: {result.summary_path}")
-    return 0 if result.ok else 1
+    return 0 if result.enriched > 0 else 1
 
 
 def cmd_classify(args: argparse.Namespace) -> int:

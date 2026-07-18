@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "strategy": "return_value",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "Sink is web.Response(text=template, content_type='text/html') which constructs an in-memory HTTP response object without network I/O, shell execution, or irreversible side effects."
+    },
+    "q2_observable_after_return": {
+      "answer": true,
+      "evidence": "The tainted template is embedded in the returned web.Response object, so the unsanitized user input is inspectable on the returned value."
+    },
+    "q3_result_in_memory": {
+      "answer": true,
+      "evidence": "returns.kind is 'value' with exprs ['_view']; the web.Response object is returned and its .text attribute holds the concatenated XSS payload."
+    }
+  },
+  "mock_guidance": null,
+  "confidence": "high",
+  "warnings": []
+}

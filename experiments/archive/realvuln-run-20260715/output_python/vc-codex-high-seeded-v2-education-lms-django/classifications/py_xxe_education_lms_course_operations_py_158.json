@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Parser configured with load_dtd=True, resolve_entities=True, no_network=False enables network I/O and external entity resolution during etree.fromstring call on line 158."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock or wrap etree.fromstring (or the XMLParser) to intercept the parse call on line 158.",
+    "capture": "Capture the full request.body bytes/text passed to etree.fromstring and the parser configuration (load_dtd, resolve_entities, no_network flags) so the harness can verify malicious payloads reach the sink.",
+    "fake_behavior": "Return a safe, minimal lxml Element (e.g., etree.Element('safe_root')) so that subsequent code referencing doc.tag does not crash, while preventing any DTD loading, entity resolution, or network access.",
+    "notes": [
+      "The parser is created with unsafe flags on line 157; mocking XMLParser itself to force no_network=True, load_dtd=False, resolve_entities=False is an alternative approach.",
+      "Ensure the mock does not suppress the data-flow signal — the harness must still detect that user-controlled input reached the parse sink."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

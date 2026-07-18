@@ -1,0 +1,48 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "pathlib.Path.mkdir",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "the Path object (self) representing target.parent, to check whether its string representation contains directory traversal sequences like '../'",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured Path object's string representation contains '../' or '..\\' indicating the user-provided name caused the path to escape BASE_EXPORT_DIR",
+    "trigger_patterns": [
+      "\\.{2}[/\\\\]"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_PATH-INJECTION: directory traversal detected in mkdir path — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "../../../etc/evil",
+      "../../tmp/x",
+      "../escape_dir",
+      "foo/../../bar",
+      "a/../../../b/c",
+      "..\\..\\windows"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "payroll_dock_shelf_391",
+    "file": "hr_portal/payroll_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def payroll_dock_shelf_391(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "request"
+      }
+    ],
+    "target_id": "py_path_injection_hr_portal_payroll_operations_py_147",
+    "finding_id": "4",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_4_py_path-injection.json"
+  }
+}

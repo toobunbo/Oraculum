@@ -1,0 +1,72 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "target": "flask.redirect",
+    "capture": {
+      "argument_index": 0,
+      "name": "location"
+    },
+    "patch_target": "flask.redirect",
+    "target_arg_index": 0,
+    "target_arg_name": "location",
+    "capture_what": "location",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "predicate": "captured_args[0] contains taint from request.cookies.get('BenchmarkTest00068')",
+    "regex": null,
+    "condition_description": "captured_args[0] contains taint from request.cookies.get('BenchmarkTest00068')",
+    "trigger_patterns": [
+      "[\\s\\S]+"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "ORACULUM_VIOLATION: captured={captured}"
+  },
+  "fuzz_guidance": {
+    "input_type": "flask_view",
+    "sink_trigger": "flask.redirect(bar)",
+    "taint_source": "request.cookies.get('BenchmarkTest00068')",
+    "expected_flow": "cookie → unquote_plus → map43804[key] → bar → redirect(location)",
+    "seed_corpus": [],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "aliasing_risks": [
+      "flask.redirect may be aliased as 'redirect' or imported from flask.shortcuts",
+      "Ensure mock applies to the fully qualified name 'flask.redirect' and common aliases"
+    ],
+    "import_risks": [
+      "The actual redirect call is not visible in the provided snippet; verify the import style (e.g., from flask import redirect)"
+    ],
+    "async_risks": null,
+    "classification_strategy": "recorded_call",
+    "classification_confidence": "high",
+    "mock_guidance": {
+      "required": true,
+      "target": "flask.redirect call",
+      "capture": "the 'bar' argument passed to flask.redirect",
+      "fake_behavior": "Stub the redirect to avoid actual HTTP redirection while capturing the URL for verification",
+      "notes": [
+        "Ensure the mock captures the user-controlled input path to validate that tainted data reaches the redirect sink",
+        "The redirect should not execute in test environments to prevent unintended external requests"
+      ]
+    },
+    "target_id": "py_url_redirection_testcode_BenchmarkTest00068_py_49",
+    "finding_id": "26",
+    "rule_id": "py/url-redirection",
+    "rule_slug": "py_url-redirection",
+    "file": "testcode/BenchmarkTest00068.py",
+    "function": "BenchmarkTest00068_post",
+    "input_strategy": "flask_view",
+    "function_signature": "def BenchmarkTest00068_post()",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": -1,
+        "type": "flask_request"
+      }
+    ],
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "output/python/benchmark-python/verification_results/findings/finding_26_py_url-redirection.json"
+  }
+}

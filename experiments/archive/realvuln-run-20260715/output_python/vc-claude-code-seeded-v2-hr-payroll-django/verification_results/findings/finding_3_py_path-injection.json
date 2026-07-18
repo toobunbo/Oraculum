@@ -1,0 +1,76 @@
+{
+  "id": "3",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/summary_vc-claude-code-seeded-v2-hr-payroll-django_20260714_152802.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 42,
+    "end_line": 42,
+    "repo_name": "vc-claude-code-seeded-v2-hr-payroll-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/vc-claude-code-seeded-v2-hr-payroll-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 36: ControlFlowNode for request",
+      "line 39: ControlFlowNode for Attribute",
+      "line 39: ControlFlowNode for Attribute()",
+      "line 39: ControlFlowNode for packet_ref",
+      "line 40: ControlFlowNode for parcel_path",
+      "line 42: ControlFlowNode for parcel_path"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "data_flow": "request.GET.get(\"packet_ref\", ...) (line 39) → parcel_path = BASE_EXPORT_DIR / packet_ref (line 40) → parcel_path.read_text() (line 42)",
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "tokens_used": 13696,
+    "timestamp": "2026-07-14T15:27:36.020282",
+    "input_tokens": 12660,
+    "output_tokens": 1036,
+    "confidence_score": 0.95,
+    "elapsed_seconds": 10.140413761138916,
+    "reasoning": "User-controlled input `packet_ref` from `request.GET` is used to construct a file path `parcel_path` which is then read directly without any sanitization or validation, allowing for potential directory traversal. The missing context does not provide any evidence of defenses being in place.",
+    "cost_usd": 0.0,
+    "answers": [
+      "The exact file-operation sink is `parcel_path.read_text()` on line 42. The path value passed to it is `parcel_path`.",
+      "The assignments to `parcel_path` are: line 40: `parcel_path = BASE_EXPORT_DIR / packet_ref`.",
+      "The value of `parcel_path` derives from `packet_ref` which is assigned on line 39: `packet_ref = request.GET.get(\"packet_ref\", \"payroll-summary.csv\")`. This derives from user input via `request.GET`.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense that contains the path. The code does not use any of the mentioned defenses like `secure_filename`, `Path.resolve()` with `is_relative_to()`, or `relative_to()`.",
+      "The user-tainted value `packet_ref` from `request.GET` reaches the sink `parcel_path.read_text()` on line 42 without any sanitization or defense. The additional context does not change this conclusion as we still cannot see the caller or the definition of `BASE_EXPORT_DIR`."
+    ],
+    "cached_input_tokens": 0,
+    "context_needed": []
+  },
+  "function": {
+    "name": "payroll_fold_drop_014",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 36,
+    "end_line": 45,
+    "scope": ""
+  },
+  "web_params": []
+}

@@ -1,0 +1,69 @@
+{
+  "id": "0",
+  "rule_slug": "py_template-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-python-insecure-app",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-python-insecure-app",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-python-insecure-app/verification_results/summary_realvuln-python-insecure-app_20260714_150522.json"
+  },
+  "finding": {
+    "rule_id": "py/template-injection",
+    "message": "This template construction depends on a [user-provided value](1).",
+    "file": "app/main.py",
+    "start_line": 41,
+    "end_line": 41,
+    "repo_name": "realvuln-python-insecure-app",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-python-insecure-app/realvuln-python-insecure-app.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 19: ControlFlowNode for name",
+      "line 37: ControlFlowNode for name",
+      "line 38: ControlFlowNode for content",
+      "line 41: ControlFlowNode for content"
+    ],
+    "severity": "9.3",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-74"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "context_needed": [],
+    "input_tokens": 13334,
+    "iterations": 3,
+    "confidence": "High",
+    "data_flow": "user input `name` (line 19) → `name` reassigned (line 37) → `content` constructed (line 38) → `Template(content).render()` (line 41)",
+    "elapsed_seconds": 11.662019729614258,
+    "timestamp": "2026-07-14T15:05:22.659732",
+    "confidence_score": 0.95,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "output_tokens": 1491,
+    "cached_input_tokens": 0,
+    "verdict": "True Positive",
+    "answers": [
+      "The exact template-render sink is `Template(content).render()` on line 41. The template-source string passed to it is `content`.",
+      "The template-source string `content` is assigned on line 38: `content = f\"<h1>Hello, {name}!</h1><h2>Public IP: <code>{public_ip}</code></h2>\"`. This is the only assignment to `content` on the path reaching the sink.",
+      "The value of `content` derives from user input. The `name` variable on line 19 is a query parameter (`name: str = config.SUPER_SECRET_NAME`), which is user-provided input. It flows to line 37 (`name = name or config.SUPER_SECRET_NAME`), and then to line 38 where it is embedded into the `content` string. The data-flow chain is: line 19 (user input `name`) → line 37 (reassigned `name`) → line 38 (`content` string construction).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path. The `name` variable can be provided by the user, and if it is, it will be used in the `content` string.",
+      "There is no specific defense preventing SSTI. The user-controlled `name` is directly embedded into the template source string `content`, which is then passed to `Template(content).render()`. This is a direct SSTI vulnerability as the template source itself is tainted. No sandboxing, escaping, or variable-isolation mechanisms are applied.",
+      "User-controlled data (`name`) reaches the template SOURCE (`content`) with concrete line numbers (19 → 37 → 38), and there is no defense such as sandboxing or variable isolation. The template engine is invoked directly on a dynamically constructed string that includes user input."
+    ],
+    "cost_usd": 0.0,
+    "reasoning": "User-provided input `name` is embedded directly into the template source string `content` on line 38, which is then passed to `jinja2.Template().render()` on line 41. There is no sanitization or sandboxing to prevent template injection, making this a clear SSTI vulnerability. The additional context confirms that there are no callers visible, but the function is a FastAPI endpoint, meaning the `name` parameter is directly controllable by users via query parameters.",
+    "tokens_used": 14825
+  },
+  "function": {
+    "name": "try_hack_me",
+    "file": "app/main.py",
+    "start_line": 19,
+    "end_line": 41,
+    "scope": ""
+  },
+  "web_params": []
+}

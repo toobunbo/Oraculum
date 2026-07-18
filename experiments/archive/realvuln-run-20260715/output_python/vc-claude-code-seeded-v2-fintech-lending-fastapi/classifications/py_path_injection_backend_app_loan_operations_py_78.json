@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is target.write_text(...) on line 78, a file write operation which is an irreversible side effect."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; decision terminated at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; decision terminated at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the write_text method on the pathlib.Path object 'target' (line 78).",
+    "capture": "Capture the path string passed to write_text's receiver (i.e., str(target)) to verify it contains the unsanitized user input 'ref' and check for directory traversal sequences like '..'.",
+    "fake_behavior": "Make the mocked write_text a no-op that returns None, allowing execution to continue to the return statement.",
+    "notes": [
+      "The function returns {'path': str(target)}, so after mocking write_text, also inspect the return value to confirm the tainted path is exposed.",
+      "Alternatively, patch BASE_EXPORT_DIR to a temporary directory if the test needs to verify actual file behavior safely, but mocking write_text is simpler and avoids any filesystem side effects."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

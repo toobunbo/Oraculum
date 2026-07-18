@@ -1,0 +1,44 @@
+{
+  "monitor": {
+    "strategy": "filesystem_state",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "files created or modified during execution — note: the actual vulnerability is reflective XSS via HTMLResponse, not a filesystem operation, so this monitor is expected to be a no-op for this finding",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "No filesystem writes occur in this function; the sink is HTMLResponse (XSS), not a file I/O call. The filesystem_state monitor will never trigger for this vulnerability class.",
+    "trigger_patterns": [],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_REFLECTIVE_XSS: file written outside boundary — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "<script>alert(1)</script>",
+      "<img src=x onerror=alert(1)>",
+      "\"\"><script>document.cookie</script>",
+      "'>alert(String.fromCharCode(88,83,83))<'"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "get_trigger_view",
+    "file": "src/vulnpy/fastapi/vulnerable.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def get_trigger_view(name, trigger)",
+    "tainted_params": [
+      {
+        "name": "trigger",
+        "index": 1,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_reflective_xss_src_vulnpy_fastapi_vulnerable_py_44",
+    "finding_id": "2",
+    "rule_id": "py/reflective-xss",
+    "rule_slug": "py_reflective-xss",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-vulnpy/verification_results/findings/finding_2_py_reflective-xss.json"
+  }
+}

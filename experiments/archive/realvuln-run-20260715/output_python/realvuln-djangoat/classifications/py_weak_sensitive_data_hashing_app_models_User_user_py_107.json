@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "hashlib.md5 is a local in-memory hash computation with no network, shell, DB, or external side effects"
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "Function returns only 'auth' (a boolean auth result); the MD5 algorithm choice is not exposed in the return value"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; decision terminated at Q2"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock or wrap hashlib.md5 to intercept the call on line 107",
+    "capture": "Record which hashlib algorithm function was invoked (e.g., md5 vs sha256) and the input being hashed to confirm the weak algorithm usage",
+    "fake_behavior": "Allow the mocked md5 to behave normally (compute and return the digest) so authentication logic proceeds, but log the algorithm name for assertion",
+    "notes": [
+      "The violation is the choice of algorithm, not the output value, so the mock must capture the algorithm identifier.",
+      "Consider patching hashlib.md5 at the module level or wrapping the hashlib.new entrypoint to capture the algorithm name string."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

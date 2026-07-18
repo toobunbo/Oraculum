@@ -1,0 +1,67 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "target": "flask.redirect",
+    "capture": {
+      "argument_index": 0,
+      "argument_name": null
+    },
+    "patch_target": "flask.redirect",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "captured value",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "predicate": {
+      "type": "regex",
+      "pattern": "^(https?://|//)",
+      "match_full_value": true
+    },
+    "condition_description": "{'type': 'regex', 'pattern': '^(https?://|//)', 'match_full_value': True}",
+    "trigger_patterns": [
+      "[\\s\\S]+"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "ORACULUM_VIOLATION: captured={captured}"
+  },
+  "fuzz_guidance": {
+    "sink_fake_behavior": "return a mock Response object with status 302 and Location header set to the captured URL, without performing actual redirection",
+    "seed_corpus": [],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "aliasing_risk": "flask.redirect may be aliased as 'redirect' or imported from flask.helpers; mock must cover common import patterns",
+    "import_risk": "ensure mock applies to both 'from flask import redirect' and 'import flask' usage patterns",
+    "async_risk": null,
+    "classification_strategy": "recorded_call",
+    "classification_confidence": "high",
+    "mock_guidance": {
+      "required": true,
+      "target": "flask.redirect call",
+      "capture": "the 'bar' argument passed to flask.redirect",
+      "fake_behavior": "stub the redirect to return a mock response object without performing actual redirection",
+      "notes": [
+        "Mocking flask.redirect prevents actual HTTP redirection during testing while capturing the URL value for verification",
+        "The base64 encoding/decoding chain should be preserved in the test to validate the data flow"
+      ]
+    },
+    "target_id": "py_url_redirection_testcode_BenchmarkTest00067_py_47",
+    "finding_id": "25",
+    "rule_id": "py/url-redirection",
+    "rule_slug": "py_url-redirection",
+    "file": "testcode/BenchmarkTest00067.py",
+    "function": "BenchmarkTest00067_post",
+    "input_strategy": "flask_view",
+    "function_signature": "def BenchmarkTest00067_post()",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": -1,
+        "type": "flask_request"
+      }
+    ],
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "output/python/benchmark-python/verification_results/findings/finding_25_py_url-redirection.json"
+  }
+}

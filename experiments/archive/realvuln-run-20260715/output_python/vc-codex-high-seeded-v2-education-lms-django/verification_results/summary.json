@@ -1,0 +1,121 @@
+{
+  "stage": "ingest",
+  "repo": "vc-codex-high-seeded-v2-education-lms-django",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/summary_vc-codex-high-seeded-v2-education-lms-django_20260714_154006.json"
+  },
+  "counts": {
+    "total_verdicts": 14,
+    "selected": 14,
+    "enriched": 14,
+    "skipped": 0,
+    "failed": 0
+  },
+  "findings": [
+    {
+      "id": "0",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/findings/finding_0_py_path-injection.json",
+      "function_name": "course_vault_stash_245"
+    },
+    {
+      "id": "1",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/findings/finding_1_py_path-injection.json",
+      "function_name": "course_vault_stash_245"
+    },
+    {
+      "id": "2",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/findings/finding_2_py_path-injection.json",
+      "function_name": "course_dock_shelf_593"
+    },
+    {
+      "id": "3",
+      "rule_id": "py/path-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/findings/finding_3_py_path-injection.json",
+      "function_name": "course_dock_shelf_593"
+    },
+    {
+      "id": "4",
+      "rule_id": "py/reflective-xss",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/findings/finding_4_py_reflective-xss.json",
+      "function_name": "course_memo_badge_064"
+    },
+    {
+      "id": "5",
+      "rule_id": "py/clear-text-storage-sensitive-data",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/findings/finding_5_py_clear-text-storage-sensitive-data.json",
+      "function_name": "course_vault_stash_245"
+    },
+    {
+      "id": "6",
+      "rule_id": "py/xxe",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/findings/finding_6_py_xxe.json",
+      "function_name": "course_xml_fold_616"
+    },
+    {
+      "id": "7",
+      "rule_id": "py/url-redirection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/findings/finding_7_py_url-redirection.json",
+      "function_name": "course_return_lane_162"
+    },
+    {
+      "id": "8",
+      "rule_id": "py/command-line-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/findings/finding_8_py_command-line-injection.json",
+      "function_name": "course_shell_probe_634"
+    },
+    {
+      "id": "9",
+      "rule_id": "py/weak-sensitive-data-hashing",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/findings/finding_9_py_weak-sensitive-data-hashing.json",
+      "function_name": "hash_key"
+    },
+    {
+      "id": "10",
+      "rule_id": "py/template-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/findings/finding_10_py_template-injection.json",
+      "function_name": "course_jinja_cast_586"
+    },
+    {
+      "id": "11",
+      "rule_id": "py/jinja2/autoescape-false",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/findings/finding_11_py_jinja2_autoescape-false.json",
+      "function_name": "course_jinja_cast_586"
+    },
+    {
+      "id": "12",
+      "rule_id": "py/log-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/findings/finding_12_py_log-injection.json",
+      "function_name": "course_wire_tally_222"
+    },
+    {
+      "id": "13",
+      "rule_id": "py/log-injection",
+      "verdict": "True Positive",
+      "artifact": "output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/findings/finding_13_py_log-injection.json",
+      "function_name": "course_wire_tally_222"
+    }
+  ],
+  "errors": []
+}

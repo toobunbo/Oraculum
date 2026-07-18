@@ -1,0 +1,84 @@
+{
+  "id": "0",
+  "rule_slug": "py_code-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-damn-vulnerable-flask-application",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-flask-application",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-flask-application/verification_results/summary_realvuln-damn-vulnerable-flask-application_20260714_145037.json"
+  },
+  "finding": {
+    "rule_id": "py/code-injection",
+    "message": "This code execution depends on a [user-provided value](1).",
+    "file": "app.py",
+    "start_line": 120,
+    "end_line": 120,
+    "repo_name": "realvuln-damn-vulnerable-flask-application",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-flask-application/realvuln-damn-vulnerable-flask-application.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 11: ControlFlowNode for ImportMember",
+      "line 11: ControlFlowNode for request",
+      "line 115: ControlFlowNode for request",
+      "line 116: ControlFlowNode for expression",
+      "line 120: ControlFlowNode for expression",
+      "--- Flow 2 ---",
+      "line 11: ControlFlowNode for ImportMember",
+      "line 11: ControlFlowNode for request",
+      "line 116: ControlFlowNode for request",
+      "line 116: ControlFlowNode for expression",
+      "line 120: ControlFlowNode for expression"
+    ],
+    "severity": "9.3",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-94",
+      "CWE-95"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "timestamp": "2026-07-14T14:50:22.483463",
+    "reasoning": "User-controlled input from `request.form['expression']` flows directly to the `eval()` function on line 120 with no sanitization or defensive checks, constituting a clear code injection vulnerability. The additional context confirms no external protections or callers that might mitigate this.",
+    "data_flow": "request.form['expression'] (line 116) → expression (line 116) → eval(expression) (line 120)",
+    "verdict": "True Positive",
+    "tokens_used": 13904,
+    "output_tokens": 1047,
+    "cached_input_tokens": 0,
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "answers": [
+      "The EXACT sink is `eval(expression)` on line 120. The value passed to it is `expression`.",
+      "The assignments to `expression` are: line 114 (`expression = None`), and line 116 (`expression = request.form['expression']`). The LAST assignment on the path reaching the sink is line 116.",
+      "The value of `expression` on line 116 derives from user input via `request.form['expression']`. This is confirmed by the data flow: [SOURCE] line 11 (request) → line 116 (expression = request.form['expression']) → line 120 (eval(expression)).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the path to the sink. The value flows directly from line 116 to line 120 without sanitization or filtering.",
+      "There is NO specific defense preventing arbitrary code execution. No use of `ast.literal_eval`, allow-lists, or restricted globals. The code directly passes user input to `eval()`.",
+      "The user-tainted value `expression` reaches the sink `eval()` on line 120 with no sanitization or defense. The additional context shows no callers or callees, confirming this function stands alone in its vulnerability."
+    ],
+    "elapsed_seconds": 14.800038814544678,
+    "input_tokens": 12857,
+    "iterations": 3
+  },
+  "function": {
+    "name": "evaluate",
+    "file": "app.py",
+    "start_line": 113,
+    "end_line": 130,
+    "scope": ""
+  },
+  "web_params": [
+    {
+      "name": "expression",
+      "source": "form"
+    }
+  ]
+}

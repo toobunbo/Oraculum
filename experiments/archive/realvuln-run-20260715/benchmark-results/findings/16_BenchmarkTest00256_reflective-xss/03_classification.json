@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink is `make_response` which sets a header using user-controlled input directly, leading to potential XSS or header injection."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "Not evaluated because Q1 was true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated because Q1 was true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "mock the `make_response` call to prevent actual header injection",
+    "capture": "capture the value of `bar` being set in the response header",
+    "fake_behavior": "return a safe, stubbed response object without setting dangerous headers",
+    "notes": [
+      "Ensure the mock prevents real HTTP response manipulation during testing.",
+      "Capture the header value for inspection but do not allow it to be rendered in actual responses."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

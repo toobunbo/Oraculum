@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "strategy": "return_value",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "The sink is Template(...).render(), an in-memory string manipulation with no network I/O, shell execution, or irreversible side effects."
+    },
+    "q2_observable_after_return": {
+      "answer": true,
+      "evidence": "The rendered template body is returned as HTMLResponse(body), so the unescaped user input is present in the return value."
+    },
+    "q3_result_in_memory": {
+      "answer": true,
+      "evidence": "returns.kind is 'value' with exprs ['HTMLResponse(body)'], indicating the result is directly accessible in memory on return."
+    }
+  },
+  "mock_guidance": null,
+  "confidence": "high",
+  "warnings": []
+}

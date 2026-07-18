@@ -1,0 +1,22 @@
+{
+  "stage": "ingest",
+  "repo": "vc-codex-seeded-v2-crm-saas-django",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-seeded-v2-crm-saas-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-seeded-v2-crm-saas-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-seeded-v2-crm-saas-django/verification_results/summary_vc-codex-seeded-v2-crm-saas-django_20260714_155336.json"
+  },
+  "counts": {
+    "total_verdicts": 13,
+    "selected": 0,
+    "enriched": 0,
+    "skipped": 13,
+    "failed": 0
+  },
+  "findings": [],
+  "errors": []
+}

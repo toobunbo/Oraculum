@@ -1,0 +1,68 @@
+{
+  "id": "1",
+  "rule_slug": "py_stack-trace-exposure",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-legal-case-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/verification_results/summary_vc-claude-code-seeded-v2-legal-case-django_20260714_152949.json"
+  },
+  "finding": {
+    "rule_id": "py/stack-trace-exposure",
+    "message": "[Stack trace information](1) flows to this location and may be exposed to an external user.",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 105,
+    "end_line": 105,
+    "repo_name": "vc-claude-code-seeded-v2-legal-case-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/vc-claude-code-seeded-v2-legal-case-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 104: ControlFlowNode for exc",
+      "line 105: ControlFlowNode for Dict"
+    ],
+    "severity": "5.4",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-209",
+      "CWE-497"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "answers": [
+      "The sensitive information exposed includes internal file paths (BASE_EXPORT_DIR) and exception details (RuntimeError message and class name) as seen in line 103 and 105.",
+      "This is returned in an HTTP response via JsonResponse on line 105, which is a Django-style response object based on the framework context.",
+      "Not visible in provided context. There is no indication of DEBUG mode configuration or generic error handling.",
+      "Yes, an attacker can trigger this deliberately by calling the endpoint with any 'ref' parameter, as the exception is raised unconditionally on line 103 and its details are exposed.",
+      "Yes, the exception handler catches Exception (line 104) and re-exposes the full exception message and class name in the response (line 105), which is overly broad.",
+      "External users can observe this output via the HTTP response returned from the JsonResponse on line 105."
+    ],
+    "reasoning": "The code raises a RuntimeError with internal path information (line 103), catches it (line 104), and directly exposes both the exception message and class name in an HTTP response (line 105) without any sanitization or generic error handling. This reveals internal paths and exception details to external users.",
+    "cost_usd": 0.0,
+    "iterations": 1,
+    "input_tokens": 4680,
+    "cached_input_tokens": 0,
+    "output_tokens": 354,
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "source (line 104) → transform (str(exc), exc.__class__.__name__) (line 105) → sink (line 105)",
+    "elapsed_seconds": 3.5504579544067383,
+    "tokens_used": 5034,
+    "verdict": "True Positive",
+    "confidence": "High",
+    "timestamp": "2026-07-14T15:29:15.155974"
+  },
+  "function": {
+    "name": "case_pulse_spill_346",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 98,
+    "end_line": 105,
+    "scope": ""
+  },
+  "web_params": []
+}

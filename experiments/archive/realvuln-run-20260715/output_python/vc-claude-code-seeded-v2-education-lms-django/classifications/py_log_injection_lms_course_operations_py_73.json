@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "Sink is logger.warning, which is not network I/O, shell execution, DB write, or RCE."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "Log injection occurs at the logger.warning call; the function returns a JsonResponse and the injected newlines in the log are not observable from the return value or in-memory state after return."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; decision stopped at Q2."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock or patch the logger.warning call on line 73 to intercept the log message before it is written.",
+    "capture": "Capture the full string argument passed to logger.warning, including any embedded newline (\\n, \\r) or control characters originating from request.body and the Authorization header.",
+    "fake_behavior": "Prevent actual log output; simply record the arguments and allow execution to continue normally so the JsonResponse is still returned.",
+    "notes": [
+      "The test should supply request.body or authorization header values containing newline characters to trigger the vulnerability.",
+      "Assert that the captured log message string contains the raw newline characters, proving lack of sanitization."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

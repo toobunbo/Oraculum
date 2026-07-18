@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink is a subprocess call executing a shell command constructed via an f-string, which is dangerous due to potential command injection."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "Not evaluated because Q1 was true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated because Q1 was true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "subprocess call on line 57",
+    "capture": "the command argument `argList` and its construction via f-string from user input `bar`",
+    "fake_behavior": "stub the subprocess call to prevent actual shell execution while capturing the attempted command",
+    "notes": [
+      "Ensure the subprocess call is mocked to avoid actual command execution during testing.",
+      "Capture the full `argList` to verify the tainted input reached the sink.",
+      "Consider mocking `subprocess.run` or `subprocess.Popen` depending on the exact API used."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

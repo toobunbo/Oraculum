@@ -1,0 +1,50 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "pathlib.Path.write_text",
+    "target_arg_index": 0,
+    "target_arg_name": "data",
+    "capture_what": "JSON string passed to write_text, which contains the user-controlled ref value including any traversal sequences",
+    "additional_imports": [
+      "pathlib"
+    ]
+  },
+  "oracle_check": {
+    "condition_description": "The JSON payload written to the file contains a 'ref' field value with directory traversal sequences (../ or ..\\\\), confirming the unsanitized user input reached the sink.",
+    "trigger_patterns": [
+      "\"ref\"\\s*:\\s*\"[^\"]*\\.\\./",
+      "\"ref\"\\s*:\\s*\"[^\"]*\\.\\.\\\\"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_PATH_INJECTION: directory traversal in write_text payload — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "{\"ref\": \"../etc/passwd\"}",
+      "{\"ref\": \"../../tmp/evil.json\"}",
+      "{\"ref\": \"....//....//etc//shadow\"}",
+      "{\"ref\": \"..\\\\..\\\\windows\\\\system32\"}",
+      "{\"ref\": \"..%2F..%2Fetc%2Fpasswd\", \"ssn\": \"000-00-0000\"}"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "ticket_vault_stash_232",
+    "file": "backend/app/support_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def ticket_vault_stash_232(request: Request, gate_ref: None)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "Request"
+      }
+    ],
+    "target_id": "py_path_injection_backend_app_support_operations_py_57",
+    "finding_id": "2",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_2_py_path-injection.json"
+  }
+}

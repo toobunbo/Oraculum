@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Jinja2 Template().render() with user-controlled template source enables SSTI, which can escalate to RCE via Python object traversal — unsafe to execute in tests."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the Jinja2 Template constructor or its render method so that Template(\"Result: \" + fragment).render() does not actually interpret the template source.",
+    "capture": "Capture the exact template-source string passed to the Template constructor (i.e., the value of \"Result: \" + fragment) to verify it contains user-controlled input without sanitization.",
+    "fake_behavior": "Return a benign string such as \"Result: mock_rendered\" so that downstream HttpResponse creation proceeds normally without executing any template expressions.",
+    "notes": [
+      "The injection is in the template SOURCE, not in render-context variables, so patching jinja2.Template or the import used on line 124 is appropriate.",
+      "Ensure the mock captures the full source string to enable assertions that the tainted fragment reaches the sink unsanitized."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

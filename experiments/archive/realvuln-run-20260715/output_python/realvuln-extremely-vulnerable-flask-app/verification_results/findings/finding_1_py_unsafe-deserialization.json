@@ -1,0 +1,73 @@
+{
+  "id": "1",
+  "rule_slug": "py_unsafe-deserialization",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-extremely-vulnerable-flask-app",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-extremely-vulnerable-flask-app",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-extremely-vulnerable-flask-app/verification_results/summary_realvuln-extremely-vulnerable-flask-app_20260714_150009.json"
+  },
+  "finding": {
+    "rule_id": "py/unsafe-deserialization",
+    "message": "Unsafe deserialization depends on a [user-provided value](1).",
+    "file": "routes/account.py",
+    "start_line": 118,
+    "end_line": 118,
+    "repo_name": "realvuln-extremely-vulnerable-flask-app",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-extremely-vulnerable-flask-app/realvuln-extremely-vulnerable-flask-app.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 8: ControlFlowNode for ImportMember",
+      "line 8: ControlFlowNode for request",
+      "line 114: ControlFlowNode for request",
+      "line 114: ControlFlowNode for Attribute",
+      "line 114: ControlFlowNode for Attribute()",
+      "line 114: ControlFlowNode for preferences",
+      "line 118: ControlFlowNode for b64decode()"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-502"
+    ],
+    "tags": [
+      "security",
+      "serialization"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "reasoning": "User-provided cookie data flows directly to an unsafe deserialization sink (`loads`) without any visible sanitization or defense. The deserialization function is not explicitly safe (e.g., `json.loads`), and the rule flags it as unsafe. The absence of a caller does not mitigate the vulnerability.",
+    "iterations": 3,
+    "context_needed": [],
+    "timestamp": "2026-07-14T14:59:55.788974",
+    "cached_input_tokens": 0,
+    "output_tokens": 1467,
+    "data_flow": "request.cookies.get('preferences') (line 114) → b64decode(preferences) (line 118) → loads() (line 118)",
+    "confidence_score": 0.95,
+    "verdict": "True Positive",
+    "elapsed_seconds": 11.123267650604248,
+    "answers": [
+      "The EXACT flagged line is `preferences = loads(b64decode(preferences))` on line 118. This line lives in the `before_request` function in the file `routes/account.py`.",
+      "The value `preferences` is assigned on line 114 from `request.cookies.get('preferences')` and on line 116 from `default_preferences` if the cookie value is None. The last assignment on the path where the cookie is present is line 114.",
+      "The value `preferences` on line 114 derives from `request.cookies.get('preferences')`, which is user-provided input from the cookie. The data-flow chain is: line 8 (request) → line 114 (request.cookies.get) → line 118 (b64decode(preferences)).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the path where the cookie is present. The else branch on line 115 leads directly to line 118 without any sanitization or override.",
+      "There is no specific defense preventing code execution. The function `loads` is still not defined in the provided context, but the rule flags it as unsafe deserialization, implying it is likely `pickle.loads` or similar. There is no evidence of safe alternatives like `yaml.safe_load()` or HMAC verification.",
+      "The user-controlled data from the cookie reaches the unsafe deserialization sink without any visible sanitization or defense mechanism. The absence of a caller does not change the fact that the data flow is from user input to the sink."
+    ],
+    "input_tokens": 12411,
+    "tokens_used": 13878
+  },
+  "function": {
+    "name": "before_request",
+    "file": "routes/account.py",
+    "start_line": 113,
+    "end_line": 120,
+    "scope": ""
+  },
+  "web_params": []
+}

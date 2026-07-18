@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "Sink is logger.warning, which is not network I/O, shell execution, DB write, or RCE"
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "Return value is {'status': 'queued'}, which does not reveal whether log injection occurred in logger.warning"
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not reached; Q2 answered NO"
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock or spy on the logger.warning call at line 33",
+    "capture": "Capture the arguments passed to logger.warning, specifically the wire_text argument and the authorization header value, so that injected newline or control characters can be detected",
+    "fake_behavior": "Allow the call to proceed without actually writing to any log output; simply record the arguments for assertion",
+    "notes": [
+      "The vulnerability is that wire_text from request.body() is logged unsanitized, allowing newline injection",
+      "Assert that the captured wire_text argument does not contain \\r or \\n characters, or verify that it was sanitized before reaching the logger"
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

@@ -1,0 +1,51 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "hr_portal.payroll_operations._os.system",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "the full command string passed to _os.system, which is 'ping -c 1 ' concatenated with the user-controlled host value",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured command string contains 'ping -c 1 ' followed by a shell metacharacter (;, &&, |, $() or backtick) that introduces an injected command",
+    "trigger_patterns": [
+      "ping -c 1 .*;.*",
+      "ping -c 1 .*&&.*",
+      "ping -c 1 .*\\|.*",
+      "ping -c 1 .*\\$\\(.*\\)",
+      "ping -c 1 .*`.*`"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_COMMAND-LINE-INJECTION: shell injection in os.system command — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "127.0.0.1; cat /etc/passwd",
+      "127.0.0.1 && id",
+      "127.0.0.1 | whoami",
+      "127.0.0.1$(uname -a)",
+      "127.0.0.1`ls -la`"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "payroll_shell_probe_402",
+    "file": "hr_portal/payroll_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def payroll_shell_probe_402(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "object"
+      }
+    ],
+    "target_id": "py_command_line_injection_hr_portal_payroll_operations_py_156",
+    "finding_id": "9",
+    "rule_id": "py/command-line-injection",
+    "rule_slug": "py_command-line-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_9_py_command-line-injection.json"
+  }
+}

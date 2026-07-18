@@ -1,0 +1,76 @@
+{
+  "id": "11",
+  "rule_slug": "py_clear-text-logging-sensitive-data",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulpy",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulpy",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulpy/verification_results/summary_realvuln-vulpy_20260714_151852.json"
+  },
+  "finding": {
+    "rule_id": "py/clear-text-logging-sensitive-data",
+    "message": "This expression logs [sensitive data (password)](1) as clear text.\nThis expression logs [sensitive data (password)](2) as clear text.",
+    "file": "utils/httpbrute.py",
+    "start_line": 28,
+    "end_line": 28,
+    "repo_name": "realvuln-vulpy",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulpy/realvuln-vulpy.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 21: ControlFlowNode for Attribute()",
+      "line 21: ControlFlowNode for passwords",
+      "line 24: ControlFlowNode for password",
+      "line 28: ControlFlowNode for password",
+      "--- Flow 2 ---",
+      "line 24: ControlFlowNode for passwords",
+      "line 24: ControlFlowNode for password",
+      "line 28: ControlFlowNode for password"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-312",
+      "CWE-359",
+      "CWE-532"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "confidence_score": 0.95,
+    "reasoning": "The code reads passwords from a file and prints them in cleartext to stdout at line 28, which constitutes logging sensitive data without encryption. The dataflow clearly shows passwords flowing from the source file to the cleartext print statement.",
+    "confidence": "High",
+    "context_needed": [],
+    "verdict": "True Positive",
+    "timestamp": "2026-07-14T15:18:46.508252",
+    "iterations": 1,
+    "data_flow": "passwords from file (line 21) → password in loop (line 24) → print statement (line 28)",
+    "cost_usd": 0.0,
+    "elapsed_seconds": 4.346680641174316,
+    "cached_input_tokens": 0,
+    "answers": [
+      "The sensitive data is passwords, read from a file at line 21 and processed in the loop at line 24",
+      "The data is not stored in a database or file - it's temporarily held in memory and printed to stdout at line 28",
+      "No, the data is not encrypted or hashed - it's used in cleartext in HTTP requests (line 25) and printed in cleartext (line 28)",
+      "Not applicable as there is no persistent storage",
+      "This appears to be a security testing tool, not production code",
+      "The blast radius is exposing passwords used in security testing, but the main issue is the cleartext logging"
+    ],
+    "tokens_used": 4269,
+    "input_tokens": 3609,
+    "output_tokens": 660,
+    "model": "ollama_chat/qwen3-coder:480b-cloud"
+  },
+  "function": {
+    "name": "http_brute",
+    "file": "utils/httpbrute.py",
+    "start_line": 14,
+    "end_line": 29,
+    "scope": ""
+  },
+  "web_params": []
+}

@@ -1,0 +1,70 @@
+{
+  "id": "1",
+  "rule_slug": "py_shell-command-constructed-from-input",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-damn-vulnerable-graphql-application",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-graphql-application",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-graphql-application/verification_results/summary_realvuln-damn-vulnerable-graphql-application_20260714_145154.json"
+  },
+  "finding": {
+    "rule_id": "py/shell-command-constructed-from-input",
+    "message": "This formatted string which depends on [library input](1) is later used in a [shell command](2).",
+    "file": "core/views.py",
+    "start_line": 352,
+    "end_line": 352,
+    "repo_name": "realvuln-damn-vulnerable-graphql-application",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-damn-vulnerable-graphql-application/realvuln-damn-vulnerable-graphql-application.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 349: ControlFlowNode for arg",
+      "line 352: ControlFlowNode for arg"
+    ],
+    "severity": "6.3",
+    "precision": "medium",
+    "cwe_ids": [
+      "CWE-73",
+      "CWE-78",
+      "CWE-88"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "iterations": 3,
+    "verdict": "True Positive",
+    "confidence": "High",
+    "input_tokens": 11884,
+    "context_needed": [],
+    "reasoning": "User-controlled input `arg` is directly used in a shell command string via `'ps {}'.format(arg)` on line 352. Even though the implementation of `helpers.run_cmd` is not visible, the construction of a shell command using unsanitized user input is inherently dangerous and represents command injection (CWE-78).",
+    "data_flow": "arg (line 349) → 'ps {}'.format(arg) (line 352) → helpers.run_cmd (line 352)",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "tokens_used": 12899,
+    "elapsed_seconds": 9.801036596298218,
+    "timestamp": "2026-07-14T14:51:54.892639",
+    "answers": [
+      "The exact sink is `helpers.run_cmd('ps {}'.format(arg))` on line 352. The command string passed to the shell is `'ps {}'.format(arg)`.",
+      "The only assignment to the command string is the construction on line 352: `'ps {}'.format(arg)`.",
+      "The value of `arg` derives directly from the function parameter `arg` on line 349, which is user-controlled input as indicated by the data flow from [SOURCE] line 349 to [SINK] line 352.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The value of `arg` is used directly in the command string without any checks or modifications.",
+      "No specific defense is present. There is no sanitization, validation, or restriction on the value of `arg` before it is used in the command string. The `helpers.run_cmd` function implementation is not available, but the command construction itself is clearly vulnerable.",
+      "The user-tainted value `arg` reaches the sink directly without any sanitization or defense mechanisms."
+    ],
+    "confidence_score": 0.9,
+    "cached_input_tokens": 0,
+    "output_tokens": 1015,
+    "cost_usd": 0.0
+  },
+  "function": {
+    "name": "resolve_system_debug",
+    "file": "core/views.py",
+    "start_line": 349,
+    "end_line": 355,
+    "scope": "Query"
+  },
+  "web_params": []
+}

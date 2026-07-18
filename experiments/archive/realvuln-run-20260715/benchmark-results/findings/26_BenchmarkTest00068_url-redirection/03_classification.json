@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink is a redirect call (flask.redirect(bar)) which involves external resolution and can lead to unsafe redirection based on user input, making it dangerous in a test environment."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "Not evaluated because Q1 was true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated because Q1 was true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "flask.redirect call",
+    "capture": "the 'bar' argument passed to flask.redirect",
+    "fake_behavior": "Stub the redirect to avoid actual HTTP redirection while capturing the URL for verification",
+    "notes": [
+      "Ensure the mock captures the user-controlled input path to validate that tainted data reaches the redirect sink",
+      "The redirect should not execute in test environments to prevent unintended external requests"
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

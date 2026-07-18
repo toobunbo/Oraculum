@@ -1,0 +1,53 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of course_blurb_card_004 (HttpResponse object)",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The returned HttpResponse content contains an unescaped XSS payload such as a script tag or event handler attribute injected via the copyline parameter",
+    "trigger_patterns": [
+      "<script",
+      "onerror\\s*=",
+      "onload\\s*=",
+      "onmouseover\\s*=",
+      "javascript\\s*:",
+      "<img[^>]+onerror",
+      "<svg[^>]+onload"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_REFLECTIVE_XSS: XSS payload survived in HttpResponse content — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "<script>alert(1)</script>",
+      "<img src=x onerror=alert(1)>",
+      "<svg onload=alert(1)>",
+      "\" onmouseover=\"alert(1)",
+      "<a href=\"javascript:alert(1)\">click</a>"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "course_blurb_card_004",
+    "file": "lms/course_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def course_blurb_card_004(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "django.http.HttpRequest"
+      }
+    ],
+    "target_id": "py_reflective_xss_lms_course_operations_py_33",
+    "finding_id": "4",
+    "rule_id": "py/reflective-xss",
+    "rule_slug": "py_reflective-xss",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-education-lms-django/verification_results/findings/finding_4_py_reflective-xss.json"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Data flow ends at an SQL INSERT query on line 197, which is a DB write and explicitly classified as dangerous."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Not evaluated; decision stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; decision stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the SQL INSERT query execution (e.g., db cursor execute or ORM session commit) on line 197 that stores the MD5-hashed password into the database.",
+    "capture": "Capture the SQL query string or parameterized arguments passed to the INSERT, specifically extracting the value assigned to the password column to verify it is an MD5 hex digest rather than a secure hash.",
+    "fake_behavior": "Absorb the INSERT without performing any actual database write; return a mock success response (e.g., affected row count of 1) so that the function continues and returns {'resp': 'done'} normally.",
+    "notes": [
+      "The violation is the MD5 hash on line 187, but the dangerous sink is the DB write on line 197.",
+      "Ensure the mock does not alter the md5() call itself, since the weak hashing is exactly what the oracle needs to observe flowing into the INSERT."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

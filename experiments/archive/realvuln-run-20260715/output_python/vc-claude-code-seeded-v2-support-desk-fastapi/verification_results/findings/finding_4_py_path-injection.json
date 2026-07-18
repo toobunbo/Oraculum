@@ -1,0 +1,73 @@
+{
+  "id": "4",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/summary_vc-claude-code-seeded-v2-support-desk-fastapi_20260714_153638.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "backend/app/support_operations.py",
+    "start_line": 98,
+    "end_line": 98,
+    "repo_name": "vc-claude-code-seeded-v2-support-desk-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/vc-claude-code-seeded-v2-support-desk-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 94: ControlFlowNode for name",
+      "line 96: ControlFlowNode for target",
+      "line 98: ControlFlowNode for target"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 16973,
+    "cached_input_tokens": 0,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "reasoning": "The user-controlled `name` parameter is used directly in a file path construction without any sanitization or validation, allowing potential directory traversal. The path is then used in `target.write_bytes(body)` which writes data to the file system, making this a clear path traversal vulnerability. The absence of `BASE_EXPORT_DIR` definition doesn't change the fact that the user-controlled input can cause directory traversal.",
+    "verdict": "True Positive",
+    "confidence_score": 0.9,
+    "output_tokens": 1183,
+    "tokens_used": 18156,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "answers": [
+      "The EXACT file-operation sink is `target.write_bytes(body)` on line 98. The path value passed to it is `target`, which is a `Path` object.",
+      "The assignments to `target` are: line 96: `target = BASE_EXPORT_DIR / name`.",
+      "The value of `target` derives from `BASE_EXPORT_DIR` (unknown constant base directory) and `name` (user input from the `name` parameter in the function signature on line 94). The data flow is: `name` (line 94, user input via query parameter or default) → `target` (line 96) → `target.write_bytes(body)` (line 98).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value `name` on the reaching path.",
+      "There is no specific defense present in the code. The code does not use `secure_filename`, `resolve()`, `is_relative_to()`, or any other mechanism to prevent directory traversal. The `name` parameter is directly used to construct the file path.",
+      "The user-tainted value `name` reaches the sink `target.write_bytes(body)` on line 98. There is no visible defense mechanism to prevent directory traversal. The use of `BASE_EXPORT_DIR / name` does not inherently prevent traversal if `name` contains path traversal sequences like `../`."
+    ],
+    "elapsed_seconds": 11.808379650115967,
+    "timestamp": "2026-07-14T15:36:24.383012",
+    "context_needed": [],
+    "iterations": 3,
+    "data_flow": "name (line 94, user input) → target = BASE_EXPORT_DIR / name (line 96) → target.write_bytes(body) (line 98)"
+  },
+  "function": {
+    "name": "ticket_dock_shelf_387",
+    "file": "backend/app/support_operations.py",
+    "start_line": 94,
+    "end_line": 99,
+    "scope": ""
+  },
+  "web_params": []
+}

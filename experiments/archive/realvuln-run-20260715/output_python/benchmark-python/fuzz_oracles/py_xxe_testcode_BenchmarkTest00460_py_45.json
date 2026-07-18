@@ -1,0 +1,70 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "target": "xml.dom.minidom.parseString",
+    "capture": {
+      "args": [
+        0
+      ],
+      "kwargs": []
+    },
+    "patch_target": "xml.dom.minidom.parseString",
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "captured value",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "predicate": "lambda arg0: '<!ENTITY' in arg0 or 'file://' in arg0 or 'http://' in arg0",
+    "condition_description": "lambda arg0: '<!ENTITY' in arg0 or 'file://' in arg0 or 'http://' in arg0",
+    "trigger_patterns": [
+      "[\\s\\S]+"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "ORACULUM_VIOLATION: captured={captured}"
+  },
+  "fuzz_guidance": {
+    "sink_capture_notes": "Capturing the first positional argument (XML string) to detect XXE payloads",
+    "payload_focus": "XML external entity declarations and file/http inclusion patterns",
+    "recommended_fuzzers": [
+      "xml_xxe",
+      "generic_string_mutation"
+    ],
+    "seed_corpus": [],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "aliasing_risk": "Low - direct module call with explicit import",
+    "import_style": "xml.dom.minidom imported directly",
+    "async_risk": "Not applicable - synchronous DOM parsing",
+    "classification_strategy": "recorded_call",
+    "classification_confidence": "high",
+    "mock_guidance": {
+      "required": true,
+      "target": "xml.dom.minidom.parseString call",
+      "capture": "the bar parameter and parser configuration",
+      "fake_behavior": "return a safe, predefined XML document structure without external entity resolution",
+      "notes": [
+        "Must stub the XML parser to prevent actual XXE exploitation during testing",
+        "Should capture the input to verify it contains the expected malicious payload"
+      ]
+    },
+    "target_id": "py_xxe_testcode_BenchmarkTest00460_py_45",
+    "finding_id": "40",
+    "rule_id": "py/xxe",
+    "rule_slug": "py_xxe",
+    "file": "testcode/BenchmarkTest00460.py",
+    "function": "BenchmarkTest00460_post",
+    "input_strategy": "flask_view",
+    "function_signature": "def BenchmarkTest00460_post()",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": -1,
+        "type": "flask_request"
+      }
+    ],
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "output/python/benchmark-python/verification_results/findings/finding_40_py_xxe.json"
+  }
+}

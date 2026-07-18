@@ -1,0 +1,70 @@
+{
+  "id": "2",
+  "rule_slug": "py_full-ssrf",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/summary_vc-claude-code-seeded-v2-hr-payroll-django_20260714_152802.json"
+  },
+  "finding": {
+    "rule_id": "py/full-ssrf",
+    "message": "The full URL of this request depends on a [user-provided value](1).",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 52,
+    "end_line": 52,
+    "repo_name": "vc-claude-code-seeded-v2-hr-payroll-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-hr-payroll-django/vc-claude-code-seeded-v2-hr-payroll-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 48: ControlFlowNode for request",
+      "line 51: ControlFlowNode for Attribute",
+      "line 51: ControlFlowNode for Attribute()",
+      "line 51: ControlFlowNode for relay_ref",
+      "line 52: ControlFlowNode for relay_ref"
+    ],
+    "severity": "9.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-918"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "data_flow": "request (line 48) → request.GET.get(\"url\", ...) (line 51) → relay_ref (line 51) → urllib.request.urlopen(relay_ref, ...) (line 52)",
+    "iterations": 3,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "tokens_used": 13163,
+    "timestamp": "2026-07-14T15:27:38.439462",
+    "input_tokens": 11963,
+    "output_tokens": 1200,
+    "confidence_score": 0.95,
+    "elapsed_seconds": 12.424713134765625,
+    "reasoning": "User-controlled `relay_ref` flows directly to `urllib.request.urlopen` without sanitization or validation, enabling SSRF. The default fallback does not prevent exploitation when the `url` parameter is provided. The lack of caller context does not change the fact that the data flow within this function is clearly exploitable.",
+    "cost_usd": 0.0,
+    "answers": [
+      "The EXACT HTTP/network sink is `urllib.request.urlopen(relay_ref, timeout=3)` on line 52. The URL value passed to it is `relay_ref`.",
+      "The only assignment to `relay_ref` is on line 51: `relay_ref = request.GET.get(\"url\", \"http://127.0.0.1/status\")`. This is the LAST assignment on the path to the sink.",
+      "The value of `relay_ref` derives from user input via `request.GET.get(\"url\", ...)`. The data flow is: `request` (line 48, SOURCE) → `request.GET.get` (line 51, TRANSFORM) → `relay_ref` (line 51, TRANSFORM) → `urllib.request.urlopen` (line 52, SINK).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The default fallback \"http://127.0.0.1/status\" is only used if the `url` parameter is absent, but if it is present, it is used directly without sanitization.",
+      "There is no specific defense restricting the URL. No scheme allow-list, host validation, or private IP check is performed. The code does not sanitize or validate `relay_ref` before use.",
+      "The user-controlled `relay_ref` reaches the sink directly without any of the listed defenses. The absence of sanitization or validation confirms exploitability."
+    ],
+    "cached_input_tokens": 0,
+    "context_needed": []
+  },
+  "function": {
+    "name": "payroll_broker_tile_015",
+    "file": "hr_portal/payroll_operations.py",
+    "start_line": 48,
+    "end_line": 54,
+    "scope": ""
+  },
+  "web_params": []
+}

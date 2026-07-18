@@ -1,0 +1,73 @@
+{
+  "id": "3",
+  "rule_slug": "py_path-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/summary_vc-claude-code-seeded-v2-support-desk-fastapi_20260714_153638.json"
+  },
+  "finding": {
+    "rule_id": "py/path-injection",
+    "message": "This path depends on a [user-provided value](1).",
+    "file": "backend/app/support_operations.py",
+    "start_line": 97,
+    "end_line": 97,
+    "repo_name": "vc-claude-code-seeded-v2-support-desk-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-support-desk-fastapi/vc-claude-code-seeded-v2-support-desk-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 94: ControlFlowNode for name",
+      "line 96: ControlFlowNode for target",
+      "line 97: ControlFlowNode for Attribute"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-22",
+      "CWE-23",
+      "CWE-36",
+      "CWE-73",
+      "CWE-99"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 17181,
+    "cached_input_tokens": 0,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "reasoning": "The user-controlled `name` parameter is used directly in a file path construction without sanitization or validation, allowing potential directory traversal. The path is then used in a filesystem operation (`mkdir`), which confirms the vulnerability. Even though `BASE_EXPORT_DIR` is not visible, the user can still inject path traversal sequences through the `name` parameter.",
+    "verdict": "True Positive",
+    "confidence_score": 0.95,
+    "output_tokens": 1235,
+    "tokens_used": 18416,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "answers": [
+      "The EXACT flagged line is: `target.parent.mkdir(parents=True, exist_ok=True)` on line 97. This line is located in the function `ticket_dock_shelf_387`.",
+      "The path value `target` is assigned on line 96: `target = BASE_EXPORT_DIR / name`. The variable `name` comes from the function parameter which is user-controlled input.",
+      "The value of `target` derives directly from the user-controlled `name` parameter without any sanitization or validation. The `name` parameter can contain path traversal sequences like `../`.",
+      "There are no conditions or reassignments that override the user-tainted value. The value flows directly from the parameter to the path construction.",
+      "No specific defense is applied. There is no use of `secure_filename`, `Path.resolve()`, or any path traversal prevention mechanism. The value of `BASE_EXPORT_DIR` is not visible, but even if it were, the vulnerability would still exist because the user controls the `name` parameter which is appended to the base directory.",
+      "Since the user-tainted value reaches the sink without adequate sanitization, and no defensive measures are visible in the provided code, this represents a path injection vulnerability."
+    ],
+    "elapsed_seconds": 11.26795768737793,
+    "timestamp": "2026-07-14T15:36:12.571975",
+    "context_needed": [],
+    "iterations": 3,
+    "data_flow": "name parameter (line 94) → target = BASE_EXPORT_DIR / name (line 96) → target.parent.mkdir(...) (line 97)"
+  },
+  "function": {
+    "name": "ticket_dock_shelf_387",
+    "file": "backend/app/support_operations.py",
+    "start_line": 94,
+    "end_line": 99,
+    "scope": ""
+  },
+  "web_params": []
+}

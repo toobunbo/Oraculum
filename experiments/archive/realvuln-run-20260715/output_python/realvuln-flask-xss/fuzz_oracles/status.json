@@ -1,0 +1,43 @@
+{
+  "stage": "oracle",
+  "repo": "realvuln-flask-xss",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/oracle.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/realvuln-flask-xss/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 2,
+    "generated": 2,
+    "skipped": 0,
+    "failed": 0
+  },
+  "oracles": [
+    {
+      "id": "0",
+      "target_id": "py_clear_text_logging_sensitive_data_manage_py_21",
+      "rule_id": "py/clear-text-logging-sensitive-data",
+      "file": "manage.py",
+      "start_line": "21",
+      "function_name": "add_admin",
+      "finding_artifact": "output/python/realvuln-flask-xss/verification_results/findings/finding_0_py_clear-text-logging-sensitive-data.json",
+      "oracle": "output/python/realvuln-flask-xss/fuzz_oracles/py_clear_text_logging_sensitive_data_manage_py_21.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "1",
+      "target_id": "py_url_redirection_app_blueprints_xss_protection_views_py_12",
+      "rule_id": "py/url-redirection",
+      "file": "app/blueprints/xss_protection/views.py",
+      "start_line": "12",
+      "function_name": "index",
+      "finding_artifact": "output/python/realvuln-flask-xss/verification_results/findings/finding_1_py_url-redirection.json",
+      "oracle": "output/python/realvuln-flask-xss/fuzz_oracles/py_url_redirection_app_blueprints_xss_protection_views_py_12.json",
+      "status": "generated",
+      "strategy": "return_value"
+    }
+  ],
+  "errors": []
+}

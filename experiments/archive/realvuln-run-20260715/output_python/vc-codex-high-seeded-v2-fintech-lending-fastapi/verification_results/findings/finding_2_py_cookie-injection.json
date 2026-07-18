@@ -1,0 +1,71 @@
+{
+  "id": "2",
+  "rule_slug": "py_cookie-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-codex-high-seeded-v2-fintech-lending-fastapi_20260714_154154.json"
+  },
+  "finding": {
+    "rule_id": "py/cookie-injection",
+    "message": "Cookie is constructed from a [user-supplied input](1).",
+    "file": "app/loan_operations.py",
+    "start_line": 79,
+    "end_line": 79,
+    "repo_name": "vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/vc-codex-high-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 77: ControlFlowNode for marker",
+      "line 79: ControlFlowNode for marker"
+    ],
+    "severity": "5.0",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-20"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "elapsed_seconds": 3.4411659240722656,
+    "answers": [
+      "The potentially dangerous data originates from the `marker` query parameter in the HTTP request on line 77.",
+      "The data flows directly from the `marker` parameter (line 77) to the `set_cookie` call (line 79). No intermediate variables are used.",
+      "No validation, sanitization, or encoding is applied to the `marker` parameter before it is used in the `set_cookie` call.",
+      "The sink is the `set_cookie` method call on line 79, where the `marker` parameter is used as the value for the cookie. This is dangerous because it allows an attacker to inject malicious cookie values.",
+      "There are no intermediate transformations applied to the data between the source and the sink.",
+      "The framework (FastAPI/Starlette) does not provide automatic protection against cookie injection. The `set_cookie` method directly sets the cookie value without sanitization.",
+      "The code is accessible via an unauthenticated GET request, as there is no authentication or authorization check in the route handler.",
+      "The code is not in a test file or debug path. It is a regular route handler that would execute in production.",
+      "If an attacker controls the cookie value, they could potentially inject malicious cookie content, leading to issues like session fixation or client-side attacks if the cookie is used in a vulnerable context.",
+      "The weakest link is the lack of any sanitization or validation of the user-supplied `marker` parameter before it is used in the `set_cookie` call. This directly allows cookie injection."
+    ],
+    "tokens_used": 5566,
+    "data_flow": "source (line 77) → sink (line 79)",
+    "output_tokens": 437,
+    "iterations": 1,
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "input_tokens": 5129,
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "timestamp": "2026-07-14T15:41:15.917100",
+    "reasoning": "The user-supplied `marker` parameter flows directly to the `set_cookie` method without any sanitization, allowing potential cookie injection. The data flow is straightforward with no intermediate protections, and the route is accessible without authentication.",
+    "cached_input_tokens": 0,
+    "confidence": "High"
+  },
+  "function": {
+    "name": "loan_crumb_lane_296",
+    "file": "app/loan_operations.py",
+    "start_line": 77,
+    "end_line": 80,
+    "scope": ""
+  },
+  "web_params": []
+}

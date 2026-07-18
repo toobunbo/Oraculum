@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink involves opening a file with a user-controlled path, which can lead to directory traversal and arbitrary file access. This is dangerous in a test environment due to potential filesystem side effects."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "Not evaluated because Q1 was true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated because Q1 was true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "codecs.open() call",
+    "capture": "the file path argument (f'{helpers.utils.TESTFILES_DIR}/{bar}') and the mode ('r')",
+    "fake_behavior": "return a mock file object that does not perform actual I/O",
+    "notes": [
+      "Mocking codecs.open prevents actual filesystem access while preserving the ability to test control flow.",
+      "Ensure the mock captures the path to verify no traversal occurs.",
+      "Return a safe, in-memory file-like object for deterministic behavior."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

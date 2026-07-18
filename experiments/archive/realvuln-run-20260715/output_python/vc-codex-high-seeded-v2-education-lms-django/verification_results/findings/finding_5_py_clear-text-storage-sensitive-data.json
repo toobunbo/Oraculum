@@ -1,0 +1,69 @@
+{
+  "id": "5",
+  "rule_slug": "py_clear-text-storage-sensitive-data",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/summary_vc-codex-high-seeded-v2-education-lms-django_20260714_154006.json"
+  },
+  "finding": {
+    "rule_id": "py/clear-text-storage-sensitive-data",
+    "message": "This expression stores [sensitive data (private)](1) as clear text.",
+    "file": "education_lms/course_operations.py",
+    "start_line": 82,
+    "end_line": 82,
+    "repo_name": "vc-codex-high-seeded-v2-education-lms-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/vc-codex-high-seeded-v2-education-lms-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 82: ControlFlowNode for Attribute()",
+      "line 82: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-312",
+      "CWE-315",
+      "CWE-359"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:39:41.177100",
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "iterations": 1,
+    "tokens_used": 5125,
+    "cost_usd": 0.0,
+    "answers": [
+      "The sensitive data being stored includes a Social Security Number (SSN) and a credit card number (line 82).",
+      "The data is stored in a file on the filesystem, specifically in BASE_EXPORT_DIR with a filename based on the 'ref' parameter (line 80-82).",
+      "The data is not encrypted or hashed before storage; it's stored as plain JSON (line 82).",
+      "Yes, an attacker with access to the file system or a backup could read the sensitive data directly since it's stored in cleartext JSON format (line 82).",
+      "This appears to be a Django-based application (based on HttpRequest/HttpResponse usage), and the function is a view that handles requests, so it's likely reachable in production (lines 76-83).",
+      "The blast radius is high as exposure of SSN and credit card numbers could lead to identity theft, financial fraud, and regulatory violations (line 82)."
+    ],
+    "context_needed": [],
+    "verdict": "True Positive",
+    "data_flow": "request.GET.get(\"ssn\") (line 82) → json.dumps() (line 82) → target.write_text() (line 82)",
+    "elapsed_seconds": 2.850266933441162,
+    "reasoning": "The code stores sensitive PII (SSN) and payment card data in cleartext JSON files without any encryption or hashing (line 82). This data is directly sourced from HTTP request parameters and written to the filesystem where it could be accessed by attackers with file system access.",
+    "cached_input_tokens": 0,
+    "output_tokens": 355,
+    "input_tokens": 4770,
+    "model": "ollama_chat/qwen3-coder:480b-cloud"
+  },
+  "function": {
+    "name": "course_vault_stash_245",
+    "file": "education_lms/course_operations.py",
+    "start_line": 76,
+    "end_line": 83,
+    "scope": ""
+  },
+  "web_params": []
+}

@@ -1,0 +1,51 @@
+{
+  "stage": "ingest",
+  "repo": "realvuln-vulnerable-tornado-app",
+  "lang": "python",
+  "verdict_filter": "TP",
+  "normalized_verdict_filter": "True Positive",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulnerable-tornado-app",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-tornado-app",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-tornado-app/verification_results/summary_realvuln-vulnerable-tornado-app_20260714_151555.json"
+  },
+  "counts": {
+    "total_verdicts": 4,
+    "selected": 4,
+    "enriched": 0,
+    "skipped": 0,
+    "failed": 4
+  },
+  "findings": [],
+  "errors": [
+    {
+      "id": "0",
+      "rule_id": "py/path-injection",
+      "file": "server.py",
+      "start_line": 46,
+      "error": "No enclosing function found for finding 0: py/path-injection @ server.py:46"
+    },
+    {
+      "id": "1",
+      "rule_id": "py/path-injection",
+      "file": "server.py",
+      "start_line": 77,
+      "error": "No enclosing function found for finding 1: py/path-injection @ server.py:77"
+    },
+    {
+      "id": "2",
+      "rule_id": "py/sql-injection",
+      "file": "server.py",
+      "start_line": 106,
+      "error": "No enclosing function found for finding 2: py/sql-injection @ server.py:106"
+    },
+    {
+      "id": "3",
+      "rule_id": "py/command-line-injection",
+      "file": "server.py",
+      "start_line": 125,
+      "error": "No enclosing function found for finding 3: py/command-line-injection @ server.py:125"
+    }
+  ]
+}

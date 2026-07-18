@@ -1,0 +1,88 @@
+{
+  "id": "17",
+  "rule_slug": "py_weak-sensitive-data-hashing",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-djangoat",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/verification_results/summary_realvuln-djangoat_20260714_145404.json"
+  },
+  "finding": {
+    "rule_id": "py/weak-sensitive-data-hashing",
+    "message": "[Sensitive data (password)](1) is used in a hashing algorithm (MD5) that is insecure for password hashing, since it is not a computationally expensive hash function.\n[Sensitive data (password)](2) is used in a hashing algorithm (MD5) that is insecure for password hashing, since it is not a computationally expensive hash function.\n[Sensitive data (password)](3) is used in a hashing algorithm (MD5) that is insecure for password hashing, since it is not a computationally expensive hash function.\n[Sensitive data (password)](4) is used in a hashing algorithm (MD5) that is insecure for password hashing, since it is not a computationally expensive hash function.\n[Sensitive data (password)](5) is used in a hashing algorithm (MD5) that is insecure for password hashing, since it is not a computationally expensive hash function.",
+    "file": "app/models/User/user.py",
+    "start_line": 107,
+    "end_line": 107,
+    "repo_name": "realvuln-djangoat",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/realvuln-djangoat.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 104: ControlFlowNode for input_password",
+      "line 107: ControlFlowNode for Attribute()",
+      "--- Flow 2 ---",
+      "line 23: ControlFlowNode for password",
+      "line 44: ControlFlowNode for password",
+      "line 104: ControlFlowNode for input_password",
+      "line 107: ControlFlowNode for Attribute()",
+      "--- Flow 3 ---",
+      "line 37: ControlFlowNode for Subscript",
+      "line 37: ControlFlowNode for password",
+      "line 44: ControlFlowNode for password",
+      "line 104: ControlFlowNode for input_password",
+      "line 107: ControlFlowNode for Attribute()",
+      "--- Flow 4 ---",
+      "line 23: ControlFlowNode for None",
+      "line 23: ControlFlowNode for password",
+      "line 44: ControlFlowNode for password",
+      "line 104: ControlFlowNode for input_password",
+      "line 107: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-327",
+      "CWE-328",
+      "CWE-916"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 14218,
+    "output_tokens": 1006,
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "data_flow": "input_password (line 104) → hashlib.md5(input_password.encode()).hexdigest() (line 107) → user.password comparison (line 107)",
+    "cost_usd": 0.0,
+    "confidence_score": 0.95,
+    "reasoning": "The code uses MD5 for password hashing in a security-sensitive context (authentication) without any visible defenses or safe alternatives. MD5 is cryptographically broken and unsuitable for password hashing.",
+    "confidence": "High",
+    "answers": [
+      "The EXACT crypto call is `hashlib.md5(input_password.encode()).hexdigest()` on line 107. The algorithm passed is MD5.",
+      "The algorithm name is specified via `hashlib.md5` which is an enum/constant import. The line is 107.",
+      "The output of the MD5 hash is used in a password comparison for authentication on line 107: `if user.password == hashlib.md5(input_password.encode()).hexdigest():`. This is a SECURITY use-case — specifically, password authentication.",
+      "Yes, collision resistance is required here because MD5 is being used for password hashing where an attacker could potentially exploit weaknesses.",
+      "There is no specific defense or safe alternative present. The code should be using a secure password hashing algorithm.",
+      "Not visible in provided context.",
+      "The use-case is SECURITY-related (password authentication), and there is no visible defense or safe alternative being used."
+    ],
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 10.553364515304565,
+    "timestamp": "2026-07-14T14:54:02.282833",
+    "iterations": 3,
+    "tokens_used": 15224
+  },
+  "function": {
+    "name": "authenticate",
+    "file": "app/models/User/user.py",
+    "start_line": 104,
+    "end_line": 113,
+    "scope": "User"
+  },
+  "web_params": []
+}

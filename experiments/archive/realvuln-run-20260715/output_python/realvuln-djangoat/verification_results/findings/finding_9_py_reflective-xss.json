@@ -1,0 +1,73 @@
+{
+  "id": "9",
+  "rule_slug": "py_reflective-xss",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-djangoat",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/verification_results/summary_realvuln-djangoat_20260714_145404.json"
+  },
+  "finding": {
+    "rule_id": "py/reflective-xss",
+    "message": "Cross-site scripting vulnerability due to a [user-provided value](1).\nCross-site scripting vulnerability due to a [user-provided value](2).",
+    "file": "app/views/users/views.py",
+    "start_line": 101,
+    "end_line": 101,
+    "repo_name": "realvuln-djangoat",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/realvuln-djangoat.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 65: ControlFlowNode for request",
+      "line 101: ControlFlowNode for BinaryExpr",
+      "--- Flow 2 ---",
+      "line 65: ControlFlowNode for user_id",
+      "line 101: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 13397,
+    "output_tokens": 1461,
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "data_flow": "user_id (line 65) → str(user_id) (line 101) → HttpResponse sink (line 101); request.method (line 65) → str(request.method) (line 101) → HttpResponse sink (line 101)",
+    "cost_usd": 0.0,
+    "confidence_score": 0.95,
+    "reasoning": "User-controlled values `user_id` and `request.method` flow directly to an HttpResponse sink without escaping or sanitization. No defense mechanisms are present in the code path. This constitutes a reflective XSS vulnerability. The lack of caller information does not change the fact that the sink is vulnerable to user-controlled input.",
+    "confidence": "High",
+    "answers": [
+      "The EXACT sink is: `return HttpResponse(\"User \" + str(user_id) + \" \" + str(request.method))` on line 101. The values being rendered are `user_id` and `request.method`.",
+      "For `user_id`: Line 65 (parameter), Line 101 (used in response). For `request.method`: Line 65 (from request), Line 101 (used in response). Both are last assigned on line 101 as part of the string concatenation.",
+      "`user_id` derives from the function parameter which is user-controlled input (SOURCE on line 65). `request.method` also derives from the request object which is user-controlled (SOURCE on line 65). Both flow directly to the sink without sanitization.",
+      "There are no constant-time conditions or reassignments that override the user-tainted values on the reaching path.",
+      "There is NO specific defense escaping the value at the sink. No calls to `html.escape()`, `markupsafe.escape()`, `bleach.clean()`, or any framework-specific escaping mechanism are present.",
+      "No, `|safe`, `{% autoescape false %}`, `Markup(...)`, or `mark_safe(...)` are NOT used to disable escaping on the user-tainted path.",
+      "The user-tainted values `user_id` and `request.method` reach the sink on line 101 without any escaping or sanitization. No defense mechanisms are visible in the provided code."
+    ],
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 10.89766240119934,
+    "timestamp": "2026-07-14T14:53:39.555908",
+    "iterations": 3,
+    "tokens_used": 14858
+  },
+  "function": {
+    "name": "user_view",
+    "file": "app/views/users/views.py",
+    "start_line": 65,
+    "end_line": 101,
+    "scope": ""
+  },
+  "web_params": []
+}

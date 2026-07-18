@@ -1,0 +1,51 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "apps.fastapi_app.os.system",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "full command string passed to os.system, constructed as 'echo ' + user_input + ' this should be echoed'",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured command string contains shell metacharacters that break out of the echo context, confirming command injection via unsanitized user_input concatenation",
+    "trigger_patterns": [
+      ";\\s*\\w+",
+      "&&\\s*\\w+",
+      "\\|\\|\\s*\\w+",
+      "\\$\\(",
+      "`[^`]+`"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_COMMAND-LINE-INJECTION: shell metacharacter injection in os.system argument — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "; id",
+      "&& whoami",
+      "|| cat /etc/passwd",
+      "$(sleep 5)",
+      "`id`"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "cmdi",
+    "file": "apps/fastapi_app.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def cmdi(user_input: str)",
+    "tainted_params": [
+      {
+        "name": "user_input",
+        "index": 0,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_command_line_injection_apps_fastapi_app_py_43",
+    "finding_id": "5",
+    "rule_id": "py/command-line-injection",
+    "rule_slug": "py_command-line-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-vulnpy/verification_results/findings/finding_5_py_command-line-injection.json"
+  }
+}

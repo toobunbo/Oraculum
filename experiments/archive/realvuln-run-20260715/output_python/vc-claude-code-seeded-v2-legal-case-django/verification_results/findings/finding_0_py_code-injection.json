@@ -1,0 +1,72 @@
+{
+  "id": "0",
+  "rule_slug": "py_code-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-legal-case-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/verification_results/summary_vc-claude-code-seeded-v2-legal-case-django_20260714_152949.json"
+  },
+  "finding": {
+    "rule_id": "py/code-injection",
+    "message": "This code execution depends on a [user-provided value](1).",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 87,
+    "end_line": 87,
+    "repo_name": "vc-claude-code-seeded-v2-legal-case-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-legal-case-django/vc-claude-code-seeded-v2-legal-case-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 83: ControlFlowNode for request",
+      "line 86: ControlFlowNode for Attribute",
+      "line 86: ControlFlowNode for Attribute()",
+      "line 86: ControlFlowNode for expr",
+      "line 87: ControlFlowNode for expr"
+    ],
+    "severity": "9.3",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-94",
+      "CWE-95"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "answers": [
+      "The EXACT sink is `eval(expr, {\"__builtins__\": {}}, {\"amount\": 42, \"fee\": 7})` on line 87. The value passed to it is `expr`.",
+      "The only assignment to `expr` is on line 86: `expr = request.GET.get(\"expr\", \"amount + fee\")`.",
+      "The LAST assignment to `expr` derives from user input via `request.GET.get(\"expr\", \"amount + fee\")` on line 86. The data flow is: request (line 83) → request.GET.get (line 86) → expr (line 86) → eval (line 87).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "The defense present is the restricted globals dictionary `{\"__builtins__\": {}}`, which prevents access to built-in functions and modules. However, this does not prevent all forms of code injection, as the expression can still contain arbitrary Python expressions that do not rely on built-ins.",
+      "The user-tainted value `expr` reaches the `eval` sink on line 87. Although the globals are restricted, `eval` can still execute arbitrary expressions that do not require built-ins, making it potentially exploitable."
+    ],
+    "reasoning": "The user-controlled input `expr` is passed directly to `eval()` on line 87. Although the `__builtins__` are restricted, `eval` can still execute arbitrary Python expressions, making it a code injection vulnerability. The additional context does not provide any evidence of additional defenses.",
+    "cost_usd": 0.0,
+    "iterations": 3,
+    "input_tokens": 11839,
+    "cached_input_tokens": 0,
+    "output_tokens": 1161,
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "data_flow": "request (line 83) → request.GET.get (line 86) → expr (line 86) → eval (line 87)",
+    "elapsed_seconds": 10.981022596359253,
+    "tokens_used": 13000,
+    "verdict": "True Positive",
+    "confidence": "High",
+    "timestamp": "2026-07-14T15:29:24.443962"
+  },
+  "function": {
+    "name": "case_formula_cast_253",
+    "file": "legal_firm/case_operations.py",
+    "start_line": 83,
+    "end_line": 88,
+    "scope": ""
+  },
+  "web_params": []
+}

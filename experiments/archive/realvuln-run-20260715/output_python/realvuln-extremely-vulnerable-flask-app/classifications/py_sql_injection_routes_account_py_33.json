@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "The sink is text(f\"text like '%{search_param}%'\") on line 33, which constructs a SQL text clause object but does not perform DB I/O itself."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "The function returns render_template(...); the SQL text clause with the injected string is not part of the return value."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "returns.kind is 'value' but the return expression is a rendered template, not the SQL text object."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the text() call on line 33 (e.g., from sqlalchemy) to intercept the SQL string being constructed.",
+    "capture": "Capture the full f-string argument passed to text(), specifically the interpolated search_param value, to verify that user input is embedded unsanitized in the SQL fragment.",
+    "fake_behavior": "Return a lightweight dummy or pass-through object that satisfies downstream query building without triggering actual database execution.",
+    "notes": [
+      "Also mock any subsequent session.execute() or equivalent DB call to prevent real I/O if the query is executed within the same function or immediately after.",
+      "The core assertion should check that the captured SQL string contains the raw user input rather than a parameterized placeholder."
+    ]
+  },
+  "confidence": "medium",
+  "warnings": [
+    "Q1 is borderline: text() itself is safe, but the broader SQL execution pipeline is dangerous; if the actual DB execution is considered part of the sink, this could be reclassified."
+  ]
+}

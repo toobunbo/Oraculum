@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": false,
+      "evidence": "The sink is hashlib.md5(password).hexdigest(), which is a pure CPU computation with no network I/O, shell execution, or external side effects."
+    },
+    "q2_observable_after_return": {
+      "answer": false,
+      "evidence": "The return value is a JSON success/error response. The MD5 hash result is stored in a User object and committed to the database, not exposed in the return value."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Not evaluated; Q2 was NO."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock or wrap hashlib.md5 to intercept the call on line 141.",
+    "capture": "Record the fact that hashlib.md5 was invoked and capture the algorithm name (MD5) from the call, along with the input argument (password).",
+    "fake_behavior": "Allow execution to continue by returning a dummy hex digest string, since the violation is the algorithm choice, not the output value.",
+    "notes": [
+      "The core violation is the use of MD5 for password hashing instead of a strong algorithm like bcrypt or argon2.",
+      "The DB commit on line 143 should also be mocked to prevent actual database writes during testing.",
+      "Assert that hashlib.md5 was called to confirm the finding, and optionally assert that no secure alternative (e.g., bcrypt) was called."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

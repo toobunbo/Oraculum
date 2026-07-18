@@ -1,0 +1,68 @@
+{
+  "id": "0",
+  "rule_slug": "py_stack-trace-exposure",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-claude-code-seeded-v2-fintech-lending-fastapi_20260714_152421.json"
+  },
+  "finding": {
+    "rule_id": "py/stack-trace-exposure",
+    "message": "[Stack trace information](1) flows to this location and may be exposed to an external user.",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 27,
+    "end_line": 27,
+    "repo_name": "vc-claude-code-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/vc-claude-code-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 26: ControlFlowNode for exc",
+      "line 27: ControlFlowNode for Dict"
+    ],
+    "severity": "5.4",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-209",
+      "CWE-497"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "verdict": "True Positive",
+    "confidence": "High",
+    "iterations": 1,
+    "answers": [
+      "The sensitive information exposed includes the exception message (line 25) which contains the lot_ref and BASE_EXPORT_DIR (line 12), revealing internal file paths and potentially the structure of the application.",
+      "This information is returned in an HTTP response via JSONResponse (line 27), making it accessible to the client.",
+      "The code does not explicitly check for DEBUG mode, and the exception is directly exposed to the client without any generic error handling, suggesting that detailed error information is being sent to the client in production.",
+      "Yes, an attacker could trigger this deliberately by making a request to the endpoint '/ops/pulse/loan-lot_ref-pulse-007' with any 'lot_ref' parameter, causing the application to expose internal paths and error details.",
+      "The exception handler catches a broad 'Exception' (line 24) and re-exposes the original exception message through 'str(exc)' (line 27), which can include sensitive internal details.",
+      "External users can observe this output via the HTTP response, as the JSONResponse (line 27) is returned directly to the client making the request."
+    ],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 3.8206899166107178,
+    "output_tokens": 357,
+    "context_needed": [],
+    "reasoning": "The exception message containing internal paths is directly exposed to external users via an HTTP response without any sanitization or generic error handling, fulfilling the criteria for CWE-209 and CWE-497.",
+    "data_flow": "source (line 26) → transform (line 27) → sink (line 27)",
+    "confidence_score": 0.95,
+    "timestamp": "2026-07-14T15:23:26.119209",
+    "cost_usd": 0.0,
+    "input_tokens": 4348,
+    "cached_input_tokens": 0,
+    "tokens_used": 4705
+  },
+  "function": {
+    "name": "loan_batch_pulse_007",
+    "file": "backend/app/loan_operations.py",
+    "start_line": 23,
+    "end_line": 27,
+    "scope": ""
+  },
+  "web_params": []
+}

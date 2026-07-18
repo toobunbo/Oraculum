@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "The sink is eval(expr, ...) with user-controlled input, which is an unsafe parser and allows arbitrary code execution."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock the built-in eval() function, specifically the call on line 88: eval(expr, {\"__builtins__\": {}}, {\"amount\": 42, \"fee\": 7}).",
+    "capture": "Capture the exact string value of the 'expr' argument passed to eval to assert that tainted user input reaches the sink.",
+    "fake_behavior": "Return a benign integer value (e.g., 49) to simulate successful evaluation without executing the untrusted expression string.",
+    "notes": [
+      "Mocking eval prevents arbitrary code execution during testing.",
+      "Ensure the mock captures the first argument so the harness can verify the tainted data flow."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

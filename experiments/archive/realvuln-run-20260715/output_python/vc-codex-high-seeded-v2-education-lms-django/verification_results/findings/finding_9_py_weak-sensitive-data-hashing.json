@@ -1,0 +1,80 @@
+{
+  "id": "9",
+  "rule_slug": "py_weak-sensitive-data-hashing",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-education-lms-django",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/verification_results/summary_vc-codex-high-seeded-v2-education-lms-django_20260714_154006.json"
+  },
+  "finding": {
+    "rule_id": "py/weak-sensitive-data-hashing",
+    "message": "[Sensitive data (password)](1) is used in a hashing algorithm (SHA256) that is insecure for password hashing, since it is not a computationally expensive hash function.\n[Sensitive data (password)](2) is used in a hashing algorithm (SHA256) that is insecure for password hashing, since it is not a computationally expensive hash function.",
+    "file": "lms/models.py",
+    "start_line": 517,
+    "end_line": 517,
+    "repo_name": "vc-codex-high-seeded-v2-education-lms-django",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-education-lms-django/vc-codex-high-seeded-v2-education-lms-django.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "--- Flow 1 ---",
+      "line 34: ControlFlowNode for StringLiteral",
+      "line 34: ControlFlowNode for DEMO_API_KEY",
+      "line 166: ControlFlowNode for DEMO_API_KEY",
+      "line 516: ControlFlowNode for raw_key",
+      "line 517: ControlFlowNode for Attribute()",
+      "--- Flow 2 ---",
+      "line 1042: ControlFlowNode for Attribute()",
+      "line 1042: ControlFlowNode for header",
+      "line 1045: ControlFlowNode for header",
+      "line 516: ControlFlowNode for raw_key",
+      "line 517: ControlFlowNode for Attribute()"
+    ],
+    "severity": "7.5",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-327",
+      "CWE-328",
+      "CWE-916"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "timestamp": "2026-07-14T15:39:59.915132",
+    "confidence": "High",
+    "confidence_score": 0.9,
+    "iterations": 3,
+    "tokens_used": 15637,
+    "cost_usd": 0.0,
+    "answers": [
+      "The EXACT crypto call is `hashlib.sha256(raw_key.encode(\"utf-8\")).hexdigest()` on line 517. The algorithm is SHA256.",
+      "The algorithm name is specified via a hardcoded method call `hashlib.sha256` on line 517.",
+      "The output of the hash function is used in line 526 where it is assigned to `key_hash=cls.hash_key(raw_key)`. Based on the method name `create_with_raw_key` and the context of generating API keys, this appears to be for SECURITY purposes - storing hashed API keys for authentication.",
+      "Collision resistance is not the primary concern here since this is for password/API key hashing; preimage resistance is more relevant. However, SHA256 itself is not broken in terms of preimage resistance, but it's considered insecure for password/API key hashing due to its speed.",
+      "There is NO specific defense or safe alternative present. The code uses plain SHA256 without any salt, iterations, or proper password hashing algorithm like bcrypt, scrypt, or Argon2. This makes it insecure for password/API key storage.",
+      "Not visible in provided context whether this is for backward compatibility.",
+      "Since the use-case is SECURITY (protecting API keys) and there is no appropriate defense (like using bcrypt or PBKDF2), this is a real vulnerability."
+    ],
+    "context_needed": [],
+    "verdict": "True Positive",
+    "data_flow": "raw_key (line 516) → hashlib.sha256().hexdigest() (line 517) → key_hash field in database object (line 526)",
+    "elapsed_seconds": 12.535475254058838,
+    "reasoning": "The code hashes sensitive API key data using SHA256 without salt or computational cost, which is insecure for password/API key storage. The hash is used for security purposes (authentication) and lacks proper defenses like bcrypt or PBKDF2, making this a true positive.",
+    "cached_input_tokens": 0,
+    "output_tokens": 1383,
+    "input_tokens": 14254,
+    "model": "ollama_chat/qwen3-coder:480b-cloud"
+  },
+  "function": {
+    "name": "hash_key",
+    "file": "lms/models.py",
+    "start_line": 516,
+    "end_line": 517,
+    "scope": "APIKey"
+  },
+  "web_params": []
+}

@@ -1,0 +1,67 @@
+{
+  "id": "10",
+  "rule_slug": "py_template-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/verification_results/summary_vc-codex-high-seeded-v2-fintech-lending-fastapi_20260714_154154.json"
+  },
+  "finding": {
+    "rule_id": "py/template-injection",
+    "message": "This template construction depends on a [user-provided value](1).",
+    "file": "app/loan_operations.py",
+    "start_line": 115,
+    "end_line": 115,
+    "repo_name": "vc-codex-high-seeded-v2-fintech-lending-fastapi",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/vc-codex-high-seeded-v2-fintech-lending-fastapi/vc-codex-high-seeded-v2-fintech-lending-fastapi.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 113: ControlFlowNode for fragment",
+      "line 115: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "9.3",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-74"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "elapsed_seconds": 13.865103244781494,
+    "answers": [
+      "The EXACT template-render sink is `Template(\"Result: \" + fragment).render()` on line 115. The template-source string passed to it is `\"Result: \" + fragment`.",
+      "The template-source string is assigned on line 115 as `\"Result: \" + fragment`. This is the ONLY assignment to the template-source string on the path that reaches the sink.",
+      "The value `\"Result: \" + fragment` derives from user input. The variable `fragment` is a parameter of the function `loan_jinja_cast_583` on line 113, with a default value of `\"{{ 7 * 7 }}\"`. The data-flow chain is: line 113 (fragment input) → line 115 (template source).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no specific defense that prevents SSTI. The user input is directly embedded into the template source string, and no sandboxing or escaping mechanisms are applied. The function uses regular Jinja2 Template, not SandboxedEnvironment.",
+      "The user-controlled data (`fragment`) reaches the template SOURCE (`\"Result: \" + fragment`) with concrete line numbers (113 → 115), and there is no defense such as sandboxing or escaping."
+    ],
+    "tokens_used": 18032,
+    "data_flow": "fragment parameter (line 113) → template string construction \"Result: \" + fragment (line 115) → Template().render() (line 115)",
+    "output_tokens": 1285,
+    "iterations": 3,
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "cost_usd": 0.0,
+    "input_tokens": 16747,
+    "confidence_score": 0.95,
+    "context_needed": [],
+    "timestamp": "2026-07-14T15:41:51.214110",
+    "reasoning": "User-controlled input `fragment` is directly concatenated into the template source string on line 115, which is then rendered without any sanitization or sandboxing. This allows for potential Server-Side Template Injection (SSTI). The function is exposed as a FastAPI route decorator, confirming external accessibility.",
+    "cached_input_tokens": 0,
+    "confidence": "High"
+  },
+  "function": {
+    "name": "loan_jinja_cast_583",
+    "file": "app/loan_operations.py",
+    "start_line": 113,
+    "end_line": 116,
+    "scope": ""
+  },
+  "web_params": []
+}

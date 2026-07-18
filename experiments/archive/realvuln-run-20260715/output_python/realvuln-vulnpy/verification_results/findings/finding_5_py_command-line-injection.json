@@ -1,0 +1,70 @@
+{
+  "id": "5",
+  "rule_slug": "py_command-line-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulnpy",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnpy",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnpy/verification_results/summary_realvuln-vulnpy_20260714_151715.json"
+  },
+  "finding": {
+    "rule_id": "py/command-line-injection",
+    "message": "This command line depends on a [user-provided value](1).",
+    "file": "apps/fastapi_app.py",
+    "start_line": 43,
+    "end_line": 43,
+    "repo_name": "realvuln-vulnpy",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnpy/realvuln-vulnpy.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 38: ControlFlowNode for user_input",
+      "line 39: ControlFlowNode for cmd",
+      "line 43: ControlFlowNode for cmd"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-78",
+      "CWE-88"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "elapsed_seconds": 9.1013503074646,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "timestamp": "2026-07-14T15:17:10.925468",
+    "output_tokens": 1212,
+    "confidence": "High",
+    "confidence_score": 0.95,
+    "iterations": 3,
+    "tokens_used": 13510,
+    "cost_usd": 0.0,
+    "data_flow": "user_input (line 38) → cmd (line 39) → os.system(cmd) (line 43)",
+    "answers": [
+      "The exact sink is `os.system(cmd)` on line 43. The value passed as the command argument is `cmd`.",
+      "The assignment to `cmd` is on line 39: `cmd = \"echo \" + user_input + \" this should be echoed\"`. This is the only assignment to `cmd` on the path that reaches the sink.",
+      "The value of `cmd` on line 39 derives from `user_input`, which is the user-provided value passed to the function on line 38. The data-flow chain is: `user_input` (line 38) → `cmd` (line 39) → `os.system(cmd)` (line 43).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path. The value of `cmd` is constructed once on line 39 and used directly in the sink on line 43.",
+      "There is no specific defense that sanitizes the value. No functions like `shlex.quote()` or `subprocess.run([...], shell=False)` are used. The code directly concatenates user input into a shell command string.",
+      "The user-tainted value `user_input` reaches the sink `os.system(cmd)` on line 43 through the construction of `cmd` on line 39. There is no sanitization or defense mechanism present in the code."
+    ],
+    "context_needed": [],
+    "input_tokens": 12298,
+    "verdict": "True Positive",
+    "reasoning": "The user-provided input `user_input` is directly concatenated into the command string `cmd` on line 39, which is then passed to `os.system()` on line 43. There is no sanitization or defense mechanism to prevent command injection, making this a clear case of Command Injection (CWE-78). The additional context shows no callers were found, but the vulnerability exists within the function itself regardless of how it's called.",
+    "cached_input_tokens": 0
+  },
+  "function": {
+    "name": "cmdi",
+    "file": "apps/fastapi_app.py",
+    "start_line": 38,
+    "end_line": 47,
+    "scope": ""
+  },
+  "web_params": []
+}

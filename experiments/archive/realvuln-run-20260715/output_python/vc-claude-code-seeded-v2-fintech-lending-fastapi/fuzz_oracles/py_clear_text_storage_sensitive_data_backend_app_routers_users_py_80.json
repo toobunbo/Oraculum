@@ -1,0 +1,47 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "builtins.open",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "file path passed to open for the password log file",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The captured file path contains 'password_reset_mailbox.log', confirming the code path that writes cleartext initial_password to the log file is reached.",
+    "trigger_patterns": [
+      "password_reset_mailbox\\.log"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_CLEAR_TEXT_STORAGE_SENSITIVE_DATA: cleartext password written to log file — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "MySecretPass123",
+      "admin123!",
+      "P@ssw0rd2024",
+      "InitialPassword99",
+      "SensitiveUserPw_01"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "create_user",
+    "file": "backend/app/routers/users.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def create_user(body: UserCreate, request: Request, db: Session, actor: User)",
+    "tainted_params": [
+      {
+        "name": "body",
+        "index": 0,
+        "type": "UserCreate"
+      }
+    ],
+    "target_id": "py_clear_text_storage_sensitive_data_backend_app_routers_users_py_80",
+    "finding_id": "12",
+    "rule_id": "py/clear-text-storage-sensitive-data",
+    "rule_slug": "py_clear-text-storage-sensitive-data",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_12_py_clear-text-storage-sensitive-data.json"
+  }
+}

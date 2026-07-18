@@ -1,0 +1,73 @@
+{
+  "id": "5",
+  "rule_slug": "py_unsafe-deserialization",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-dvblab",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab/verification_results/summary_realvuln-dvblab_20260714_145756.json"
+  },
+  "finding": {
+    "rule_id": "py/unsafe-deserialization",
+    "message": "Unsafe deserialization depends on a [user-provided value](1).",
+    "file": "backend/routes/auth_routes.py",
+    "start_line": 157,
+    "end_line": 157,
+    "repo_name": "realvuln-dvblab",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-dvblab/realvuln-dvblab.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 1: ControlFlowNode for ImportMember",
+      "line 1: ControlFlowNode for request",
+      "line 155: ControlFlowNode for request",
+      "line 155: ControlFlowNode for Attribute()",
+      "line 155: ControlFlowNode for Attribute()",
+      "line 155: ControlFlowNode for profile_yaml",
+      "line 157: ControlFlowNode for profile_yaml"
+    ],
+    "severity": "9.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-502"
+    ],
+    "tags": [
+      "security",
+      "serialization"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "reasoning": "User-controlled data flows directly into an unsafe YAML deserialization sink without any sanitization or safe loading mechanism. The use of `yaml.load()` with `yaml.Loader` is explicitly unsafe and allows arbitrary code execution. Additional context confirms no external sanitization exists.",
+    "elapsed_seconds": 9.309247732162476,
+    "answers": [
+      "The EXACT deserialization sink is `yaml.load(profile_yaml, Loader=yaml.Loader)` on line 157. The value passed to it is `profile_yaml`.",
+      "The only assignment to `profile_yaml` is on line 155: `profile_yaml = request.get_json().get('profile_yaml', '')`.",
+      "The value of `profile_yaml` derives from user input via `request.get_json().get('profile_yaml', '')` on line 155. The data flow path is: request (line 155) → profile_yaml (line 155) → yaml.load (line 157). The caller context shows no external sanitization.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value on the reaching path.",
+      "There is no defense preventing code execution. The code uses `yaml.load()` with `yaml.Loader`, which is unsafe and allows arbitrary code execution. It does not use `yaml.safe_load()` or any other safe alternative.",
+      "The user-controlled data (`profile_yaml`) reaches the unsafe sink (`yaml.load`) with no sanitization or safe loading mechanism. The additional context confirms no external callers or callees that might provide sanitization."
+    ],
+    "cached_input_tokens": 0,
+    "tokens_used": 13218,
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence_score": 0.95,
+    "timestamp": "2026-07-14T14:57:38.248930",
+    "context_needed": [],
+    "data_flow": "request (line 155) → profile_yaml (line 155) → yaml.load (line 157)",
+    "output_tokens": 1134,
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "iterations": 3,
+    "verdict": "True Positive",
+    "input_tokens": 12084
+  },
+  "function": {
+    "name": "import_profile",
+    "file": "backend/routes/auth_routes.py",
+    "start_line": 153,
+    "end_line": 165,
+    "scope": ""
+  },
+  "web_params": []
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is target.write_bytes(request.body) on line 142, a filesystem write that is an irreversible side effect."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Skipped; Q1 answered true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Skipped; Q1 answered true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock pathlib.Path.write_bytes or the target object's write_bytes method to intercept the filesystem write on line 142.",
+    "capture": "Capture the constructed path (target) and the payload (request.body) passed to write_bytes to verify path traversal and content injection.",
+    "fake_behavior": "Make the mocked write_bytes a no-op that records its arguments, allowing execution to continue and return the JsonResponse.",
+    "notes": [
+      "Ensure the mock returns None to satisfy Path.write_bytes contract.",
+      "The constructed path uses BASE_EXPORT_DIR / name; verify that name containing traversal sequences like '../' reaches the sink unsanitized."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

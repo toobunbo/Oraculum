@@ -1,0 +1,176 @@
+{
+  "stage": "oracle",
+  "repo": "vc-claude-code-seeded-v2-hr-payroll-django",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/oracle.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 12,
+    "generated": 8,
+    "skipped": 0,
+    "failed": 4
+  },
+  "oracles": [
+    {
+      "id": "0",
+      "target_id": "py_code_injection_hr_portal_payroll_operations_py_97",
+      "rule_id": "py/code-injection",
+      "file": "hr_portal/payroll_operations.py",
+      "start_line": "97",
+      "function_name": "payroll_formula_cast_252",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_0_py_code-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/fuzz_oracles/py_code_injection_hr_portal_payroll_operations_py_97.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "1",
+      "target_id": "py_cookie_injection_hr_portal_payroll_operations_py_105",
+      "rule_id": "py/cookie-injection",
+      "file": "hr_portal/payroll_operations.py",
+      "start_line": "105",
+      "function_name": "payroll_crumb_lane_290",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_1_py_cookie-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/fuzz_oracles/py_cookie_injection_hr_portal_payroll_operations_py_105.json",
+      "status": "generated",
+      "strategy": "return_value"
+    },
+    {
+      "id": "2",
+      "target_id": "py_full_ssrf_hr_portal_payroll_operations_py_52",
+      "rule_id": "py/full-ssrf",
+      "file": "hr_portal/payroll_operations.py",
+      "start_line": "52",
+      "function_name": "payroll_broker_tile_015",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_2_py_full-ssrf.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/fuzz_oracles/py_full_ssrf_hr_portal_payroll_operations_py_52.json",
+      "status": "failed"
+    },
+    {
+      "id": "3",
+      "target_id": "py_path_injection_hr_portal_payroll_operations_py_42",
+      "rule_id": "py/path-injection",
+      "file": "hr_portal/payroll_operations.py",
+      "start_line": "42",
+      "function_name": "payroll_fold_drop_014",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_3_py_path-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/fuzz_oracles/py_path_injection_hr_portal_payroll_operations_py_42.json",
+      "status": "generated",
+      "strategy": "return_value"
+    },
+    {
+      "id": "4",
+      "target_id": "py_path_injection_hr_portal_payroll_operations_py_147",
+      "rule_id": "py/path-injection",
+      "file": "hr_portal/payroll_operations.py",
+      "start_line": "147",
+      "function_name": "payroll_dock_shelf_391",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_4_py_path-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/fuzz_oracles/py_path_injection_hr_portal_payroll_operations_py_147.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "5",
+      "target_id": "py_path_injection_hr_portal_payroll_operations_py_148",
+      "rule_id": "py/path-injection",
+      "file": "hr_portal/payroll_operations.py",
+      "start_line": "148",
+      "function_name": "payroll_dock_shelf_391",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_5_py_path-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/fuzz_oracles/py_path_injection_hr_portal_payroll_operations_py_148.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "6",
+      "target_id": "py_xxe_hr_portal_payroll_operations_py_197",
+      "rule_id": "py/xxe",
+      "file": "hr_portal/payroll_operations.py",
+      "start_line": "197",
+      "function_name": "payroll_xml_fold_454",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_6_py_xxe.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/fuzz_oracles/py_xxe_hr_portal_payroll_operations_py_197.json",
+      "status": "failed"
+    },
+    {
+      "id": "7",
+      "target_id": "py_unsafe_deserialization_hr_portal_payroll_operations_py_79",
+      "rule_id": "py/unsafe-deserialization",
+      "file": "hr_portal/payroll_operations.py",
+      "start_line": "79",
+      "function_name": "payroll_bundle_thaw_170",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_7_py_unsafe-deserialization.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/fuzz_oracles/py_unsafe_deserialization_hr_portal_payroll_operations_py_79.json",
+      "status": "failed"
+    },
+    {
+      "id": "8",
+      "target_id": "py_nosql_injection_hr_portal_payroll_operations_py_165",
+      "rule_id": "py/nosql-injection",
+      "file": "hr_portal/payroll_operations.py",
+      "start_line": "165",
+      "function_name": "payroll_mongo_lane_413",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_8_py_nosql-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/fuzz_oracles/py_nosql_injection_hr_portal_payroll_operations_py_165.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "9",
+      "target_id": "py_command_line_injection_hr_portal_payroll_operations_py_156",
+      "rule_id": "py/command-line-injection",
+      "file": "hr_portal/payroll_operations.py",
+      "start_line": "156",
+      "function_name": "payroll_shell_probe_402",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_9_py_command-line-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/fuzz_oracles/py_command_line_injection_hr_portal_payroll_operations_py_156.json",
+      "status": "generated",
+      "strategy": "recorded_call"
+    },
+    {
+      "id": "10",
+      "target_id": "py_template_injection_hr_portal_payroll_operations_py_139",
+      "rule_id": "py/template-injection",
+      "file": "hr_portal/payroll_operations.py",
+      "start_line": "139",
+      "function_name": "payroll_jinja_cast_384",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_10_py_template-injection.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/fuzz_oracles/py_template_injection_hr_portal_payroll_operations_py_139.json",
+      "status": "failed"
+    },
+    {
+      "id": "11",
+      "target_id": "py_jinja2_autoescape_false_hr_portal_payroll_operations_py_139",
+      "rule_id": "py/jinja2/autoescape-false",
+      "file": "hr_portal/payroll_operations.py",
+      "start_line": "139",
+      "function_name": "payroll_jinja_cast_384",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_11_py_jinja2_autoescape-false.json",
+      "oracle": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/fuzz_oracles/py_jinja2_autoescape_false_hr_portal_payroll_operations_py_139.json",
+      "status": "generated",
+      "strategy": "return_value"
+    }
+  ],
+  "errors": [
+    {
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_2_py_full-ssrf.json",
+      "error": "monitor.strategy invalid: 'patch_call'. Must be one of {'filesystem_state', 'return_value', 'recorded_call'}"
+    },
+    {
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_6_py_xxe.json",
+      "error": "monitor.strategy invalid: 'patch_call'. Must be one of {'filesystem_state', 'return_value', 'recorded_call'}"
+    },
+    {
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_7_py_unsafe-deserialization.json",
+      "error": "monitor.strategy invalid: 'patch_call'. Must be one of {'filesystem_state', 'return_value', 'recorded_call'}"
+    },
+    {
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-hr-payroll-django/verification_results/findings/finding_10_py_template-injection.json",
+      "error": "monitor.strategy invalid: 'patch_call'. Must be one of {'filesystem_state', 'return_value', 'recorded_call'}"
+    }
+  ]
+}

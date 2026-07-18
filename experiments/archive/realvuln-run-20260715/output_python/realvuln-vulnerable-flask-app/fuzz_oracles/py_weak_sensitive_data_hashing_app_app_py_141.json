@@ -1,0 +1,43 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "hashlib.md5",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "password string passed to hashlib.md5 for hashing",
+    "additional_imports": [
+      "hashlib"
+    ]
+  },
+  "oracle_check": {
+    "condition_description": "hashlib.md5 was invoked with a non-empty password string, confirming use of weak MD5 algorithm for password hashing",
+    "trigger_patterns": [
+      ".+"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_WEAK_SENSITIVE_DATA_HASHING: MD5 used for password hashing — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "password123",
+      "admin",
+      "P@ssw0rd!",
+      "testuser",
+      "mysecret"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "reg_customer",
+    "file": "app/app.py",
+    "input_strategy": "flask_view",
+    "function_signature": "def reg_customer()",
+    "tainted_params": [],
+    "target_id": "py_weak_sensitive_data_hashing_app_app_py_141",
+    "finding_id": "3",
+    "rule_id": "py/weak-sensitive-data-hashing",
+    "rule_slug": "py_weak-sensitive-data-hashing",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-vulnerable-flask-app/verification_results/findings/finding_3_py_weak-sensitive-data-hashing.json"
+  }
+}

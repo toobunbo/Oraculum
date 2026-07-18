@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is db.engine.execute(str_query), which is database I/O executing a user-tainted SQL query."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Skipped: Q1 answered true."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Skipped: Q1 answered true."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "Mock or record the db.engine.execute call on line 265.",
+    "capture": "Capture the str_query argument passed to db.engine.execute to verify it contains unsanitized user input and a SQL injection payload (e.g., \"' OR 1=1--\").",
+    "fake_behavior": "Return a mock database result object (e.g., an empty list or a list of mock rows) so that subsequent iteration or result handling does not raise an exception and execution continues.",
+    "notes": [
+      "The mock must accept a raw string argument since the vulnerability is string-format interpolation rather than parameterized queries.",
+      "Consider asserting that the captured query string contains the malicious payload to confirm exploitability."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}

@@ -1,0 +1,48 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of acct_return_lane_161, which is an HttpResponseRedirect whose url attribute or string representation contains the user-supplied lane URL",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The returned redirect response contains an external or protocol-relative URL (e.g. http://, https://, //evil.com) in its url attribute, confirming that user-controlled input reached the redirect sink without sanitization",
+    "trigger_patterns": [
+      "https?://[^/]",
+      "//[^/]"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_URL_REDIRECTION: open redirect detected — captured={captured} pattern={matched_pattern}>"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "http://evil.com",
+      "https://attacker.example.com/steal",
+      "//malicious.site/path",
+      "http://127.0.0.1/admin",
+      "https://evil.com?token=abc"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "acct_return_lane_161",
+    "file": "config/partner_console.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def acct_return_lane_161(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "HttpRequest"
+      }
+    ],
+    "target_id": "py_url_redirection_config_partner_console_py_73",
+    "finding_id": "7",
+    "rule_id": "py/url-redirection",
+    "rule_slug": "py_url-redirection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-codex-high-seeded-v2-crm-saas-django/verification_results/findings/finding_7_py_url-redirection.json"
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "id": "5",
+  "rule_slug": "py_reflective-xss",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-djangoat",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/verification_results/summary_realvuln-djangoat_20260714_145404.json"
+  },
+  "finding": {
+    "rule_id": "py/reflective-xss",
+    "message": "Cross-site scripting vulnerability due to a [user-provided value](1).",
+    "file": "app/views/dashboard/views.py",
+    "start_line": 37,
+    "end_line": 37,
+    "repo_name": "realvuln-djangoat",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-djangoat/realvuln-djangoat.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 36: ControlFlowNode for dashboard_id",
+      "line 37: ControlFlowNode for BinaryExpr"
+    ],
+    "severity": "6.1",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-116",
+      "CWE-79"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "input_tokens": 12975,
+    "output_tokens": 1261,
+    "context_needed": [],
+    "cached_input_tokens": 0,
+    "data_flow": "dashboard_id (line 36) → str(dashboard_id) (line 37) → HttpResponse (line 37)",
+    "cost_usd": 0.0,
+    "confidence_score": 0.95,
+    "reasoning": "The user-provided `dashboard_id` parameter flows directly into an HttpResponse without any escaping or sanitization. Django's HttpResponse does not auto-escape content, making this a reflective XSS vulnerability. The missing caller context doesn't change the fact that URL parameters are typically user-controllable.",
+    "confidence": "High",
+    "answers": [
+      "The EXACT sink is: `return HttpResponse(\"Dashboard \" + str(dashboard_id))` on line 37. The value being rendered is the string concatenation of \"Dashboard \" and `str(dashboard_id)`.",
+      "The only assignment to `dashboard_id` is as a parameter in the function signature on line 36: `def dashboard_view(request, dashboard_id):`.",
+      "The value `dashboard_id` is a parameter derived from the URL path, which is user-provided input. The dataflow path confirms this: [SOURCE] line 36: ControlFlowNode for dashboard_id → [SINK] line 37: ControlFlowNode for BinaryExpr.",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The value flows directly from the function parameter to the HttpResponse.",
+      "There is no specific defense escaping the value at the sink. No explicit escaping function like `html.escape()` or framework auto-escape mechanism is applied to `dashboard_id` before it is rendered.",
+      "The code does not use `|safe`, `{% autoescape false %}`, `Markup(...)`, or `mark_safe(...)` to disable escaping. However, since no escaping is applied at all, this is irrelevant.",
+      "The user-tainted value `dashboard_id` reaches the sink directly without any escaping or sanitization. The HttpResponse constructor in Django does not perform automatic escaping."
+    ],
+    "verdict": "True Positive",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "elapsed_seconds": 11.50588607788086,
+    "timestamp": "2026-07-14T14:53:28.654979",
+    "iterations": 3,
+    "tokens_used": 14236
+  },
+  "function": {
+    "name": "dashboard_view",
+    "file": "app/views/dashboard/views.py",
+    "start_line": 36,
+    "end_line": 37,
+    "scope": ""
+  },
+  "web_params": []
+}

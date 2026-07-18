@@ -1,0 +1,70 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "target": "builtins.eval",
+    "capture_args": [
+      {
+        "index": 0,
+        "name": null
+      }
+    ],
+    "patch_target": "builtins.eval",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "captured value",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "type": "regex",
+    "pattern": ".*",
+    "match_against": "captured_args[0]",
+    "condition_description": "oracle condition",
+    "trigger_patterns": [
+      "[\\s\\S]+"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "ORACULUM_VIOLATION: captured={captured}"
+  },
+  "fuzz_guidance": {
+    "input_type": "flask_view",
+    "taint_source": "request.form.get(\"BenchmarkTest00156\")",
+    "sink_location": "line 44: eval(bar)",
+    "expected_flow": "request.form.get(\"BenchmarkTest00156\") → param → bar → eval(bar)",
+    "seed_corpus": [],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "aliasing_risk": "Low - builtins.eval is globally unique and directly referenced.",
+    "import_risk": "None - builtins module is always available in Python runtime.",
+    "async_risk": "None - The sink is synchronous and blocking.",
+    "classification_strategy": "recorded_call",
+    "classification_confidence": "high",
+    "mock_guidance": {
+      "required": true,
+      "target": "The `eval()` call on line 44 should be mocked to prevent actual code execution.",
+      "capture": "Capture the value of `bar` being passed to `eval()` to verify it originates from user input.",
+      "fake_behavior": "Stub `eval()` to return a safe, predefined value or raise an exception to simulate blocking of unsafe execution.",
+      "notes": [
+        "Mocking `eval()` is essential to prevent arbitrary code execution during testing.",
+        "Ensure the mock captures the exact value passed to `eval()` for verification purposes."
+      ]
+    },
+    "target_id": "py_code_injection_testcode_BenchmarkTest00156_py_44",
+    "finding_id": "1",
+    "rule_id": "py/code-injection",
+    "rule_slug": "py_code-injection",
+    "file": "testcode/BenchmarkTest00156.py",
+    "function": "BenchmarkTest00156_post",
+    "input_strategy": "flask_view",
+    "function_signature": "def BenchmarkTest00156_post()",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": -1,
+        "type": "flask_request"
+      }
+    ],
+    "model": "ollama/qwen3-coder:480b-cloud",
+    "source_finding_artifact": "output/python/benchmark-python/verification_results/findings/finding_1_py_code-injection.json"
+  }
+}

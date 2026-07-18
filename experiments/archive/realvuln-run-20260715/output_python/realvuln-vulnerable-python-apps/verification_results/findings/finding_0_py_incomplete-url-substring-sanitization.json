@@ -1,0 +1,74 @@
+{
+  "id": "0",
+  "rule_slug": "py_incomplete-url-substring-sanitization",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-vulnerable-python-apps",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-python-apps",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-python-apps/verification_results/summary_realvuln-vulnerable-python-apps_20260714_151422.json"
+  },
+  "finding": {
+    "rule_id": "py/incomplete-url-substring-sanitization",
+    "message": "The string [https://insecurewebapp.com](1) may be at an arbitrary position in the sanitized URL.",
+    "file": "Other/url_fetch.py",
+    "start_line": 14,
+    "end_line": 14,
+    "repo_name": "realvuln-vulnerable-python-apps",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-vulnerable-python-apps/realvuln-vulnerable-python-apps.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [],
+    "severity": "7.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-20"
+    ],
+    "tags": [
+      "correctness",
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "output_tokens": 455,
+    "reasoning": "The code performs only a prefix check on the user-provided URL, which is insufficient to prevent SSRF attacks. An attacker could craft a URL that starts with the allowed prefix but still points to an unintended destination, bypassing the check. The urllib.request.urlopen call on line 15 is a clear SSRF sink.",
+    "confidence_score": 0.95,
+    "cached_input_tokens": 0,
+    "iterations": 1,
+    "tokens_used": 3861,
+    "verdict": "True Positive",
+    "cost_usd": 0.0,
+    "data_flow": "request.args.get('url') (line 13) → url.startswith check (line 14) → urllib.request.urlopen(url) (line 15)",
+    "input_tokens": 3406,
+    "context_needed": [],
+    "answers": [
+      "The potentially dangerous data originates from user input via the 'url' query parameter (line 13).",
+      "The data flows through the variable 'url' on line 13, and is then checked on line 14 before being used in urllib.request.urlopen on line 15.",
+      "The only validation applied is checking if the URL starts with 'https://insecurewebapp.com' (line 14). This is insufficient for preventing URL redirection attacks as it does not prevent paths or subdomains that could lead to unintended destinations.",
+      "The sink is the urllib.request.urlopen call on line 15, which opens and reads from the user-provided URL.",
+      "There are no intermediate transformations that could bypass sanitization; the URL is used directly after the prefix check.",
+      "The urllib library does not provide automatic protections against malicious redirects or SSRF in this context.",
+      "The code does not specify authentication requirements, suggesting it may be accessible to unauthenticated users.",
+      "The code does not appear to be in a test file or debug path; it appears to be part of the main application logic.",
+      "The concrete security impact is Server-Side Request Forgery (SSRF), which could lead to internal network scanning, data theft, or bypassing firewall restrictions.",
+      "The weakest link is the incomplete URL sanitization on line 14, which only checks the prefix but does not ensure the URL points to a safe destination."
+    ],
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "confidence": "High",
+    "timestamp": "2026-07-14T15:14:09.742334",
+    "elapsed_seconds": 3.659101724624634
+  },
+  "function": {
+    "name": "fetch",
+    "file": "Other/url_fetch.py",
+    "start_line": 12,
+    "end_line": 18,
+    "scope": ""
+  },
+  "web_params": [
+    {
+      "name": "url",
+      "source": "args"
+    }
+  ]
+}

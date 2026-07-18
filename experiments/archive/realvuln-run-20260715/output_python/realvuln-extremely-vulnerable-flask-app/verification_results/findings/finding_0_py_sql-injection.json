@@ -1,0 +1,77 @@
+{
+  "id": "0",
+  "rule_slug": "py_sql-injection",
+  "source": {
+    "vhx_root": "/home/trieudai/VulnHunterX",
+    "vhx_repo_root": "/home/trieudai/VulnHunterX/repos/python/realvuln-extremely-vulnerable-flask-app",
+    "vhx_output_root": "/home/trieudai/VulnHunterX/output/python/realvuln-extremely-vulnerable-flask-app",
+    "summary_path": "/home/trieudai/VulnHunterX/output/python/realvuln-extremely-vulnerable-flask-app/verification_results/summary_realvuln-extremely-vulnerable-flask-app_20260714_150009.json"
+  },
+  "finding": {
+    "rule_id": "py/sql-injection",
+    "message": "This SQL query depends on a [user-provided value](1).",
+    "file": "routes/account.py",
+    "start_line": 33,
+    "end_line": 33,
+    "repo_name": "realvuln-extremely-vulnerable-flask-app",
+    "lang": "python",
+    "sarif_path": "/home/trieudai/VulnHunterX/output/python/realvuln-extremely-vulnerable-flask-app/realvuln-extremely-vulnerable-flask-app.sarif",
+    "tool": "CodeQL",
+    "dataflow_path": [
+      "line 8: ControlFlowNode for ImportMember",
+      "line 8: ControlFlowNode for request",
+      "line 27: ControlFlowNode for request",
+      "line 27: ControlFlowNode for Attribute",
+      "line 27: ControlFlowNode for Attribute()",
+      "line 27: ControlFlowNode for search_param",
+      "line 33: ControlFlowNode for Fstring"
+    ],
+    "severity": "8.8",
+    "precision": "high",
+    "cwe_ids": [
+      "CWE-89"
+    ],
+    "tags": [
+      "security"
+    ],
+    "related_locations": []
+  },
+  "verification": {
+    "cost_usd": 0.0,
+    "confidence": "High",
+    "model": "ollama_chat/qwen3-coder:480b-cloud",
+    "reasoning": "User-controlled input `search_param` is embedded directly into an SQL fragment via an f-string in the `text()` call on line 33 with no apparent sanitization or parameterization, constituting a clear SQL injection vulnerability. The lack of a caller does not mitigate this as the vulnerability is fully contained within the provided function.",
+    "iterations": 3,
+    "context_needed": [],
+    "timestamp": "2026-07-14T15:00:09.306675",
+    "cached_input_tokens": 0,
+    "output_tokens": 1214,
+    "data_flow": "request.args.get('search', '') (line 27) → search_param (line 27) → text(f\"text like '%{search_param}%\") (line 33)",
+    "confidence_score": 0.95,
+    "verdict": "True Positive",
+    "elapsed_seconds": 24.625158309936523,
+    "answers": [
+      "The EXACT sink statement is: `text(f\"text like '%{search_param}%'\")` on line 33. The variable passed to it is `search_param`.",
+      "The assignment to `search_param` is on line 27: `search_param = request.args.get('search', '')`. This is the LAST and ONLY assignment on the path to the sink.",
+      "The value of `search_param` derives from user input via `request.args.get('search', '')` on line 27. The data flow is: request.args (line 27) → search_param (line 27) → f-string in `text()` call (line 33).",
+      "There are no constant-time conditions or reassignments that override the user-tainted value. The value flows directly from the request to the sink without intermediate sanitization or override.",
+      "There is NO specific defense sanitizing the value before the sink. The `text()` function is used directly with an f-string that embeds the user-provided `search_param`, which is a classic SQL injection vulnerability pattern. No parameterization or escaping is evident.",
+      "The user-tainted value `search_param` clearly reaches the sink at line 33 via line 27, and there is no visible defense mechanism (e.g., parameterized queries or escaping). The additional context of no caller found does not change this conclusion, as the vulnerability is self-contained within the function."
+    ],
+    "input_tokens": 12144,
+    "tokens_used": 13358
+  },
+  "function": {
+    "name": "search",
+    "file": "routes/account.py",
+    "start_line": 26,
+    "end_line": 38,
+    "scope": ""
+  },
+  "web_params": [
+    {
+      "name": "search",
+      "source": "args"
+    }
+  ]
+}

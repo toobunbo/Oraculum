@@ -1,0 +1,53 @@
+{
+  "monitor": {
+    "strategy": "recorded_call",
+    "patch_target": "pathlib.Path.write_bytes",
+    "target_arg_index": 0,
+    "target_arg_name": null,
+    "capture_what": "The Path object (self) representing the resolved file path passed to write_bytes, checked for directory traversal sequences",
+    "additional_imports": [
+      "pathlib"
+    ]
+  },
+  "oracle_check": {
+    "condition_description": "The Path object's string representation contains directory traversal sequences such as '../' indicating the user-supplied name escaped BASE_EXPORT_DIR",
+    "trigger_patterns": [
+      "\\.\\./",
+      "\\.\\.\\\\",
+      "/\\.\\.",
+      "\\\\.\\."
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_PATH_INJECTION: directory traversal detected in write_bytes path — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "../../etc/passwd",
+      "../../../tmp/evil.bin",
+      "foo/../../bar/shell.py",
+      "../config/settings.json",
+      "....//....//etc//shadow",
+      "normal.txt"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "loan_dock_shelf_390",
+    "file": "backend/app/loan_operations.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def loan_dock_shelf_390(request: Request, name: str, gate_ref: None)",
+    "tainted_params": [
+      {
+        "name": "name",
+        "index": 1,
+        "type": "str"
+      }
+    ],
+    "target_id": "py_path_injection_backend_app_loan_operations_py_121",
+    "finding_id": "5",
+    "rule_id": "py/path-injection",
+    "rule_slug": "py_path-injection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/vc-claude-code-seeded-v2-fintech-lending-fastapi/verification_results/findings/finding_5_py_path-injection.json"
+  }
+}

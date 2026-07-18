@@ -1,0 +1,206 @@
+{
+  "config": {
+    "runs": 10000,
+    "n": 3,
+    "harnesses": 33
+  },
+  "oracle_only_metric": {
+    "precision_mean_std": "82.4% ± 0.0%",
+    "recall_mean_std": "82.4% ± 0.0%",
+    "f1_mean_std": "82.4% ± 0.0%",
+    "per_repeat": [
+      {
+        "rep": 0,
+        "tp": 14,
+        "fp": 3,
+        "precision": 0.824,
+        "recall": 0.824,
+        "f1": 0.824
+      },
+      {
+        "rep": 1,
+        "tp": 14,
+        "fp": 3,
+        "precision": 0.824,
+        "recall": 0.824,
+        "f1": 0.824
+      },
+      {
+        "rep": 2,
+        "tp": 14,
+        "fp": 3,
+        "precision": 0.824,
+        "recall": 0.824,
+        "f1": 0.824
+      }
+    ]
+  },
+  "per_finding_run0": [
+    {
+      "test": "BenchmarkTest00073",
+      "gt": "FP",
+      "run0": "incidental_crash"
+    },
+    {
+      "test": "BenchmarkTest00156",
+      "gt": "FP",
+      "run0": "no_trigger"
+    },
+    {
+      "test": "BenchmarkTest00158",
+      "gt": "FP",
+      "run0": "incidental_crash"
+    },
+    {
+      "test": "BenchmarkTest00159",
+      "gt": "TP",
+      "run0": "incidental_crash"
+    },
+    {
+      "test": "BenchmarkTest00165",
+      "gt": "TP",
+      "run0": "oracle_violation"
+    },
+    {
+      "test": "BenchmarkTest00167",
+      "gt": "TP",
+      "run0": "oracle_violation"
+    },
+    {
+      "test": "BenchmarkTest00168",
+      "gt": "TP",
+      "run0": "oracle_violation"
+    },
+    {
+      "test": "BenchmarkTest00267",
+      "gt": "TP",
+      "run0": "oracle_violation"
+    },
+    {
+      "test": "BenchmarkTest00001",
+      "gt": "TP",
+      "run0": "oracle_violation"
+    },
+    {
+      "test": "BenchmarkTest00002",
+      "gt": "TP",
+      "run0": "oracle_violation"
+    },
+    {
+      "test": "BenchmarkTest00005",
+      "gt": "FP",
+      "run0": "incidental_crash"
+    },
+    {
+      "test": "BenchmarkTest00150",
+      "gt": "FP",
+      "run0": "no_trigger"
+    },
+    {
+      "test": "BenchmarkTest00256",
+      "gt": "FP",
+      "run0": "no_trigger"
+    },
+    {
+      "test": "BenchmarkTest00257",
+      "gt": "FP",
+      "run0": "no_trigger"
+    },
+    {
+      "test": "BenchmarkTest00591",
+      "gt": "FP",
+      "run0": "incidental_crash"
+    },
+    {
+      "test": "BenchmarkTest01083",
+      "gt": "FP",
+      "run0": "incidental_crash"
+    },
+    {
+      "test": "BenchmarkTest00078",
+      "gt": "TP",
+      "run0": "oracle_violation"
+    },
+    {
+      "test": "BenchmarkTest00164",
+      "gt": "TP",
+      "run0": "oracle_violation"
+    },
+    {
+      "test": "BenchmarkTest00270",
+      "gt": "TP",
+      "run0": "no_trigger"
+    },
+    {
+      "test": "BenchmarkTest00507",
+      "gt": "TP",
+      "run0": "oracle_violation"
+    },
+    {
+      "test": "BenchmarkTest00067",
+      "gt": "TP",
+      "run0": "oracle_violation"
+    },
+    {
+      "test": "BenchmarkTest00068",
+      "gt": "TP",
+      "run0": "oracle_violation"
+    },
+    {
+      "test": "BenchmarkTest00151",
+      "gt": "FP",
+      "run0": "no_trigger"
+    },
+    {
+      "test": "BenchmarkTest00258",
+      "gt": "TP",
+      "run0": "oracle_violation"
+    },
+    {
+      "test": "BenchmarkTest00017",
+      "gt": "FP",
+      "run0": "oracle_violation"
+    },
+    {
+      "test": "BenchmarkTest00204",
+      "gt": "FP",
+      "run0": "oracle_violation"
+    },
+    {
+      "test": "BenchmarkTest00459",
+      "gt": "FP",
+      "run0": "incidental_crash"
+    },
+    {
+      "test": "BenchmarkTest00460",
+      "gt": "TP",
+      "run0": "oracle_violation"
+    },
+    {
+      "test": "BenchmarkTest00539",
+      "gt": "FP",
+      "run0": "oracle_violation"
+    },
+    {
+      "test": "BenchmarkTest00021",
+      "gt": "FP",
+      "run0": "incidental_crash"
+    },
+    {
+      "test": "BenchmarkTest00460",
+      "gt": "TP",
+      "run0": "oracle_violation"
+    },
+    {
+      "test": "BenchmarkTest00679",
+      "gt": "FP",
+      "run0": "no_trigger"
+    },
+    {
+      "test": "BenchmarkTest00930",
+      "gt": "TP",
+      "run0": "timeout"
+    }
+  ],
+  "note": "oracle_violation = oracle RuntimeError (its contribution). incidental_crash = handler crash, happens with oracle OFF too, NOT credited to oracle."
+}

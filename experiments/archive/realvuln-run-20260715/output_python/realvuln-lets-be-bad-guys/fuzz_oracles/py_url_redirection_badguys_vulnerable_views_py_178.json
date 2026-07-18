@@ -1,0 +1,47 @@
+{
+  "monitor": {
+    "strategy": "return_value",
+    "patch_target": null,
+    "target_arg_index": null,
+    "target_arg_name": null,
+    "capture_what": "return value of unvalidated_redirect, which is an HttpResponseRedirect object whose url attribute contains the unvalidated user-provided URL",
+    "additional_imports": []
+  },
+  "oracle_check": {
+    "condition_description": "The returned HttpResponseRedirect object contains an http:// or https:// URL in its url attribute, confirming that an arbitrary external URL passed the redirect sink without any validation",
+    "trigger_patterns": [
+      "https?://evil\\.com",
+      "https?://attacker\\.com",
+      "https?://malicious\\.site"
+    ],
+    "raise_type": "RuntimeError",
+    "raise_message_template": "PY_URL-REDIRECTION: unvalidated open redirect detected — captured={captured} pattern={matched_pattern}"
+  },
+  "fuzz_guidance": {
+    "seed_corpus": [
+      "http://evil.com",
+      "https://attacker.com/steal",
+      "https://malicious.site/path?token=abc"
+    ],
+    "skip_condition": "False"
+  },
+  "_meta": {
+    "function": "unvalidated_redirect",
+    "file": "badguys/vulnerable/views.py",
+    "input_strategy": "direct_params",
+    "function_signature": "def unvalidated_redirect(request)",
+    "tainted_params": [
+      {
+        "name": "request",
+        "index": 0,
+        "type": "WSGIRequest"
+      }
+    ],
+    "target_id": "py_url_redirection_badguys_vulnerable_views_py_178",
+    "finding_id": "3",
+    "rule_id": "py/url-redirection",
+    "rule_slug": "py_url-redirection",
+    "model": "openai/glm-5-turbo",
+    "source_finding_artifact": "output/python/realvuln-lets-be-bad-guys/verification_results/findings/finding_3_py_url-redirection.json"
+  }
+}

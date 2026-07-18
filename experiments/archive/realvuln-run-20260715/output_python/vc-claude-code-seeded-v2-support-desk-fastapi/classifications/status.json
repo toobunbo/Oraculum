@@ -1,0 +1,195 @@
+{
+  "stage": "classification",
+  "repo": "vc-claude-code-seeded-v2-support-desk-fastapi",
+  "lang": "python",
+  "model": "openai/glm-5-turbo",
+  "config": "config/classification.yaml",
+  "source": {
+    "ingest_summary_path": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/summary.json"
+  },
+  "counts": {
+    "selected": 13,
+    "generated": 11,
+    "skipped": 0,
+    "failed": 2
+  },
+  "classifications": [
+    {
+      "id": "0",
+      "target_id": "py_full_ssrf_backend_app_support_operations_py_75",
+      "rule_id": "py/full-ssrf",
+      "file": "backend/app/support_operations.py",
+      "start_line": "75",
+      "function_name": "ticket_relay_probe_354",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_0_py_full-ssrf.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/classifications/py_full_ssrf_backend_app_support_operations_py_75.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "high"
+    },
+    {
+      "id": "1",
+      "target_id": "py_path_injection_backend_app_support_operations_py_56",
+      "rule_id": "py/path-injection",
+      "file": "backend/app/support_operations.py",
+      "start_line": "56",
+      "function_name": "ticket_vault_stash_232",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_1_py_path-injection.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/classifications/py_path_injection_backend_app_support_operations_py_56.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "high"
+    },
+    {
+      "id": "2",
+      "target_id": "py_path_injection_backend_app_support_operations_py_57",
+      "rule_id": "py/path-injection",
+      "file": "backend/app/support_operations.py",
+      "start_line": "57",
+      "function_name": "ticket_vault_stash_232",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_2_py_path-injection.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/classifications/py_path_injection_backend_app_support_operations_py_57.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "high"
+    },
+    {
+      "id": "3",
+      "target_id": "py_path_injection_backend_app_support_operations_py_97",
+      "rule_id": "py/path-injection",
+      "file": "backend/app/support_operations.py",
+      "start_line": "97",
+      "function_name": "ticket_dock_shelf_387",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_3_py_path-injection.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/classifications/py_path_injection_backend_app_support_operations_py_97.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "high"
+    },
+    {
+      "id": "4",
+      "target_id": "py_path_injection_backend_app_support_operations_py_98",
+      "rule_id": "py/path-injection",
+      "file": "backend/app/support_operations.py",
+      "start_line": "98",
+      "function_name": "ticket_dock_shelf_387",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_4_py_path-injection.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/classifications/py_path_injection_backend_app_support_operations_py_98.json",
+      "status": "failed",
+      "errors": "classification.decision.q2_observable_after_return.evidence must be a string"
+    },
+    {
+      "id": "5",
+      "target_id": "py_reflective_xss_backend_app_support_operations_py_25",
+      "rule_id": "py/reflective-xss",
+      "file": "backend/app/support_operations.py",
+      "start_line": "25",
+      "function_name": "ticket_copy_badge_028",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_5_py_reflective-xss.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/classifications/py_reflective_xss_backend_app_support_operations_py_25.json",
+      "status": "generated",
+      "strategy": "return_value",
+      "confidence": "high"
+    },
+    {
+      "id": "6",
+      "target_id": "py_clear_text_logging_sensitive_data_backend_app_seed_py_535",
+      "rule_id": "py/clear-text-logging-sensitive-data",
+      "file": "backend/app/seed.py",
+      "start_line": "535",
+      "function_name": "seed",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_6_py_clear-text-logging-sensitive-data.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/classifications/py_clear_text_logging_sensitive_data_backend_app_seed_py_535.json",
+      "status": "generated",
+      "strategy": "return_value",
+      "confidence": "medium"
+    },
+    {
+      "id": "7",
+      "target_id": "py_clear_text_storage_sensitive_data_backend_app_support_operations_py_57",
+      "rule_id": "py/clear-text-storage-sensitive-data",
+      "file": "backend/app/support_operations.py",
+      "start_line": "57",
+      "function_name": "ticket_vault_stash_232",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_7_py_clear-text-storage-sensitive-data.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/classifications/py_clear_text_storage_sensitive_data_backend_app_support_operations_py_57.json",
+      "status": "generated",
+      "strategy": "filesystem_state",
+      "confidence": "high"
+    },
+    {
+      "id": "8",
+      "target_id": "py_url_redirection_backend_app_support_operations_py_42",
+      "rule_id": "py/url-redirection",
+      "file": "backend/app/support_operations.py",
+      "start_line": "42",
+      "function_name": "ticket_return_lane_148",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_8_py_url-redirection.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/classifications/py_url_redirection_backend_app_support_operations_py_42.json",
+      "status": "generated",
+      "strategy": "return_value",
+      "confidence": "high"
+    },
+    {
+      "id": "9",
+      "target_id": "py_command_line_injection_backend_app_support_operations_py_104",
+      "rule_id": "py/command-line-injection",
+      "file": "backend/app/support_operations.py",
+      "start_line": "104",
+      "function_name": "ticket_shell_probe_398",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_9_py_command-line-injection.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/classifications/py_command_line_injection_backend_app_support_operations_py_104.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "high"
+    },
+    {
+      "id": "10",
+      "target_id": "py_weak_sensitive_data_hashing_backend_app_security_py_72",
+      "rule_id": "py/weak-sensitive-data-hashing",
+      "file": "backend/app/security.py",
+      "start_line": "72",
+      "function_name": "hash_token",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_10_py_weak-sensitive-data-hashing.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/classifications/py_weak_sensitive_data_hashing_backend_app_security_py_72.json",
+      "status": "generated",
+      "strategy": "return_value",
+      "confidence": "high"
+    },
+    {
+      "id": "11",
+      "target_id": "py_template_injection_backend_app_support_operations_py_90",
+      "rule_id": "py/template-injection",
+      "file": "backend/app/support_operations.py",
+      "start_line": "90",
+      "function_name": "ticket_jinja_cast_378",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_11_py_template-injection.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/classifications/py_template_injection_backend_app_support_operations_py_90.json",
+      "status": "generated",
+      "strategy": "recorded_call",
+      "confidence": "high"
+    },
+    {
+      "id": "13",
+      "target_id": "py_log_injection_backend_app_support_operations_py_47",
+      "rule_id": "py/log-injection",
+      "file": "backend/app/support_operations.py",
+      "start_line": "47",
+      "function_name": "ticket_wire_tally_210",
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_13_py_log-injection.json",
+      "classification": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/classifications/py_log_injection_backend_app_support_operations_py_47.json",
+      "status": "failed",
+      "errors": "classification.decision.q3_result_in_memory.evidence must be a string"
+    }
+  ],
+  "errors": [
+    {
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_4_py_path-injection.json",
+      "error": "classification.decision.q2_observable_after_return.evidence must be a string"
+    },
+    {
+      "finding_artifact": "output/python/vc-claude-code-seeded-v2-support-desk-fastapi/verification_results/findings/finding_13_py_log-injection.json",
+      "error": "classification.decision.q3_result_in_memory.evidence must be a string"
+    }
+  ]
+}

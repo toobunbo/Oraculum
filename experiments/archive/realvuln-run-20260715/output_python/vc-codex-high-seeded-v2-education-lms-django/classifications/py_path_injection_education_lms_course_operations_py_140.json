@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "strategy": "recorded_call",
+  "decision": {
+    "q1_sink_dangerous": {
+      "answer": true,
+      "evidence": "Sink is target.parent.mkdir(...) which is a filesystem write operation that can create directories anywhere due to path traversal."
+    },
+    "q2_observable_after_return": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    },
+    "q3_result_in_memory": {
+      "answer": null,
+      "evidence": "Decision stopped at Q1."
+    }
+  },
+  "mock_guidance": {
+    "required": true,
+    "target": "pathlib.Path.mkdir call on target.parent",
+    "capture": "Capture the exact path string passed to mkdir to verify if it escapes BASE_EXPORT_DIR via traversal sequences.",
+    "fake_behavior": "No-op or simulate successful directory creation without touching the real filesystem.",
+    "notes": [
+      "Mocking mkdir prevents irreversible filesystem modifications in the test environment.",
+      "The return value of mkdir is None, so the fake behavior only needs to avoid raising exceptions to allow execution to continue to the JsonResponse."
+    ]
+  },
+  "confidence": "high",
+  "warnings": []
+}
