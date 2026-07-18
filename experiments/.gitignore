@@ -1,0 +1,9 @@
+# API keys — never commit
+.env
+
+# Intermediate logs
+logs/
+
+# Python cache
+__pycache__/
+*.pyc

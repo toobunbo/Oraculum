@@ -1,9 +1,0 @@
-=== Env ===
-LLM_MODEL=glm-4.7  OPENAI_API_BASE=https://api.z.ai/api/coding/paas/v4
-Found 62 repos to process
-Start: Wed Jul 15 09:41:10 UTC 2026
-
-[1/62] ===== realvuln-damn-vulnerable-flask-application =====
-  TP findings: 5
-  [INGEST] Wed Jul 15 09:41:10 UTC 2026
-  [CLASSIFY] Wed Jul 15 09:41:11 UTC 2026
